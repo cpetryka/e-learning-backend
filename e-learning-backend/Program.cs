@@ -1,7 +1,10 @@
+using e_learning_backend.Infrastructure.Configuration;
+using e_learning_backend.Infrastructure.Configuration.Impl;
 using e_learning_backend.Infrastructure.DatabaseContexts;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSingleton<IJsonConfigurationProvider, JsonConfigurationProvider>();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
