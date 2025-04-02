@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace e_learning_backend.Data;
+namespace e_learning_backend.Infrastructure.DatabaseContexts;
 
 public class ApplicationContext : DbContext
 {

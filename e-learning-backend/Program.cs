@@ -1,4 +1,4 @@
-using e_learning_backend.Data;
+using e_learning_backend.Infrastructure.DatabaseContexts;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
