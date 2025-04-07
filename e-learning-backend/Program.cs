@@ -1,6 +1,6 @@
 using e_learning_backend.Infrastructure.Configuration;
 using e_learning_backend.Infrastructure.Configuration.Impl;
-using e_learning_backend.Infrastructure.DatabaseContexts;
+using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,9 +13,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddControllers();
 
-// Add DbContext
-builder.Services.AddDbContext<ApplicationContext>(
-    options => options.UseSqlServer("Name=ConnectionStrings:Default"));
+// Add DbContexts
+builder.Services.AddDbContext<CoursesDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 var app = builder.Build();
 
