@@ -16,6 +16,8 @@ builder.Services.AddControllers();
 // Add DbContexts
 builder.Services.AddDbContext<CoursesDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddDbContext<UsersDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 var app = builder.Build();
 
