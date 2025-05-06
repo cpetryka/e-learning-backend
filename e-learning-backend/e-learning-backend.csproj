@@ -22,7 +22,6 @@
       <Folder Include="Domain\Classes\" />
       <Folder Include="Domain\ExercisesAndMaterials\" />
       <Folder Include="Domain\Quizzes\" />
-      <Folder Include="Domain\Users\" />
       <Folder Include="Infrastructure\Api\" />
       <Folder Include="Infrastructure\Persistence\" />
       <Folder Include="Migrations\" />
