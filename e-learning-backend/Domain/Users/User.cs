@@ -68,9 +68,9 @@ public class User
         }
 
         // The role at the time of creation must be either Student or Teacher
-        if (initialRole != Role.Student && initialRole != Role.Teacher)
+        if (!initialRole.Equals(Role.Student) && !initialRole.Equals(Role.Teacher))
         {
-            throw new InvalidOperationException("Initial role must be either Student or Teacher.");
+            throw new InvalidOperationException("Initial role must be either student or teacher.");
         }
 
         Id = id;
