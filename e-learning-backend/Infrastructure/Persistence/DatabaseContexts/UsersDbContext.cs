@@ -58,6 +58,8 @@ public class UsersDbContext : DbContext
             var student2Id            = Guid.Parse("33333333-3333-3333-3333-333333333333");
             var spectatorStudentId    = Guid.Parse("44444444-4444-4444-4444-444444444444");
 
+            var salt = "$2a$12$abcdefghijklmnopqrstuv";
+
             u.HasData(
                 new
                 {
@@ -65,7 +67,7 @@ public class UsersDbContext : DbContext
                     Name                   = "Alice",
                     Surname                = "Johnson",
                     Email                  = "alice.johnson@example.com",
-                    HashedPassword         = "HASHED_PASSWORD_1",
+                    HashedPassword         = BCrypt.Net.BCrypt.HashPassword("teacher", salt),
                     Phone                  = "+1-202-555-0101",
                     AboutMe                = "Passionate about teaching mathematics.",
                     RefreshToken           = (string?)null,
@@ -77,7 +79,7 @@ public class UsersDbContext : DbContext
                     Name                   = "John",
                     Surname                = "Doe",
                     Email                  = "john.doe@example.com",
-                    HashedPassword         = "HASHED_PASSWORD_2",
+                    HashedPassword         = BCrypt.Net.BCrypt.HashPassword("student1", salt),
                     Phone                  = "+1-202-555-0102",
                     AboutMe                = (string?)null,
                     RefreshToken           = (string?)null,
@@ -89,7 +91,7 @@ public class UsersDbContext : DbContext
                     Name                   = "Jane",
                     Surname                = "Doe",
                     Email                  = "jane.doe@example.com",
-                    HashedPassword         = "HASHED_PASSWORD_3",
+                    HashedPassword         = BCrypt.Net.BCrypt.HashPassword("student2", salt),
                     Phone                  = "+1-202-555-0103",
                     AboutMe                = (string?)null,
                     RefreshToken           = (string?)null,
@@ -101,7 +103,7 @@ public class UsersDbContext : DbContext
                     Name                   = "Michael",
                     Surname                = "Brown",
                     Email                  = "michael.brown@example.com",
-                    HashedPassword         = "HASHED_PASSWORD_4",
+                    HashedPassword         = BCrypt.Net.BCrypt.HashPassword("spectatorStudent", salt),
                     Phone                  = "+1-202-555-0104",
                     AboutMe                = "Enjoys following courses as a spectator.",
                     RefreshToken           = (string?)null,
