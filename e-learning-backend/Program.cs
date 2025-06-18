@@ -27,6 +27,18 @@ builder.Services.AddDbContext<ClassesDbContext>(options =>
 
 builder.Services.AddControllers();
 
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 // --------------------------------------------------------------------------------------------------------
 // SECURITY CONFIGURATION
 // --------------------------------------------------------------------------------------------------------
@@ -144,6 +156,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
