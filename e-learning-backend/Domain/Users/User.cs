@@ -15,7 +15,11 @@ public class User
     // Used to differentiate between a teacher, a student, etc.
     private readonly HashSet<Role> _roles = new();
     public IReadOnlyCollection<Role> Roles => _roles;
-
+    
+    // Blocking other users
+    private readonly HashSet<User> _blockedUsers = new();
+    public IReadOnlyCollection<User> BlockedUsers => _blockedUsers;
+    
     // Used for authentication
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiryTime { get; set; }
@@ -146,5 +150,88 @@ public class User
         }
 
         _roles.Remove(role);
+    }
+
+    /// <summary>
+    ///     Blocks the specified user.
+    /// </summary>
+    /// <param name="user">The user to block. Cannot be null.</param>
+    /// <exception cref="ArgumentNullException">
+    ///     Thrown when the provided user is <c>null</c>.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown when the user is already blocked.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown when attempting to block oneself.
+    /// </exception>
+    public void BlockUser(User user)
+    {
+        if(user is null) 
+        {
+            throw new ArgumentNullException(nameof(user));
+        }
+        
+        if (_blockedUsers.Contains(user))
+        {
+            throw new InvalidOperationException("User is already blocked.");
+        }
+        
+        if(user == this) 
+        {
+            throw new InvalidOperationException("Cannot block yourself.");
+        }
+        
+        _blockedUsers.Add(user);
+    }
+    
+    /// <summary>
+    ///     Unblocks the specified user.
+    /// </summary>
+    /// <param name="user">The user to unblock. Cannot be null.</param>
+    /// <exception cref="ArgumentNullException">
+    ///     Thrown when the provided user is <c>null</c>.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown when the user is not currently blocked.
+    /// </exception>
+    public void UnblockUser(User user)
+    {
+        if(user is null) 
+        {
+            throw new ArgumentNullException(nameof(user));
+        }
+        
+        if (!_blockedUsers.Contains(user))
+        {
+            throw new InvalidOperationException("User is not blocked.");
+        }
+        
+        _blockedUsers.Remove(user);
+    }
+
+    /// <summary>
+    ///     Determines whether the current user is blocked by the specified <paramref name="user"/>.
+    /// </summary>
+    /// <param name="user">The user to check against.</param>
+    /// <returns>
+    ///     <c>true</c> if the current user is in the <paramref name="user"/>'s list of blocked users; otherwise, <c>false</c>.
+    /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="user"/> is <c>null</c>.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the method is called on the same user as the argument.</exception>
+
+    public bool IsBlockedBy(User user)
+    {
+        if(user is null) 
+        {
+            throw new ArgumentNullException(nameof(user));
+        }
+        
+        if (user == this)
+        {
+            throw new InvalidOperationException("Cannot check if yourself is blocked.");
+        }
+        
+        return user.BlockedUsers.Contains(user);
     }
 }

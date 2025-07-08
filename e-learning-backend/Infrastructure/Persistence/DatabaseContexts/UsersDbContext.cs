@@ -20,6 +20,14 @@ public class UsersDbContext : DbContext
 
         modelBuilder.Entity<User>(u =>
         {
+            // Seed the User table with sample data
+            var teacherId             = Guid.Parse("11111111-1111-1111-1111-111111111111");
+            var student1Id            = Guid.Parse("22222222-2222-2222-2222-222222222222");
+            var student2Id            = Guid.Parse("33333333-3333-3333-3333-333333333333");
+            var spectatorStudentId    = Guid.Parse("44444444-4444-4444-4444-444444444444");
+
+            var salt = "$2a$12$abcdefghijklmnopqrstuv";
+            
             // Primary key
             u.HasKey(x => x.Id);
 
@@ -51,14 +59,23 @@ public class UsersDbContext : DbContext
                 .HasMaxLength(500);
 
             u.Property(x => x.RefreshTokenExpiryTime);
-
-            // Seed the User table with sample data
-            var teacherId             = Guid.Parse("11111111-1111-1111-1111-111111111111");
-            var student1Id            = Guid.Parse("22222222-2222-2222-2222-222222222222");
-            var student2Id            = Guid.Parse("33333333-3333-3333-3333-333333333333");
-            var spectatorStudentId    = Guid.Parse("44444444-4444-4444-4444-444444444444");
-
-            var salt = "$2a$12$abcdefghijklmnopqrstuv";
+            
+            u.HasMany(u => u.BlockedUsers) // Użytkownik ma wielu zablokowanych użytkowników
+                .WithMany() // Brak jawnej właściwości nawigacyjnej po drugiej stronie
+                .UsingEntity( // Konfiguracja tabeli pośredniczącej
+                    "UserBlockedUsers",
+                    l => l.HasOne(typeof(User)) // Strona "lewa" (użytkownik, który blokuje)
+                        .WithMany()
+                        .HasForeignKey("BlockingUserId") // Klucz obcy dla użytkownika blokującego
+                        .HasPrincipalKey(nameof(User.Id)), // Klucz główny w encji User
+                    r => r.HasOne(typeof(User)) // Strona "prawa" (użytkownik, który jest blokowany)
+                        .WithMany()
+                        .HasForeignKey("BlockedUserId") // Klucz obcy dla użytkownika blokowanego
+                        .HasPrincipalKey(nameof(User.Id)),
+                    j => j.HasData( // Dodawanie danych do tabeli pośredniczącej UserBlockedUsers
+                        new { BlockingUserId = teacherId, BlockedUserId = student1Id }
+                    )
+                );
 
             u.HasData(
                 new
@@ -132,7 +149,6 @@ public class UsersDbContext : DbContext
                     new { UserId = spectatorStudentId, RoleName = Role.Student.RoleName },
                     new { UserId = spectatorStudentId, RoleName = Role.Spectator.RoleName }
                 );
-
             });
         });
     }
