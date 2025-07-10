@@ -21,6 +21,9 @@ public class User
     private readonly HashSet<User> _blockedUsers = new();
     public IReadOnlyCollection<User> BlockedUsers => _blockedUsers;
     
+    private readonly HashSet<User> _blockedByUsers = new();
+    public IReadOnlyCollection<User> BlockedByUsers => _blockedByUsers;
+    
     // Used for authentication
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiryTime { get; set; }
@@ -193,6 +196,7 @@ public class User
         }
         
         _blockedUsers.Add(user);
+        user._blockedByUsers.Add(this);
     }
     
     /// <summary>
@@ -218,6 +222,7 @@ public class User
         }
         
         _blockedUsers.Remove(user);
+        user._blockedByUsers.Remove(this);
     }
 
     /// <summary>
@@ -242,7 +247,7 @@ public class User
             throw new InvalidOperationException("Cannot check if yourself is blocked.");
         }
         
-        return user.BlockedUsers.Contains(user);
+        return _blockedByUsers.Contains(user);
     }
     
     public void AddParticipation(Participation participation)

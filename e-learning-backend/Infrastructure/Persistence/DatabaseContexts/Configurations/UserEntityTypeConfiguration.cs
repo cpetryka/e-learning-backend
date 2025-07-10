@@ -50,20 +50,29 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
 
         // BlockedUsers many-to-many relationship
         builder.HasMany(u => u.BlockedUsers)
-            .WithMany()
-            .UsingEntity(
-                "UserBlockedUsers",
-                l => l.HasOne(typeof(User))
-                      .WithMany()
-                      .HasForeignKey("BlockingUserId")
-                      .HasPrincipalKey(nameof(User.Id)),
-                r => r.HasOne(typeof(User))
-                      .WithMany()
-                      .HasForeignKey("BlockedUserId")
-                      .HasPrincipalKey(nameof(User.Id)),
-                j => j.HasData(
-                    new { BlockingUserId = teacherId, BlockedUserId = student1Id }
-                )
+            .WithMany(u => u.BlockedByUsers)
+            .UsingEntity<Dictionary<string, object>>(
+                "BlockedUsers",
+                j => j
+                    .HasOne<User>()
+                    .WithMany()
+                    .HasForeignKey("BlockedUserId")
+                    .OnDelete(DeleteBehavior.Restrict),
+                j => j
+                    .HasOne<User>()
+                    .WithMany()
+                    .HasForeignKey("BlockingUserId")
+                    .OnDelete(DeleteBehavior.Restrict),
+                j =>
+                {
+                    j.HasKey("BlockingUserId", "BlockedUserId");
+
+                    j.HasData(new
+                    {
+                        BlockingUserId = teacherId,
+                        BlockedUserId = student1Id
+                    });
+                }
             );
 
         // Seed users
