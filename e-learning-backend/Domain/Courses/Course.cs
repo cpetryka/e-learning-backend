@@ -1,5 +1,6 @@
 using e_learning_backend.Domain.Courses.ValueObjects;
 using e_learning_backend.Domain.Participations;
+using e_learning_backend.Domain.Users;
 
 namespace e_learning_backend.Domain.Courses;
 
@@ -12,6 +13,9 @@ public class Course
     public string Name { get; private set; }
     public CourseCategory Category { get; private set; }
     public string Description { get; private set; }
+    
+    public Guid TeacherId { get; set; }
+    public User Teacher { get; set; }
 
     private readonly List<CourseVariant> _variants = new();
     public IReadOnlyCollection<CourseVariant> Variants => _variants.AsReadOnly();
@@ -21,12 +25,14 @@ public class Course
 
     public Course() { }
 
-    public Course(string name, CourseCategory category, string description)
+    public Course(string name, CourseCategory category, string description, User teacher)
     {
         Id = Guid.NewGuid();
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Category = category ?? throw new ArgumentNullException(nameof(category));
         Description = description ?? throw new ArgumentNullException(nameof(description));
+        Teacher = teacher ?? throw new ArgumentNullException(nameof(teacher));
+        TeacherId = teacher.Id;
     }
 
     /// <summary>

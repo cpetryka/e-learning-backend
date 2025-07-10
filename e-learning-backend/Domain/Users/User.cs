@@ -1,3 +1,4 @@
+using e_learning_backend.Domain.Courses;
 using e_learning_backend.Domain.Users.ValueObjects;
 using e_learning_backend.Domain.Participations;
 
@@ -29,6 +30,8 @@ public class User
     public DateTime? RefreshTokenExpiryTime { get; set; }
     
     // Teacher only
+    private readonly HashSet<Course> _conductedCourses = new();
+    public IReadOnlyCollection<Course> ConductedCourses => _conductedCourses;
     
     // Spectator only
     
@@ -163,6 +166,48 @@ public class User
         }
 
         _roles.Remove(role);
+    }
+    
+    /// <summary>
+    ///     Adds a course to the collection of courses conducted by this user.
+    /// </summary>
+    /// <param name="course">The <see cref="Course"/> object to add.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="course"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the user does not have the <see cref="Role.Teacher"/> role.</exception>
+    public void AddConductedCourse(Course course)
+    {
+        if (course is null)
+        {
+            throw new ArgumentNullException(nameof(course));
+        }
+
+        if(!Roles.Contains(Role.Teacher)) 
+        {
+            throw new InvalidOperationException("Only users with the Teacher role can conduct courses.");
+        }
+        
+        _conductedCourses.Add(course);
+    }
+    
+    /// <summary>
+    ///     Removes a course from the collection of courses conducted by this user.
+    /// </summary>
+    /// <param name="course">The <see cref="Course"/> object to remove.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="course"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the course is not found in the user's conducted courses.</exception>
+    public void RemoveConductedCourse(Course course)
+    {
+        if (course is null)
+        {
+            throw new ArgumentNullException(nameof(course));
+        }
+
+        if (!_conductedCourses.Contains(course))
+        {
+            throw new InvalidOperationException("Course is not conducted by this user.");
+        }
+
+        _conductedCourses.Remove(course);
     }
 
     /// <summary>
