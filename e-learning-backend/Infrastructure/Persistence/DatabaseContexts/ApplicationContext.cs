@@ -24,6 +24,7 @@ public class ApplicationContext : DbContext
     public DbSet<CourseLevel> CourseLevels { get; set; }
     
     public DbSet<Participation> Participations { get; set; }
+    public DbSet<Review> Reviews { get; set; }
     
     public DbSet<Class> Classes { get; set; }
     public DbSet<ClassStatus> ClassStatuses { get; set; }
@@ -41,6 +42,7 @@ public class ApplicationContext : DbContext
         modelBuilder.ApplyConfiguration(new CourseLevelEntityTypeConfiguration());
         
         modelBuilder.ApplyConfiguration(new ParticipationEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new ReviewEntityTypeConfiguration());
         
         modelBuilder.ApplyConfiguration(new ClassEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new ClassStatusEntityTypeConfiguration());

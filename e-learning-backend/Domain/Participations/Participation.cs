@@ -11,6 +11,9 @@ public class Participation
     public Guid CourseId { get;set; }
     public Course Course { get; set; }
     
+    public Guid? ReviewId { get;set; }
+    public Review? Review { get; set; }
+    
     public bool Notifications { get; set; } // For a teacher
     
     protected Participation() { }
@@ -36,5 +39,16 @@ public class Participation
     public void TurnOffNotifications()
     {
         Notifications = false;
+    }
+    
+    public void AddReview(int starsNumber, string content)
+    {
+        if (Review != null)
+        {
+            throw new InvalidOperationException("Participation already has a review.");
+        }
+
+        Review = new Review(starsNumber, content, this);
+        ReviewId = Review.Id;
     }
 }
