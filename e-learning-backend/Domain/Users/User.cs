@@ -1,4 +1,5 @@
 using e_learning_backend.Domain.Users.ValueObjects;
+using e_learning_backend.Domain.Participations;
 
 namespace e_learning_backend.Domain.Users;
 
@@ -23,6 +24,15 @@ public class User
     // Used for authentication
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiryTime { get; set; }
+    
+    // Teacher only
+    
+    // Spectator only
+    
+    // Student only
+    private readonly HashSet<Participation> _participations = new();
+    public IReadOnlyCollection<Participation> Participations => _participations;
+    
 
     private User() { }
 
@@ -233,5 +243,30 @@ public class User
         }
         
         return user.BlockedUsers.Contains(user);
+    }
+    
+    public void AddParticipation(Participation participation)
+    {
+        if (participation == null)
+        {
+            throw new ArgumentNullException(nameof(participation));
+        }
+
+        _participations.Add(participation);
+    }
+    
+    public void RemoveParticipation(Participation participation)
+    {
+        if (participation == null)
+        {
+            throw new ArgumentNullException(nameof(participation));
+        }
+
+        if (!_participations.Contains(participation))
+        {
+            throw new InvalidOperationException("Participation does not exist for this course.");
+        }
+
+        _participations.Remove(participation);
     }
 }
