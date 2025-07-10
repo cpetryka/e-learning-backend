@@ -1,4 +1,5 @@
 ﻿using e_learning_backend.Domain.Classes.ValueObjects;
+using e_learning_backend.Domain.Participations;
 
 namespace e_learning_backend.Domain.Classes;
 
@@ -10,6 +11,11 @@ public class Class
     public string? Comment { get; private set; }
     public string? LinkToMeeting { get; private set; }
     public ClassStatus Status { get; private set; }
+    
+    public Guid UserId { get; set; }
+    public Guid CourseId { get; set; }
+    public Participation Participation { get; set; } 
+    
     public Class() { }
     public Class(
         Guid id, 

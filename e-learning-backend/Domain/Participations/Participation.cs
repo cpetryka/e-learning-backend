@@ -1,3 +1,4 @@
+using e_learning_backend.Domain.Classes;
 using e_learning_backend.Domain.Courses;
 using e_learning_backend.Domain.Users;
 
@@ -15,6 +16,9 @@ public class Participation
     public Review? Review { get; set; }
     
     public bool Notifications { get; set; } // For a teacher
+    
+    private readonly HashSet<Class> _classes = new();
+    public IReadOnlyCollection<Class> Classes => _classes;
     
     protected Participation() { }
     
