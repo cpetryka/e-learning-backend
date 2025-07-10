@@ -13,10 +13,10 @@ namespace e_learning_backend.Infrastructure.Security.Impl;
 
 public class SecurityService : ISecurityService
 {
-    private readonly UsersDbContext _context;
+    private readonly ApplicationContext _context;
     private readonly IConfiguration _configuration;
 
-    public SecurityService(UsersDbContext context, IConfiguration configuration)
+    public SecurityService(ApplicationContext context, IConfiguration configuration)
     {
         _context       = context;
         _configuration = configuration;

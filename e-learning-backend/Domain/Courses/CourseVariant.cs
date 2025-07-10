@@ -9,7 +9,7 @@ public class CourseVariant
 {
     public Guid Id { get; private set; }
     public CourseLevel Level { get; private set; }
-    public CourseRate Rate { get; private set; }
+    public CourseRate Rate { get; set; }
     public CourseLanguage Language { get; private set; }
 
     public CourseVariant() { }

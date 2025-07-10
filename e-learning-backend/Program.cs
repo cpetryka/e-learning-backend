@@ -18,11 +18,7 @@ builder.Services.AddEndpointsApiExplorer();
 // --------------------------------------------------------------------------------------------------------
 // DBCONTEXTS AND CONTROLLERSREGISTRATION
 // --------------------------------------------------------------------------------------------------------
-builder.Services.AddDbContext<CoursesDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
-builder.Services.AddDbContext<UsersDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
-builder.Services.AddDbContext<ClassesDbContext>(options =>
+builder.Services.AddDbContext<ApplicationContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddControllers();
