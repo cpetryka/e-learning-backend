@@ -79,6 +79,30 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
             .WithOne(a => a.Teacher)
             .HasForeignKey(a => a.TeacherId);
         
+        builder.HasMany(u => u.Spectates)
+            .WithMany(u => u.SpectatedBy)
+            .UsingEntity<Dictionary<string, object>>(
+                "UserSpectators",
+                l => l.HasOne<User>()
+                    .WithMany()
+                    .HasForeignKey("SpectatedUserId")
+                    .OnDelete(DeleteBehavior.NoAction),
+                r => r.HasOne<User>()
+                    .WithMany()
+                    .HasForeignKey("SpectatorUserId")
+                    .OnDelete(DeleteBehavior.NoAction),
+                j =>
+                {
+                    j.HasKey("SpectatedUserId", "SpectatorUserId");
+                    j.ToTable("UserSpectators");
+
+                    j.HasData(new
+                    {
+                        SpectatedUserId = teacherId, // student
+                        SpectatorUserId = spectatorStudentId  // spectator
+                    });
+                });
+        
         // Seed users
         builder.HasData(
             new

@@ -37,10 +37,15 @@ public class User
     public IReadOnlyCollection<Availability> Availability => _availability;
     
     // Spectator only
+    private readonly HashSet<User> _spectates = new();
+    public IReadOnlyCollection<User> Spectates => _spectates;
     
     // Student only
     private readonly HashSet<Participation> _participations = new();
     public IReadOnlyCollection<Participation> Participations => _participations;
+    
+    private readonly HashSet<User> _spectatedBy = new();
+    public IReadOnlyCollection<User> SpectatedBy => _spectatedBy;
     
 
     private User() { }
@@ -356,5 +361,53 @@ public class User
         }
 
         _participations.Remove(participation);
+    }
+
+    /// <summary>
+    ///     Adds a user as a spectator to this user.
+    /// This establishes a bidirectional relationship where this user is spectated by the given user,
+    /// and the given user spectates this user.
+    /// </summary>
+    /// <param name="user">The <see cref="User"/> object to add as a spectator.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="user"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when this user does not have the <see cref="Role.Student"/> role,
+    /// as only students can have spectators.</exception>
+    public void AddSpectator(User user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException(nameof(user));
+        }
+
+        if (!Roles.Contains(Role.Student))
+        {
+            throw new InvalidOperationException("Only users with the Student role can have spectators.");
+        }
+
+        _spectatedBy.Add(user);
+        user._spectates.Add(this);
+    }
+    
+    /// <summary>
+    ///     Removes a user from the list of spectators for this user.
+    ///     This removes the bidirectional relationship between this user and the specified spectator.
+    /// </summary>
+    /// <param name="user">The <see cref="User"/> object to remove as a spectator.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="user"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the specified user is not currently a spectator of this user.</exception>
+    public void RemoveSpectator(User user)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException(nameof(user));
+        }
+
+        if (!_spectatedBy.Contains(user))
+        {
+            throw new InvalidOperationException("User is not a spectator of this user.");
+        }
+
+        _spectatedBy.Remove(user);
+        user._spectates.Remove(this);
     }
 }
