@@ -75,6 +75,10 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
                 }
             );
 
+        builder.HasMany(u => u.Availability)
+            .WithOne(a => a.Teacher)
+            .HasForeignKey(a => a.TeacherId);
+        
         // Seed users
         builder.HasData(
             new

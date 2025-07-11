@@ -33,6 +33,9 @@ public class User
     private readonly HashSet<Course> _conductedCourses = new();
     public IReadOnlyCollection<Course> ConductedCourses => _conductedCourses;
     
+    private readonly HashSet<Availability> _availability = new();
+    public IReadOnlyCollection<Availability> Availability => _availability;
+    
     // Spectator only
     
     // Student only
@@ -279,7 +282,6 @@ public class User
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown when the <paramref name="user"/> is <c>null</c>.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the method is called on the same user as the argument.</exception>
-
     public bool IsBlockedBy(User user)
     {
         if(user is null) 
@@ -293,6 +295,42 @@ public class User
         }
         
         return _blockedByUsers.Contains(user);
+    }
+    
+    /// <summary>
+    ///     Adds an availability slot to the user's collection of availabilities.
+    /// </summary>
+    /// <param name="availability">The <see cref="Availability"/> object to add.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="availability"/> is null.</exception>
+    public void AddAvailability(Availability availability)
+    {
+        if (availability == null)
+        {
+            throw new ArgumentNullException(nameof(availability));
+        }
+
+        _availability.Add(availability);
+    }
+    
+    /// <summary>
+    ///     Removes an availability slot from the user's collection of availabilities.
+    /// </summary>
+    /// <param name="availability">The <see cref="Availability"/> object to remove.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="availability"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the specified availability slot does not exist for this user.</exception>
+    public void RemoveAvailability(Availability availability)
+    {
+        if (availability == null)
+        {
+            throw new ArgumentNullException(nameof(availability));
+        }
+
+        if (!_availability.Contains(availability))
+        {
+            throw new InvalidOperationException("Availability does not exist for this user.");
+        }
+
+        _availability.Remove(availability);
     }
     
     public void AddParticipation(Participation participation)

@@ -34,6 +34,8 @@ public class ApplicationContext : DbContext
         base.OnModelCreating(modelBuilder);
         
         new UserEntityTypeConfiguration().Configure(modelBuilder.Entity<User>());
+        modelBuilder.ApplyConfiguration(new AvailabilityEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new TimeSlotEntityTypeConfiguration());
         
         modelBuilder.ApplyConfiguration(new CourseEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new CourseVariantEntityTypeConfiguration());
