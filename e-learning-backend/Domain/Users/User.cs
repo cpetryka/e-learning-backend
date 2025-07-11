@@ -1,4 +1,5 @@
 using e_learning_backend.Domain.Courses;
+using e_learning_backend.Domain.ExercisesAndMaterials;
 using e_learning_backend.Domain.Users.ValueObjects;
 using e_learning_backend.Domain.Participations;
 
@@ -29,6 +30,10 @@ public class User
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiryTime { get; set; }
     
+    // Files
+    private readonly HashSet<FileResource> _files = new();
+    public IReadOnlyCollection<FileResource> Files => _files;
+    
     // Teacher only
     private readonly HashSet<Course> _conductedCourses = new();
     public IReadOnlyCollection<Course> ConductedCourses => _conductedCourses;
@@ -46,7 +51,6 @@ public class User
     
     private readonly HashSet<User> _spectatedBy = new();
     public IReadOnlyCollection<User> SpectatedBy => _spectatedBy;
-    
 
     private User() { }
 

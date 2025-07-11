@@ -17,6 +17,8 @@ public class ApplicationContext : DbContext
         : base(options) { }
     
     public DbSet<User> Users { get; set; }
+    public DbSet<Availability> Availabilities { get; set; }
+    public DbSet<TimeSlot> TimeSlots { get; set; }
     
     public DbSet<Course> Courses { get; set; }
     public DbSet<CourseVariant> CourseVariants { get; set; }
@@ -31,6 +33,8 @@ public class ApplicationContext : DbContext
     public DbSet<ClassStatus> ClassStatuses { get; set; }
     
     public DbSet<Exercise> Exercises { get; set; }
+    public DbSet<FileResource> FileResources { get; set; }
+    public DbSet<ExerciseResource> ExerciseResources { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -53,5 +57,8 @@ public class ApplicationContext : DbContext
         modelBuilder.ApplyConfiguration(new ClassStatusEntityTypeConfiguration());
         
         modelBuilder.ApplyConfiguration(new ExerciseEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new FileResourceEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new ExerciseResourceEntityTypeConfiguration());
+        
     }
 }

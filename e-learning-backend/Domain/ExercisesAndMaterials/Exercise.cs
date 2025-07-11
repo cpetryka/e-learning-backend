@@ -14,6 +14,9 @@ public class Exercise
     public Guid ClassId { get; set; }
     public Class Class { get; set; }
     
+    private readonly HashSet<ExerciseResource> _exerciseResources = new();
+    public IReadOnlyCollection<ExerciseResource> ExerciseResources => _exerciseResources;
+    
     protected Exercise() { }
 
     public Exercise(Guid id, string instruction, Class? associatedClass)
@@ -38,5 +41,39 @@ public class Exercise
         Grade = grade;
         Comment = comment;
         Status = ExerciseStatus.Graded;
+    }
+
+    public void addContentFile(FileResource file)
+    {
+        if (file == null)
+        {
+            throw new ArgumentNullException(nameof(file));
+        }
+        
+        if (file.ExerciseResources.Any(er => er.ExerciseId == Id))
+        {
+            throw new InvalidOperationException("File is already associated with this exercise.");
+        }
+        
+        var exerciseResource = new ExerciseResource(this, file, ExerciseResourceType.Content);
+        
+        _exerciseResources.Add(exerciseResource);
+    }
+    
+    public void addSolutionFile(FileResource file)
+    {
+        if (file == null)
+        {
+            throw new ArgumentNullException(nameof(file));
+        }
+        
+        if (file.ExerciseResources.Any(er => er.ExerciseId == Id))
+        {
+            throw new InvalidOperationException("File is already associated with this exercise.");
+        }
+
+        var exerciseResource = new ExerciseResource(this, file, ExerciseResourceType.Solution);
+        
+        _exerciseResources.Add(exerciseResource);
     }
 }

@@ -27,6 +27,11 @@ public class ExerciseEntityTypeConfiguration : IEntityTypeConfiguration<Exercise
             .WithMany(c => c.Exercises)
             .HasForeignKey(e => e.ClassId)
             .OnDelete(DeleteBehavior.Cascade); // Optional
+        
+        builder.HasMany(e => e.ExerciseResources)
+            .WithOne(er => er.Exercise)
+            .HasForeignKey(er => er.ExerciseId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Sample seed (optional)
         builder.HasData(new
