@@ -17,8 +17,12 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
         builder.HasOne(c => c.Participation)
             .WithMany(p => p.Classes)
             .HasForeignKey(c => new { c.UserId, c.CourseId });
-
-
+        
+        builder.HasMany(c => c.Exercises)
+            .WithOne(e => e.Class)
+            .HasForeignKey(e => e.ClassId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
         var classId = Guid.Parse("43333333-3333-3333-3333-333333333333");
         var statusScheduledId = Guid.Parse("41111111-1111-1111-1111-111111111111");
         var student1Id = Guid.Parse("22222222-2222-2222-2222-222222222222");

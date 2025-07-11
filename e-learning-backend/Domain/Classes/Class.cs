@@ -1,4 +1,5 @@
 ﻿using e_learning_backend.Domain.Classes.ValueObjects;
+using e_learning_backend.Domain.ExercisesAndMaterials;
 using e_learning_backend.Domain.Participations;
 
 namespace e_learning_backend.Domain.Classes;
@@ -15,6 +16,9 @@ public class Class
     public Guid UserId { get; set; }
     public Guid CourseId { get; set; }
     public Participation Participation { get; set; } 
+    
+    private readonly HashSet<Exercise> _exercises = new();
+    public IReadOnlyCollection<Exercise> Exercises => _exercises;
     
     public Class() { }
     public Class(
@@ -56,11 +60,27 @@ public class Class
         if (status == null) {
             throw new ArgumentNullException(nameof(status));
         }
+        
         Status = status;
     }
+    
     private void SetId(Guid id)
     {
         Id = id;
     }
+    
+    public void AddExercise(Exercise exercise)
+    {
+        if (exercise == null)
+        {
+            throw new ArgumentNullException(nameof(exercise));
+        }
 
+        if (exercise.ClassId != Id)
+        {
+            throw new ArgumentException("Exercise IDs do not match.");
+        }
+        
+        _exercises.Add(exercise);
+    }
 }

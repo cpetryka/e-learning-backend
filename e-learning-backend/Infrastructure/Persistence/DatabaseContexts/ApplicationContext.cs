@@ -1,6 +1,7 @@
 using e_learning_backend.Domain.Classes;
 using e_learning_backend.Domain.Classes.ValueObjects;
 using e_learning_backend.Domain.Courses;
+using e_learning_backend.Domain.ExercisesAndMaterials;
 using e_learning_backend.Domain.Participations;
 using e_learning_backend.Domain.Users;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts.Configurations;
@@ -28,6 +29,8 @@ public class ApplicationContext : DbContext
     
     public DbSet<Class> Classes { get; set; }
     public DbSet<ClassStatus> ClassStatuses { get; set; }
+    
+    public DbSet<Exercise> Exercises { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,5 +51,7 @@ public class ApplicationContext : DbContext
         
         modelBuilder.ApplyConfiguration(new ClassEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new ClassStatusEntityTypeConfiguration());
+        
+        modelBuilder.ApplyConfiguration(new ExerciseEntityTypeConfiguration());
     }
 }
