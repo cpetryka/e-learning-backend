@@ -3,8 +3,10 @@ using e_learning_backend.Domain.Classes.ValueObjects;
 using e_learning_backend.Domain.Courses;
 using e_learning_backend.Domain.ExercisesAndMaterials;
 using e_learning_backend.Domain.Participations;
+using e_learning_backend.Domain.Quizzes;
 using e_learning_backend.Domain.Users;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts.Configurations;
+using e_learning_backend.Infrastructure.Persistence.DatabaseContexts.Configurations.Quizzes;
 using Microsoft.EntityFrameworkCore;
 
 namespace e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
@@ -35,6 +37,13 @@ public class ApplicationContext : DbContext
     public DbSet<Exercise> Exercises { get; set; }
     public DbSet<FileResource> FileResources { get; set; }
     public DbSet<ExerciseResource> ExerciseResources { get; set; }
+    public DbSet<Tag> Tags { get; set; }
+    
+    public DbSet<QuestionCategory> QuestionCategories { get; set; }
+    public DbSet<Answer> Answers { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<Quiz> Quizzes { get; set; }
+    public DbSet<TeacherQuestionAccess> TeacherQuestionAccesses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -61,5 +70,10 @@ public class ApplicationContext : DbContext
         modelBuilder.ApplyConfiguration(new ExerciseResourceEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new TagEntityTypeConfiguration());
 
+        modelBuilder.ApplyConfiguration(new QuestionCategoryEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new AnswerEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new QuestionEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new QuizEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new TeacherQuestionAccessEntityTypeConfiguration());
     }
 }

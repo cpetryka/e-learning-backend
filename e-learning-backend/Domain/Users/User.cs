@@ -2,6 +2,7 @@ using e_learning_backend.Domain.Courses;
 using e_learning_backend.Domain.ExercisesAndMaterials;
 using e_learning_backend.Domain.Users.ValueObjects;
 using e_learning_backend.Domain.Participations;
+using e_learning_backend.Domain.Quizzes;
 
 namespace e_learning_backend.Domain.Users;
 
@@ -43,6 +44,12 @@ public class User
     
     private readonly HashSet<Tag> _tags = new();
     public IReadOnlyCollection<Tag> Tags => _tags;
+    
+    private readonly HashSet<QuestionCategory> _questionCategories = new();
+    public IReadOnlyCollection<QuestionCategory> QuestionCategories => _questionCategories;
+    
+    private readonly HashSet<TeacherQuestionAccess> _teacherQuestionAccesses = new();
+    public IReadOnlyCollection<TeacherQuestionAccess> TeacherQuestionAccesses => _teacherQuestionAccesses;
     
     // Spectator only
     private readonly HashSet<User> _spectates = new();

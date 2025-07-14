@@ -1,6 +1,7 @@
 ﻿using e_learning_backend.Domain.Classes.ValueObjects;
 using e_learning_backend.Domain.ExercisesAndMaterials;
 using e_learning_backend.Domain.Participations;
+using e_learning_backend.Domain.Quizzes;
 
 namespace e_learning_backend.Domain.Classes;
 
@@ -19,6 +20,9 @@ public class Class
     
     private readonly HashSet<Exercise> _exercises = new();
     public IReadOnlyCollection<Exercise> Exercises => _exercises;
+    
+    private readonly HashSet<Quiz> _quizzes = new();
+    public IReadOnlyCollection<Quiz> Quizzes => _quizzes;
     
     public Class() { }
     public Class(
@@ -82,5 +86,30 @@ public class Class
         }
         
         _exercises.Add(exercise);
+    }
+    
+    public void AddQuiz(Quiz quiz)
+    {
+        if (quiz == null)
+        {
+            throw new ArgumentNullException(nameof(quiz));
+        }
+
+        _quizzes.Add(quiz);
+    }
+    
+    public void RemoveQuiz(Quiz quiz)
+    {
+        if (quiz == null)
+        {
+            throw new ArgumentNullException(nameof(quiz));
+        }
+
+        if (!_quizzes.Contains(quiz))
+        {
+            throw new InvalidOperationException("Quiz does not exist for this course.");
+        }
+
+        _quizzes.Remove(quiz);
     }
 }

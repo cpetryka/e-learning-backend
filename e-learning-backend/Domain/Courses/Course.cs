@@ -1,5 +1,6 @@
 using e_learning_backend.Domain.Courses.ValueObjects;
 using e_learning_backend.Domain.Participations;
+using e_learning_backend.Domain.Quizzes;
 using e_learning_backend.Domain.Users;
 
 namespace e_learning_backend.Domain.Courses;
