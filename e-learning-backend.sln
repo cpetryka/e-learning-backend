@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "e-learning-backend", "e-learning-backend\e-learning-backend.csproj", "{7EEB6B66-37CE-43D2-A157-18A2C96EAA55}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "e-learning-tests", "e-learning-tests\e-learning-tests.csproj", "{A85A4867-B253-4ED3-912D-542B6D324D3E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{7EEB6B66-37CE-43D2-A157-18A2C96EAA55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7EEB6B66-37CE-43D2-A157-18A2C96EAA55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EEB6B66-37CE-43D2-A157-18A2C96EAA55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A85A4867-B253-4ED3-912D-542B6D324D3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A85A4867-B253-4ED3-912D-542B6D324D3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A85A4867-B253-4ED3-912D-542B6D324D3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A85A4867-B253-4ED3-912D-542B6D324D3E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

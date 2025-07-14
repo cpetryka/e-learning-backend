@@ -21,6 +21,7 @@ public class Tag
         Name = name ?? throw new ArgumentNullException(nameof(name), "Tag name cannot be null or empty.");
         Teacher = teacher ?? throw new ArgumentNullException(nameof(teacher), "Teacher cannot be null.");
         TeacherId = teacher.Id;
+        teacher.AddTag(this);
     }
     
     public Tag(Guid id, string name)

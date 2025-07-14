@@ -424,4 +424,14 @@ public class User
         _spectatedBy.Remove(user);
         user._spectates.Remove(this);
     }
+    
+    public void AddTag(Tag tag)
+    {
+        if (tag == null)
+        {
+            throw new ArgumentNullException(nameof(tag));
+        }
+
+        _tags.Add(tag);
+    }
 }
