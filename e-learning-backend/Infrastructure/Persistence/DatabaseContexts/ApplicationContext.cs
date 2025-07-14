@@ -59,6 +59,7 @@ public class ApplicationContext : DbContext
         modelBuilder.ApplyConfiguration(new ExerciseEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new FileResourceEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new ExerciseResourceEntityTypeConfiguration());
-        
+        modelBuilder.ApplyConfiguration(new TagEntityTypeConfiguration());
+
     }
 }

@@ -41,6 +41,9 @@ public class User
     private readonly HashSet<Availability> _availability = new();
     public IReadOnlyCollection<Availability> Availability => _availability;
     
+    private readonly HashSet<Tag> _tags = new();
+    public IReadOnlyCollection<Tag> Tags => _tags;
+    
     // Spectator only
     private readonly HashSet<User> _spectates = new();
     public IReadOnlyCollection<User> Spectates => _spectates;

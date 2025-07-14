@@ -15,6 +15,9 @@ public class FileResource
     private readonly HashSet<ExerciseResource> _exerciseResources = new();
     public IReadOnlyCollection<ExerciseResource> ExerciseResources => _exerciseResources;
     
+    private readonly HashSet<Tag> _tags = new();
+    public IReadOnlyCollection<Tag> Tags => _tags;
+    
     protected FileResource() { }
     
     public FileResource(Guid id, string name, string path, DateTime addedAt, User user)
@@ -29,4 +32,35 @@ public class FileResource
     
     public FileResource(string name, string path, DateTime addedAt, User user)
         : this(Guid.NewGuid(), name, path, addedAt, user) { }
+    
+    public void AddTag(Tag tag)
+    {
+        if (tag == null)
+        {
+            throw new ArgumentNullException(nameof(tag), "Tag cannot be null.");
+        }
+        
+        if (_tags.Any(t => t.Id == tag.Id))
+        {
+            throw new InvalidOperationException("Tag is already associated with this file.");
+        }
+        
+        _tags.Add(tag);
+        tag.AddFileToTagged(this);
+    }
+    
+    public void RemoveTag(Tag tag)
+    {
+        if (tag == null)
+        {
+            throw new ArgumentNullException(nameof(tag), "Tag cannot be null.");
+        }
+        
+        if (!_tags.Remove(tag))
+        {
+            throw new InvalidOperationException("Tag is not associated with this file.");
+        }
+        
+        tag.RemoveFileFromTagged(this);
+    }
 }
