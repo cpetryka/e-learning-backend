@@ -63,4 +63,27 @@ public class FileResource
         
         tag.RemoveFileFromTagged(this);
     }
+    
+    public void AddExerciseResource(ExerciseResource exerciseResource)
+    {
+        if (exerciseResource == null)
+        {
+            throw new ArgumentNullException(nameof(exerciseResource), "Exercise resource cannot be null.");
+        }
+        
+        _exerciseResources.Add(exerciseResource);
+    }
+    
+    public void RemoveExerciseResource(ExerciseResource exerciseResource)
+    {
+        if (exerciseResource == null)
+        {
+            throw new ArgumentNullException(nameof(exerciseResource), "Exercise resource cannot be null.");
+        }
+        
+        if (!_exerciseResources.Remove(exerciseResource))
+        {
+            throw new InvalidOperationException("Exercise resource is not associated with this file.");
+        }
+    }
 }

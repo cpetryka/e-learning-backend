@@ -76,4 +76,27 @@ public class Exercise
         
         _exerciseResources.Add(exerciseResource);
     }
+    
+    public void AddResource(ExerciseResource resource)
+    {
+        if (resource == null)
+        {
+            throw new ArgumentNullException(nameof(resource), "Resource cannot be null.");
+        }
+        
+        _exerciseResources.Add(resource);
+    }
+    
+    public void RemoveResource(ExerciseResource resource)
+    {
+        if (resource == null)
+        {
+            throw new ArgumentNullException(nameof(resource), "Resource cannot be null.");
+        }
+        
+        if (!_exerciseResources.Remove(resource))
+        {
+            throw new InvalidOperationException("Resource is not associated with this exercise.");
+        }
+    }
 }

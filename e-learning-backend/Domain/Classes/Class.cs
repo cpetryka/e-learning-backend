@@ -38,6 +38,10 @@ public class Class
         SetLinkToMeeting(linkToMeeting);
         SetStatus(status);
     }
+    
+    public Class(
+        DateTime startTime)
+        : this(Guid.NewGuid(), startTime, "", "", new ClassStatus("new")) { }
 
     public void SetStartTime(DateTime startTime)
     {

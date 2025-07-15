@@ -22,5 +22,8 @@ public class ExerciseResource
         
         ExerciseId = exercise.Id;
         FileId = file.Id;
+        
+        exercise.AddResource(this);
+        file.AddExerciseResource(this);
     }
 }

@@ -13,6 +13,12 @@ public class ClassStatus
         setStatus(status);
     }
     
+    public ClassStatus(string status)
+    {
+        setId(Guid.NewGuid());
+        setStatus(status);
+    }
+    
     public void setId(Guid id)
     {
         Id = id;
