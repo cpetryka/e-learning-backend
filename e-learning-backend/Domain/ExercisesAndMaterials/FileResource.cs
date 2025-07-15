@@ -28,6 +28,8 @@ public class FileResource
         AddedAt = addedAt;
         User = user ?? throw new ArgumentNullException(nameof(user), "User cannot be null.");
         UserId = user.Id;
+        
+        user.AddFile(this);
     }
     
     public FileResource(string name, string path, DateTime addedAt, User user)

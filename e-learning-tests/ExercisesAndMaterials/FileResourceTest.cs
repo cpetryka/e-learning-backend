@@ -61,6 +61,7 @@ public class FileResourceTests
         Assert.IsFalse(fileResource.ExerciseResources.Any());
         Assert.IsNotNull(fileResource.Tags);
         Assert.IsFalse(fileResource.Tags.Any());
+        Assert.IsTrue(_testStudentUser.Files.Contains(fileResource));
     }
 
     [TestMethod]

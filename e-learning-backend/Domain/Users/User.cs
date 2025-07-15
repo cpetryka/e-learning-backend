@@ -434,4 +434,24 @@ public class User
 
         _tags.Add(tag);
     }
+    
+    public void AddFile(FileResource file)
+    {
+        if (file == null)
+        {
+            throw new ArgumentNullException(nameof(file));
+        }
+
+        _files.Add(file);
+    }
+    
+    public void RemoveFile(FileResource file)
+    {
+        if (file == null)
+        {
+            throw new ArgumentNullException(nameof(file));
+        }
+
+        _files.Remove(file);
+    }
 }
