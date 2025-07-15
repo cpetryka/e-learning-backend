@@ -1,4 +1,5 @@
 using e_learning_backend.Domain.Classes;
+using e_learning_backend.Domain.ExercisesAndMaterials;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -22,6 +23,32 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
             .WithOne(e => e.Class)
             .HasForeignKey(e => e.ClassId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasMany(c => c.Files)
+            .WithMany(f => f.Classes)
+            .UsingEntity<Dictionary<string, object>>(
+                "ClassFileResources", // nazwa tabeli pośredniczącej
+                j => j
+                    .HasOne<FileResource>()
+                    .WithMany()
+                    .HasForeignKey("FileResourceId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j => j
+                    .HasOne<Class>()
+                    .WithMany()
+                    .HasForeignKey("ClassId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j =>
+                {
+                    j.HasKey("ClassId", "FileResourceId");
+                    
+                    j.HasData(new
+                    {
+                        ClassId = Guid.Parse("43333333-3333-3333-3333-333333333333"), 
+                        FileResourceId = Guid.Parse("ff555555-5555-5555-5555-555555555555")
+                    });
+                });
+
         
         var classId = Guid.Parse("43333333-3333-3333-3333-333333333333");
         var statusScheduledId = Guid.Parse("41111111-1111-1111-1111-111111111111");

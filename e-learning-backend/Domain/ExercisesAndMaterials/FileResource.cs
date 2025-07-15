@@ -1,3 +1,4 @@
+using e_learning_backend.Domain.Classes;
 using e_learning_backend.Domain.Users;
 
 namespace e_learning_backend.Domain.ExercisesAndMaterials;
@@ -17,6 +18,9 @@ public class FileResource
     
     private readonly HashSet<Tag> _tags = new();
     public IReadOnlyCollection<Tag> Tags => _tags;
+    
+    private readonly HashSet<Class> _classes = new();
+    public IReadOnlyCollection<Class> Classes => _classes;
     
     protected FileResource() { }
     

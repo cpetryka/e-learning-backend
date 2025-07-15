@@ -13,6 +13,7 @@ public class Class
     public string? Comment { get; private set; }
     public string? LinkToMeeting { get; private set; }
     public ClassStatus Status { get; private set; }
+    public HashSet<string> Links { get; } = new();
     
     public Guid UserId { get; set; }
     public Guid CourseId { get; set; }
@@ -23,6 +24,9 @@ public class Class
     
     private readonly HashSet<Quiz> _quizzes = new();
     public IReadOnlyCollection<Quiz> Quizzes => _quizzes;
+    
+    private readonly HashSet<FileResource> _files = new();
+    public IReadOnlyCollection<FileResource> Files => _files;
     
     public Class() { }
     public Class(
@@ -115,5 +119,51 @@ public class Class
         }
 
         _quizzes.Remove(quiz);
+    }
+    
+    public void AddLink(string link)
+    {
+        if (string.IsNullOrWhiteSpace(link))
+        {
+            throw new ArgumentException("Link cannot be null or empty.", nameof(link));
+        }
+        
+        Links.Add(link);
+    }
+    
+    public void RemoveLink(string link)
+    {
+        if (string.IsNullOrWhiteSpace(link))
+        {
+            throw new ArgumentException("Link cannot be null or empty.", nameof(link));
+        }
+        
+        if (!Links.Remove(link))
+        {
+            throw new InvalidOperationException("Link does not exist in the class.");
+        }
+    }
+    
+    public void AddFile(FileResource file) 
+    {
+        if (file == null)
+        {
+            throw new ArgumentNullException(nameof(file), "File cannot be null.");
+        }
+
+        _files.Add(file);
+    }
+    
+    public void RemoveFile(FileResource file)
+    {
+        if (file == null)
+        {
+            throw new ArgumentNullException(nameof(file), "File cannot be null.");
+        }
+
+        if (!_files.Remove(file))
+        {
+            throw new InvalidOperationException("File does not exist in the class.");
+        }
     }
 }
