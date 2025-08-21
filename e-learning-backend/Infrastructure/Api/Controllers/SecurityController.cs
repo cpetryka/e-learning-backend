@@ -22,32 +22,30 @@ public class SecurityController : ControllerBase
         if (!authorizationResult.Success)
             return BadRequest(authorizationResult.Errors);
 
-        SetTokenCookies(authorizationResult.AccessToken!, authorizationResult.RefreshToken!);
+        SetTokenCookies(authorizationResult.RefreshToken!);
 
         return Ok(new
         {
             AccessToken = authorizationResult.AccessToken,
-            RefreshToken = authorizationResult.RefreshToken,
             Roles = authorizationResult.Roles
         });
     }
 
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginUserDto loginUserDto)
+    public async Task<IActionResult> Login([FromBody] LoginUserDto loginUserDto)
     {
         var authorizationResult = await _securityService.LoginAsync(loginUserDto);
 
         if (!authorizationResult.Success)
             return BadRequest(authorizationResult.Errors);
 
-        // ustaw tokeny w cookies
-        SetTokenCookies(authorizationResult.AccessToken!, authorizationResult.RefreshToken!);
+        
+        SetTokenCookies(authorizationResult.RefreshToken!);
 
         return Ok(new
         {
             AccessToken = authorizationResult.AccessToken,
-            RefreshToken = authorizationResult.RefreshToken,
             Roles = authorizationResult.Roles
         });
     }
@@ -64,35 +62,23 @@ public class SecurityController : ControllerBase
         if (!authorizationResult.Success)
             return BadRequest(authorizationResult.Errors);
 
-        SetTokenCookies(authorizationResult.AccessToken!, authorizationResult.RefreshToken!);
+        SetTokenCookies(authorizationResult.RefreshToken!);
 
         return Ok(new
         {
             AccessToken = authorizationResult.AccessToken,
-            RefreshToken = authorizationResult.RefreshToken,
             Roles = authorizationResult.Roles
         });
     }
 
     
-    
-    
-    private void SetTokenCookies(string accessToken, string refreshToken)
+    private void SetTokenCookies( string refreshToken)
     {
-        var cookieOptions = new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = false, // zmienić jeśli będziemy chcieli otwierać na świat wtedy będzie szyfrowane
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddMinutes(15)
-        };
-
-        Response.Cookies.Append("AccessToken", accessToken, cookieOptions);
-
+        
         Response.Cookies.Append("RefreshToken", refreshToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
+            Secure = false,
             SameSite = SameSiteMode.Strict,
             Expires = DateTime.UtcNow.AddHours(1)
         });
