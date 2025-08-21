@@ -1,22 +1,18 @@
-﻿using e_learning_backend.Infrastructure.Api.DTO;
-using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
+﻿using e_learning_backend.Domain.Courses;
+using e_learning_backend.Infrastructure.Api.DTO;
+using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace e_learning_backend.Infrastructure.Security.Impl;
 
 public class CoursesService : ICoursesService
 {
-    private readonly ApplicationContext _context;
-    private readonly IConfiguration _configuration;
+    private readonly ICourseRepository _courseRepository;
 
-
-    public CoursesService(ApplicationContext context, IConfiguration configuration)
+    public CoursesService(ICourseRepository courseRepository)
     {
-        _context = context;
-        _configuration = configuration;
+        _courseRepository = courseRepository;
     }
-
 
     public async Task<IEnumerable<CourseWidgetDTO>> GetCoursesAsync(
         string[]? categories,
@@ -26,34 +22,18 @@ public class CoursesService : ICoursesService
         int? priceTo,
         Guid? teacherId)
     {
-        var query = _context.Courses
-            .Include(c => c.Variants)
-            .Include(c => c.Teacher)
-            .Include(c => c.Participations)
-            .AsQueryable();
+        var courses = await _courseRepository.GetAllAsync();
+        
+        var filtered = courses
+            .Where(c => categories == null || categories.Length == 0 || categories.Contains(c.Category.Name))
+            .Where(c => !teacherId.HasValue || c.TeacherId == teacherId.Value)
+            .Where(c => levels == null || levels.Length == 0 || c.Variants.Any(v => levels.Contains(v.Level.Name)))
+            .Where(c => languages == null || languages.Length == 0 || c.Variants.Any(v => languages.Contains(v.Language.Name)))
+            .Where(c => !priceFrom.HasValue || c.Variants.Any(v => v.Rate.Amount >= priceFrom.Value))
+            .Where(c => !priceTo.HasValue || c.Variants.Any(v => v.Rate.Amount <= priceTo.Value))
+            .ToList();
 
-
-        if (categories is { Length: > 0 })
-            query = query.Where(c => categories.Contains(c.Category.Name));
-
-        if (teacherId.HasValue)
-            query = query.Where(c => c.TeacherId == teacherId.Value);
-
-        if (levels is { Length: > 0 })
-            query = query.Where(c => c.Variants.Any(v => levels.Contains(v.Level.Name)));
-
-        if (languages is { Length: > 0 })
-            query = query.Where(c => c.Variants.Any(v => languages.Contains(v.Language.Name)));
-
-        if (priceFrom.HasValue)
-            query = query.Where(c => c.Variants.Any(v => v.Rate.Amount >= priceFrom.Value));
-
-        if (priceTo.HasValue)
-            query = query.Where(c => c.Variants.Any(v => v.Rate.Amount <= priceTo.Value));
-
-        var courses = await query.ToListAsync();
-
-        return courses.Select(c => new CourseWidgetDTO
+        return filtered.Select(c => new CourseWidgetDTO
         {
             Id = c.Id,
             Name = c.Name,
@@ -65,7 +45,7 @@ public class CoursesService : ICoursesService
                 ? c.Participations
                     .Where(p => p.Review != null)
                     .Average(p => p.Review!.StarsNumber)
-                : 0, // jeśli brak recenzji, rating = 0
+                : 0,
             Variants = c.Variants
                 .Where(v =>
                     v != null &&
@@ -84,6 +64,5 @@ public class CoursesService : ICoursesService
                     Price = v.Rate?.Amount ?? 0
                 }).ToList()
         }).ToList();
-
     }
 }
