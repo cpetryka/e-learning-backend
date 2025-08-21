@@ -17,22 +17,24 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 
 // --------------------------------------------------------------------------------------------------------
-// DBCONTEXTS AND CONTROLLERSREGISTRATION
+// DBCONTEXTS AND CONTROLLERS REGISTRATION
 // --------------------------------------------------------------------------------------------------------
 builder.Services.AddDbContext<ApplicationContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddControllers();
 
-
-
+// --------------------------------------------------------------------------------------------------------
+// CORS CONFIGURATION
+// --------------------------------------------------------------------------------------------------------
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins("http://localhost:5173")
-            .AllowAnyMethod()
-            .AllowAnyHeader();
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -55,14 +57,10 @@ builder.Services.AddAuthentication(options =>
                                           Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]!)),
             ValidateIssuer           = false,
             ValidateAudience         = false,
-
-            // Tell ASP.NET “look for ClaimTypes.Role” when evaluating [Authorize(Roles=...)]
             RoleClaimType            = ClaimTypes.Role,
             NameClaimType            = ClaimTypes.NameIdentifier
         };
 
-        // After the JWT is validated, go to the DB and load _all_ roles for this user,
-        // then add them as ClaimTypes.Role so policies will work.
         options.Events = new JwtBearerEvents
         {
             OnTokenValidated = async ctx =>
@@ -93,11 +91,11 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("all",   p => p.RequireRole("admin", "user", "student", "spectator"));
-    options.AddPolicy("admin", p => p.RequireRole("admin"));
-    options.AddPolicy("teacher",  p => p.RequireRole("teacher"));
-    options.AddPolicy("student",  p => p.RequireRole("student"));
-    options.AddPolicy("spectator",  p => p.RequireRole("spectator"));
+    options.AddPolicy("all",     p => p.RequireRole("admin", "user", "student", "spectator"));
+    options.AddPolicy("admin",   p => p.RequireRole("admin"));
+    options.AddPolicy("teacher", p => p.RequireRole("teacher"));
+    options.AddPolicy("student", p => p.RequireRole("student"));
+    options.AddPolicy("spectator", p => p.RequireRole("spectator"));
 });
 
 // Add Swagger with bearer‐token support
@@ -131,7 +129,6 @@ builder.Services.AddSwaggerGen(c =>
 // --------------------------------------------------------------------------------------------------------
 // "BEANS" CONFIGURATION
 // --------------------------------------------------------------------------------------------------------
-
 builder.Services.AddSingleton<IJsonConfigurationProvider, JsonConfigurationProvider>();
 builder.Services.AddScoped<IUsersRepository, UserRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
@@ -140,14 +137,11 @@ builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddScoped<ICoursesService, CoursesService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 
-
 // --------------------------------------------------------------------------------------------------------
 // WEB APPLICATION CONFIGURATION: MIDDLEWARES, ROUTING, AUTHORIZATION, EXCEPTION HANDLING, ETC.
 // --------------------------------------------------------------------------------------------------------
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
