@@ -72,7 +72,8 @@ public class SecurityService : ISecurityService
 
         var accessToken  = GenerateAccessToken(user);
         var refreshToken = GenerateRefreshToken();
-
+        var roles = user.Roles.Select(r => r.RoleName).ToList();
+        
         user.RefreshToken           = refreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(1);
         await _context.SaveChangesAsync();
@@ -81,7 +82,8 @@ public class SecurityService : ISecurityService
         {
             Success      = true,
             AccessToken  = accessToken,
-            RefreshToken = refreshToken
+            RefreshToken = refreshToken,
+            Roles = roles
         };
     }
 
@@ -111,7 +113,8 @@ public class SecurityService : ISecurityService
         {
             Success      = true,
             AccessToken  = newAccessToken,
-            RefreshToken = newRefreshToken
+            RefreshToken = newRefreshToken,
+            Roles = user.Roles.Select(r => r.RoleName).ToList()
         };
     }
 

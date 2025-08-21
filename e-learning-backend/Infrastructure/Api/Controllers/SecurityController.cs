@@ -40,7 +40,8 @@ public class SecurityController : ControllerBase
         return Ok(new
         {
             AccessToken = authorizationResult.AccessToken,
-            RefreshToken = authorizationResult.RefreshToken
+            RefreshToken = authorizationResult.RefreshToken,
+            Roles = authorizationResult.Roles
         });
     }
 
@@ -57,7 +58,8 @@ public class SecurityController : ControllerBase
         return Ok(new
         {
             AccessToken = authorizationResult.AccessToken,
-            RefreshToken = authorizationResult.RefreshToken
+            RefreshToken = authorizationResult.RefreshToken,
+            Roles = authorizationResult.Roles
         });
     }
 }
