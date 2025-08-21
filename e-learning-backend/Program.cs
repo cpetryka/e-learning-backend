@@ -134,6 +134,8 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddSingleton<IJsonConfigurationProvider, JsonConfigurationProvider>();
 builder.Services.AddScoped<IUsersRepository, UserRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddScoped<ICoursesService, CoursesService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
