@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text;
+using e_learning_backend.Infrastructure.Api.Services;
 using e_learning_backend.Infrastructure.Configuration;
 using e_learning_backend.Infrastructure.Configuration.Impl;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
@@ -135,12 +136,14 @@ builder.Services.AddSingleton<IJsonConfigurationProvider, JsonConfigurationProvi
 builder.Services.AddScoped<IUsersRepository, UserRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+builder.Services.AddScoped<IStudentsRepository, StudnetsRepository>();
 
 
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddScoped<ICoursesService, CoursesService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
-builder.Services.AddScoped<ITeacherService, TeacherService>();
+builder.Services.AddScoped<ITeacherService, TeachersService>();
+builder.Services.AddScoped<IStudentsService, StudentsService>();
 
 // --------------------------------------------------------------------------------------------------------
 // WEB APPLICATION CONFIGURATION: MIDDLEWARES, ROUTING, AUTHORIZATION, EXCEPTION HANDLING, ETC.
