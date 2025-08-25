@@ -8,11 +8,11 @@ public interface ITeacherService
     Task<TeacherDTO?> GetTeacherAsync(Guid teacherId);
 }
 
-public class TeacherService : ITeacherService
+public class TeachersService : ITeacherService
 {
     private readonly ITeacherRepository _teacherRepository;
 
-    public TeacherService(ITeacherRepository teacherRepository)
+    public TeachersService(ITeacherRepository teacherRepository)
     {
         _teacherRepository = teacherRepository;
     }
