@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace e_learning_backend.Infrastructure.Api;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
     private readonly IUsersService _usersService;
