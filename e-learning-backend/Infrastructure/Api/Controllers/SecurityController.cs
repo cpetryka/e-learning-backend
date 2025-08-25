@@ -49,8 +49,32 @@ public class SecurityController : ControllerBase
             Roles = authorizationResult.Roles
         });
     }
+    
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        if (!Request.Cookies.TryGetValue("RefreshToken", out var refreshToken))
+            return BadRequest(new[] { "No refresh token found" });
 
+        
+        var user = await _securityService.RefreshTokenAsync(refreshToken);
+        if (!user.Success)
+        {
+            Response.Cookies.Delete("RefreshToken");
+            return Ok(new { Message = "Logged out" });
+        }
 
+        
+        var userId = Guid.Parse(user.UserId);
+        await _securityService.LogoutAsync(userId);
+
+        // usuń cookie z przeglądarki
+        Response.Cookies.Delete("RefreshToken");
+
+        return Ok(new { Message = "Logged out" });
+    }
+
+    
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh()
     {

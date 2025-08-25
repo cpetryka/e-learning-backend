@@ -49,6 +49,7 @@ public class SecurityService : ISecurityService
 
         return new AuthorizationResultDto
         {
+            UserId = domainUser.Id.ToString(),
             Success      = true,
             AccessToken  = accessToken,
             RefreshToken = refreshToken
@@ -80,6 +81,7 @@ public class SecurityService : ISecurityService
 
         return new AuthorizationResultDto
         {
+            UserId = user.Id.ToString(),
             Success      = true,
             AccessToken  = accessToken,
             RefreshToken = refreshToken,
@@ -111,6 +113,7 @@ public class SecurityService : ISecurityService
 
         return new AuthorizationResultDto
         {
+            UserId = user.Id.ToString(),
             Success      = true,
             AccessToken  = newAccessToken,
             RefreshToken = newRefreshToken,
@@ -149,6 +152,17 @@ public class SecurityService : ISecurityService
         var token   = handler.CreateToken(tokenDescriptor);
         return handler.WriteToken(token);
     }
+    
+    public async Task LogoutAsync(Guid userId)
+    {
+        var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == userId);
+        if (user == null) return;
+
+        user.RefreshToken = null;
+        user.RefreshTokenExpiryTime = null;
+        await _context.SaveChangesAsync();
+    }
+
 
     private string GenerateRefreshToken()
         => Guid.NewGuid().ToString("N");
