@@ -20,11 +20,20 @@ public class CourseRepository : ICourseRepository
 
     
     public async Task<IEnumerable<Course>> GetAllAsync()
-        => await _context.Courses
+    {
+        return await _context.Courses
+            .Include(c => c.Category)
             .Include(c => c.Teacher)
             .Include(c => c.Variants)
+            .ThenInclude(v => v.Level)
+            .Include(c => c.Variants)
+            .ThenInclude(v => v.Language)
+            .Include(c => c.Variants)
+            .ThenInclude(v => v.Rate)
             .Include(c => c.Participations)
+            .ThenInclude(p => p.Review)
             .ToListAsync();
+    }
 
     
     public async Task AddAsync(Course course)

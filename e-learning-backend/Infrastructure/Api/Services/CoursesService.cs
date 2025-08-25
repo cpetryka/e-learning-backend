@@ -52,8 +52,8 @@ public class CoursesService : ICoursesService
                     v.Level != null &&
                     v.Language != null &&
                     v.Rate != null &&
-                    (levels == null || levels.Contains(v.Level.Name)) &&
-                    (languages == null || languages.Contains(v.Language.Name)) &&
+                    (levels == null || levels.Length == 0 || levels.Contains(v.Level.Name)) &&
+                    (languages == null || languages.Length == 0 || languages.Contains(v.Language.Name)) &&
                     (!priceFrom.HasValue || v.Rate.Amount >= priceFrom.Value) &&
                     (!priceTo.HasValue || v.Rate.Amount <= priceTo.Value)
                 )
