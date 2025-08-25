@@ -8,10 +8,12 @@ using e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
 using e_learning_backend.Infrastructure.Persistence.Services;
 using e_learning_backend.Infrastructure.Security.Impl;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
+using e_learning_backend.Infrastructure.Security.Impl.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using ITeacherRepository = e_learning_backend.Infrastructure.Persistence.Repositories.ITeacherRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -132,10 +134,13 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddSingleton<IJsonConfigurationProvider, JsonConfigurationProvider>();
 builder.Services.AddScoped<IUsersRepository, UserRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+
 
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddScoped<ICoursesService, CoursesService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<ITeacherService, TeacherService>();
 
 // --------------------------------------------------------------------------------------------------------
 // WEB APPLICATION CONFIGURATION: MIDDLEWARES, ROUTING, AUTHORIZATION, EXCEPTION HANDLING, ETC.
