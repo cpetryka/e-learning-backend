@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using e_learning_backend.Domain.Users;
 using e_learning_backend.Domain.Users.ValueObjects;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
@@ -133,10 +134,16 @@ public class SecurityService : ISecurityService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
         };
 
-        foreach (var role in user.Roles)
+        /*foreach (var role in user.Roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role.RoleName));
-        }
+        }*/
+        
+        var roleNames = user.Roles.Select(r => r.RoleName).ToList();
+        var rolesJson = JsonSerializer.Serialize(roleNames);
+
+        claims.Add(new Claim("roles", rolesJson, JsonClaimValueTypes.JsonArray));
+
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
