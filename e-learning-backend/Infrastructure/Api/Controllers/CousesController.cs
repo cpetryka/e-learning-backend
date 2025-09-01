@@ -35,4 +35,15 @@ public class CoursesController : ControllerBase
 
         return Ok(courses);
     }
+    [HttpGet("{courseId}")]
+    public async Task<ActionResult<CourseDetailsDTO>> GetCourseDetails(Guid courseId)
+    {
+        var courseDetails = await _coursesService.GetCourseDetailsAsync(courseId);
+        if (courseDetails == null)
+            return NotFound();
+
+        return Ok(courseDetails);
+    }
+
+
 }
