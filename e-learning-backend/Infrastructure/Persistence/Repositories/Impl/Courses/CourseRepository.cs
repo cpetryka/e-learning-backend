@@ -11,12 +11,21 @@ public class CourseRepository : ICourseRepository
     public CourseRepository(ApplicationContext context) => _context = context;
 
    
-    public async Task<Course?> GetByIdAsync(Guid id)
-        => await _context.Courses
-            .Include(c => c.Teacher)
+    public async Task<Course?> GetByIdAsync(Guid courseId)
+    {
+        return await _context.Courses
             .Include(c => c.Variants)
+            .ThenInclude(v => v.Language)
+            .Include(c => c.Variants)
+            .ThenInclude(v => v.Level)
+            .Include(c => c.Teacher)
             .Include(c => c.Participations)
-            .SingleOrDefaultAsync(c => c.Id == id);
+            .ThenInclude(p => p.Review)
+            .Include(c => c.Category)
+            .FirstOrDefaultAsync(c => c.Id == courseId);
+    }
+
+
 
     
     public async Task<IEnumerable<Course>> GetAllAsync()
