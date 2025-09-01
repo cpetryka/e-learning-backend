@@ -1,12 +1,8 @@
 ﻿using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.Repositories;
+using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 
 namespace e_learning_backend.Infrastructure.Security.Impl.Services;
-
-public interface ITeacherService
-{
-    Task<TeacherDTO?> GetTeacherAsync(Guid teacherId);
-}
 
 public class TeachersService : ITeacherService
 {
@@ -33,16 +29,17 @@ public class TeachersService : ITeacherService
                     Id = c.Id,
                     Name = c.Name
                 }).ToList(),
-            Availability = teacher.Availability
-                .Select(a => new TeacherDTO.AvailabilityDTO
-                {
-                    Day = DateOnly.FromDateTime(a.Date),
-                    Timeslots = a.TimeSlots.Select(ts => new TeacherDTO.TimeslotDTO
-                    {
-                        TimeFrom = TimeOnly.FromDateTime(ts.StartTime),
-                        TimeUntil = TimeOnly.FromDateTime(ts.EndTime)
-                    }).ToList()
-                }).ToList(),
         };
+    }
+
+    public async Task<IEnumerable<TeacherReviewDTO>> GetTeacherReviewsAsync(Guid teacherId)
+    {
+        return await _teacherRepository.GetTeacherReviews(teacherId);
+    }
+
+
+    public async Task<List<TeacherAvailabilityDTO>> GetTeacherAvailabilityAsync(Guid teacherId)
+    {
+        return await _teacherRepository.GetTeacherAvailabilityAsync(teacherId);
     }
 }
