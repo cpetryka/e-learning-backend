@@ -17,21 +17,23 @@ public class ParticipationEntityTypeConfiguration : IEntityTypeConfiguration<Par
         builder.HasOne(p => p.Course)
             .WithMany(c => c.Participations)
             .HasForeignKey(p => p.CourseId);
-        
+
         builder.HasOne(p => p.Review)
             .WithOne(r => r.Participation)
             .HasForeignKey<Participation>(p => p.ReviewId);
 
         builder.Property(p => p.Notifications);
 
-        // Example data (commented out by default)
+        // Example data with ReviewId set
         var student1Id = Guid.Parse("22222222-2222-2222-2222-222222222222");
         var student2Id = Guid.Parse("33333333-3333-3333-3333-333333333333");
         var courseId = Guid.Parse("0042b980-d8cc-4969-af0f-62d8c1632871");
+        var reviewId = Guid.Parse("55555555-5555-5555-5555-555555555555");
 
         builder.HasData(
-            new { UserId = student1Id, CourseId = courseId, Notifications = false },
-            new { UserId = student2Id, CourseId = courseId, Notifications = true }
+            new { UserId = student1Id, CourseId = courseId, ReviewId = reviewId, Notifications = false },
+            new { UserId = student2Id, CourseId = courseId, ReviewId = (Guid?)null, Notifications = true } // brak recenzji
         );
     }
+
 }
