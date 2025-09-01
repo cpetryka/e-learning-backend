@@ -8,10 +8,12 @@ namespace e_learning_backend.Infrastructure.Security.Impl;
 public class CoursesService : ICoursesService
 {
     private readonly ICourseRepository _courseRepository;
+    private readonly ITeacherService _teacherService;
 
-    public CoursesService(ICourseRepository courseRepository)
+    public CoursesService(ICourseRepository courseRepository, ITeacherService teacherService)
     {
         _courseRepository = courseRepository;
+        _teacherService = teacherService;
     }
 
     public async Task<IEnumerable<CourseWidgetDTO>> GetCoursesAsync(
@@ -23,12 +25,13 @@ public class CoursesService : ICoursesService
         Guid? teacherId)
     {
         var courses = await _courseRepository.GetAllAsync();
-        
+
         var filtered = courses
             .Where(c => categories == null || categories.Length == 0 || categories.Contains(c.Category.Name))
             .Where(c => !teacherId.HasValue || c.TeacherId == teacherId.Value)
             .Where(c => levels == null || levels.Length == 0 || c.Variants.Any(v => levels.Contains(v.Level.Name)))
-            .Where(c => languages == null || languages.Length == 0 || c.Variants.Any(v => languages.Contains(v.Language.Name)))
+            .Where(c => languages == null || languages.Length == 0 ||
+                        c.Variants.Any(v => languages.Contains(v.Language.Name)))
             .Where(c => !priceFrom.HasValue || c.Variants.Any(v => v.Rate.Amount >= priceFrom.Value))
             .Where(c => !priceTo.HasValue || c.Variants.Any(v => v.Rate.Amount <= priceTo.Value))
             .ToList();
@@ -64,5 +67,59 @@ public class CoursesService : ICoursesService
                     Price = v.Rate?.Amount ?? 0
                 }).ToList()
         }).ToList();
+    }
+
+    public async Task<CourseDetailsDTO?> GetCourseDetailsAsync(Guid courseId)
+    {
+        var course = await _courseRepository.GetByIdAsync(courseId);
+        if (course == null) return null;
+
+        
+        var teacher = await _teacherService.GetTeacherAsync(course.TeacherId);
+        if (teacher == null) return null;
+        
+        var availability = await _teacherService.GetTeacherAvailabilityAsync(course.TeacherId);
+        
+        var reviews = await _teacherService.GetTeacherReviewsAsync(course.TeacherId);
+        
+        var teacherDto = new TeacherDTO
+        {
+            Name = teacher.Name,
+            Surname = teacher.Surname,
+            Description = teacher.Description,
+            CoursesBrief = teacher.CoursesBrief,
+        };
+
+        
+        double rating = 0;
+        var courseReviews = course.Participations
+            .Where(p => p.Review != null)
+            .Select(p => p.Review!)
+            .ToList();
+
+        if (courseReviews.Any())
+            rating = courseReviews.Average(r => r.StarsNumber);
+
+        
+        return new CourseDetailsDTO
+        {
+            Id = course.Id,
+            Name = course.Name,
+            Category = course.Category?.Name,
+            Description = course.Description,
+            Rating = rating,
+            Variants = course.Variants
+                .Where(v => v != null)
+                .Select(v => new CourseWidgetDTO.CourseVariantDTO
+                {
+                    LanguageName = v.Language?.Name ?? "Unknown",
+                    LevelName = v.Level?.Name ?? "Unknown",
+                    Price = v.Rate?.Amount ?? 0
+                }).ToList(),
+            Teacher = teacherDto,
+            TeacherAvailability = availability.ToList(),
+            TeacherReviews = reviews.ToList(), 
+            
+        };
     }
 }

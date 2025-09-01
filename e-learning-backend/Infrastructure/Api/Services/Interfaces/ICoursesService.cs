@@ -12,4 +12,6 @@ public interface ICoursesService
         int? priceTo,
         Guid? teacherId
     );
+
+    Task<CourseDetailsDTO?> GetCourseDetailsAsync(Guid courseId);
 }
