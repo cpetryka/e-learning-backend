@@ -2,6 +2,7 @@
 
 public class TeacherDTO
 {
+    public Guid TeacherId { get; set; }
     public string Name { get; set; } = default!;
     public string Surname { get; set; } = default!;
     public string? Description { get; set; }
