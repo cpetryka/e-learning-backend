@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
 
-public class UserRepository : IUsersRepository
+public class UsersRepository : IUsersRepository
 {
     private readonly ApplicationContext _context;
 
-    public UserRepository(ApplicationContext context) => _context = context;
+    public UsersRepository(ApplicationContext context) => _context = context;
 
     public async Task<User?> GetByIdAsync(Guid id)
         => await _context.Users
