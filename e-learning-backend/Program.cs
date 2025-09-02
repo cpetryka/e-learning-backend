@@ -12,6 +12,7 @@ using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 using e_learning_backend.Infrastructure.Security.Impl.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ITeacherRepository = e_learning_backend.Infrastructure.Persistence.Repositories.ITeacherRepository;
@@ -133,7 +134,7 @@ builder.Services.AddSwaggerGen(c =>
 // "BEANS" CONFIGURATION
 // --------------------------------------------------------------------------------------------------------
 builder.Services.AddSingleton<IJsonConfigurationProvider, JsonConfigurationProvider>();
-builder.Services.AddScoped<IUsersRepository, UserRepository>();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 builder.Services.AddScoped<IStudentsRepository, StudnetsRepository>();
@@ -155,6 +156,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.WebRootPath, "uploads")),
+    RequestPath = "/uploads"
+});
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
