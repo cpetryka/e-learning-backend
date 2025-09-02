@@ -43,7 +43,35 @@ public class CourseRepository : ICourseRepository
             .ThenInclude(p => p.Review)
             .ToListAsync();
     }
-
+    
+    public async Task<IReadOnlyCollection<CourseCategory>> GetAllDistinctCategoriesAsync()
+    {
+        return await _context.Courses
+            .Include(c => c.Category)
+            .Select(c => c.Category)
+            .Distinct()
+            .ToListAsync();
+    }
+    
+    public async Task<IReadOnlyCollection<CourseLevel>> GetAllDistinctLevelsAsync()
+    {
+        return await _context.Courses
+            .Include(c => c.Variants)
+            .ThenInclude(v => v.Level)
+            .SelectMany(c => c.Variants.Select(v => v.Level))
+            .Distinct()
+            .ToListAsync();
+    }
+    
+    public async Task<IReadOnlyCollection<CourseLanguage>> GetAllDistinctLanguagesAsync()
+    {
+        return await _context.Courses
+            .Include(c => c.Variants)
+            .ThenInclude(v => v.Language)
+            .SelectMany(c => c.Variants.Select(v => v.Language))
+            .Distinct()
+            .ToListAsync();
+    }
     
     public async Task AddAsync(Course course)
     {

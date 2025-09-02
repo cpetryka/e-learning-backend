@@ -1,4 +1,5 @@
-﻿using e_learning_backend.Infrastructure.Api.DTO;
+﻿using e_learning_backend.Domain.Courses;
+using e_learning_backend.Infrastructure.Api.DTO;
 
 namespace e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 
@@ -14,4 +15,7 @@ public interface ICoursesService
     );
 
     Task<CourseDetailsDTO?> GetCourseDetailsAsync(Guid courseId);
+    Task<IReadOnlyCollection<CourseCategory>> GetAllDistinctCategoriesAsync();
+    Task<IReadOnlyCollection<CourseLevel>> GetAllDistinctLevelsAsync();
+    Task<IReadOnlyCollection<CourseLanguage>> GetAllDistinctLanguagesAsync();
 }

@@ -1,4 +1,5 @@
-﻿using e_learning_backend.Infrastructure.Api.DTO;
+﻿using e_learning_backend.Domain.Courses;
+using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,8 @@ public class CoursesController : ControllerBase
 
         return Ok(courses);
     }
+   
+    
     [HttpGet("{courseId}")]
     public async Task<ActionResult<CourseDetailsDTO>> GetCourseDetails(Guid courseId)
     {
@@ -44,6 +47,23 @@ public class CoursesController : ControllerBase
 
         return Ok(courseDetails);
     }
-
-
+    
+    [HttpGet("categories")]
+    public async Task<ActionResult<IReadOnlyCollection<CourseCategory>>> GetDistinctCategories()
+    {
+        var categories = await _coursesService.GetAllDistinctCategoriesAsync();
+        return Ok(categories);
+    }
+    [HttpGet("levels")]
+    public async Task<ActionResult<IReadOnlyCollection<CourseLevel>>> GetDistinctLevels()
+    {
+        var levels = await _coursesService.GetAllDistinctLevelsAsync();
+        return Ok(levels);
+    }
+    [HttpGet("languages")]
+    public async Task<ActionResult<IReadOnlyCollection<CourseLanguage>>> GetDistinctLanguages()
+    {
+        var languages = await _coursesService.GetAllDistinctLanguagesAsync();
+        return Ok(languages);
+    }
 }
