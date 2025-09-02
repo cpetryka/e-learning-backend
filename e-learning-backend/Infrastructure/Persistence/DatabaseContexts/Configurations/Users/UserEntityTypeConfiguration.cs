@@ -51,6 +51,21 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(500);
 
         builder.Property(x => x.RefreshTokenExpiryTime);
+        
+        builder.OwnsOne(u => u.ProfilePicture, pp =>
+        {
+            pp.Property(p => p.FileName)
+                .HasMaxLength(255)
+                .HasColumnName("ProfilePictureFileName");
+
+            pp.Property(p => p.FilePath)
+                .HasMaxLength(500)
+                .HasColumnName("ProfilePictureFilePath");
+
+            pp.Property(p => p.UploadedAt)
+                .HasColumnName("ProfilePictureUploadedAt");
+        });
+
 
         // BlockedUsers many-to-many relationship
         builder.HasMany(u => u.BlockedUsers)
