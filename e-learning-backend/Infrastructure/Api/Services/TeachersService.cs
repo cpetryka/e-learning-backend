@@ -20,6 +20,7 @@ public class TeachersService : ITeacherService
 
         return new TeacherDTO
         {
+            TeacherId = teacher.Id,
             Name = teacher.Name,
             Surname = teacher.Surname,
             Description = teacher.AboutMe,
@@ -29,7 +30,16 @@ public class TeachersService : ITeacherService
                     Id = c.Id,
                     Name = c.Name
                 }).ToList(),
+            ProfilePicture = teacher.ProfilePicture != null
+                ? new TeacherDTO.ProfilePictureDTO
+                {
+                    FileName = teacher.ProfilePicture.FileName,
+                    Url = "http://localhost:5249/" + teacher.ProfilePicture.FilePath.Replace("\\", "/"),
+                    UploadedAt = teacher.ProfilePicture.UploadedAt
+                }
+                : null
         };
+
     }
 
     public async Task<IEnumerable<TeacherReviewDTO>> GetTeacherReviewsAsync(Guid teacherId)
