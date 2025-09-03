@@ -18,6 +18,20 @@ public class CourseEntityTypeConfiguration : IEntityTypeConfiguration<Course>
             .WithMany(u => u.ConductedCourses)
             .HasForeignKey(c => c.TeacherId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.OwnsOne(u => u.ProfilePicture, pp =>
+        {
+            pp.Property(p => p.FileName)
+                .HasMaxLength(255)
+                .HasColumnName("ProfilePictureFileName");
+
+            pp.Property(p => p.FilePath)
+                .HasMaxLength(500)
+                .HasColumnName("ProfilePictureFilePath");
+
+            pp.Property(p => p.UploadedAt)
+                .HasColumnName("ProfilePictureUploadedAt");
+        });
 
         // Kategorie (muszą pasować do tych z CourseCategoryEntityTypeConfiguration)
         var programmingId = Guid.Parse("92625ae5-da0e-48ce-ac3f-79f9be35caa4");
