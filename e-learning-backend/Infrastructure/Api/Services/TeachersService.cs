@@ -30,13 +30,8 @@ public class TeachersService : ITeacherService
                     Id = c.Id,
                     Name = c.Name
                 }).ToList(),
-            ProfilePicture = teacher.ProfilePicture != null
-                ? new TeacherDTO.ProfilePictureDTO
-                {
-                    FileName = teacher.ProfilePicture.FileName,
-                    Url = "http://localhost:5249/" + teacher.ProfilePicture.FilePath.Replace("\\", "/"),
-                    UploadedAt = teacher.ProfilePicture.UploadedAt
-                }
+            TeacherProfilePictureUrl = teacher.ProfilePicture != null
+                ? "http://localhost:5249/" + teacher.ProfilePicture.FilePath.Replace("\\", "/")
                 : null
         };
 
