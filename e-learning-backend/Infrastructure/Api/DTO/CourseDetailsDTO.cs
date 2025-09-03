@@ -4,7 +4,7 @@ public class CourseDetailsDTO
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
-    public string? Image { get; set; }
+    public string? ProfilePictureUrl { get; set; }
     public string? Category { get; set; }
     public double Rating { get; set; }
     public string Description { get; set; } = null!;
