@@ -2,6 +2,7 @@ using e_learning_backend.Domain.Courses.ValueObjects;
 using e_learning_backend.Domain.Participations;
 using e_learning_backend.Domain.Quizzes;
 using e_learning_backend.Domain.Users;
+using e_learning_backend.Domain.Users.ValueObjects;
 
 namespace e_learning_backend.Domain.Courses;
 
@@ -15,6 +16,7 @@ public class Course
     public CourseCategory Category { get; private set; }
     public string Description { get; private set; }
     
+    public ProfilePicture? ProfilePicture { get; private set; }
     public Guid TeacherId { get; set; }
     public User Teacher { get; set; }
 
@@ -99,4 +101,5 @@ public class Course
 
         _participations.Remove(participation);
     }
+    public void SetProfilePicture(ProfilePicture picture) => ProfilePicture = picture;
 }
