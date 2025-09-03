@@ -101,6 +101,7 @@ public class CoursesService : ICoursesService
         
         var teacherDto = new TeacherDTO
         {
+            TeacherId = teacher.TeacherId,
             Name = teacher.Name,
             Surname = teacher.Surname,
             Description = teacher.Description,
