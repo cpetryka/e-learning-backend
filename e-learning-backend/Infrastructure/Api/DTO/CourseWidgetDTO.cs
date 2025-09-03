@@ -1,10 +1,13 @@
-﻿namespace e_learning_backend.Infrastructure.Api.DTO;
+﻿using e_learning_backend.Domain.Users.ValueObjects;
+
+namespace e_learning_backend.Infrastructure.Api.DTO;
 
    public class CourseWidgetDTO
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
-    public string? Image { get; set; } // thumbnail (opcjonalne)
+    
+    public string? ProfilePictureUrl { get; set; }
     public double? Rating { get; set; }
     public string Description { get; set; }
     public decimal MinimumCoursePrice { get; set; } 
