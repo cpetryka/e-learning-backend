@@ -10,7 +10,9 @@ using e_learning_backend.Infrastructure.Persistence.Services;
 using e_learning_backend.Infrastructure.Security.Impl;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 using e_learning_backend.Infrastructure.Security.Impl.Services;
+using e_learning_backend.Infrastructure.Transformers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
@@ -27,7 +29,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<ApplicationContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Conventions.Add(new RouteTokenTransformerConvention(new LowercaseRouteTransformer()));
+});
 
 // --------------------------------------------------------------------------------------------------------
 // CORS CONFIGURATION
