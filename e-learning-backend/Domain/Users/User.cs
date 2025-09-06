@@ -15,6 +15,8 @@ public class User
     public string HashedPassword { get; private set; }
     public string Phone { get; private set; }
     public string? AboutMe { get; private set; }
+    
+    public ProfilePicture? ProfilePicture { get; private set; }
 
     // Used to differentiate between a teacher, a student, etc.
     private readonly HashSet<Role> _roles = new();
@@ -454,4 +456,5 @@ public class User
 
         _files.Remove(file);
     }
+    public void SetProfilePicture(ProfilePicture picture) => ProfilePicture = picture;
 }

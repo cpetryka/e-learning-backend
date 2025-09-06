@@ -9,10 +9,14 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        var teacherId          = Guid.Parse("11111111-1111-1111-1111-111111111111");
-        var student1Id         = Guid.Parse("22222222-2222-2222-2222-222222222222");
-        var student2Id         = Guid.Parse("33333333-3333-3333-3333-333333333333");
+        var teacherId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var teacher2Id = Guid.Parse("555e5555-5555-5555-5555-555555555555");
+        var teacher3Id = Guid.Parse("666e6666-6666-6666-6666-666666666666");
+        
+        var student1Id = Guid.Parse("22222222-2222-2222-2222-222222222222");
+        var student2Id = Guid.Parse("33333333-3333-3333-3333-333333333333");
         var spectatorStudentId = Guid.Parse("44444444-4444-4444-4444-444444444444");
+
 
         var salt = "$2a$12$abcdefghijklmnopqrstuv";
 
@@ -47,6 +51,21 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(500);
 
         builder.Property(x => x.RefreshTokenExpiryTime);
+        
+        builder.OwnsOne(u => u.ProfilePicture, pp =>
+        {
+            pp.Property(p => p.FileName)
+                .HasMaxLength(255)
+                .HasColumnName("ProfilePictureFileName");
+
+            pp.Property(p => p.FilePath)
+                .HasMaxLength(500)
+                .HasColumnName("ProfilePictureFilePath");
+
+            pp.Property(p => p.UploadedAt)
+                .HasColumnName("ProfilePictureUploadedAt");
+        });
+
 
         // BlockedUsers many-to-many relationship
         builder.HasMany(u => u.BlockedUsers)
@@ -78,7 +97,7 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
         builder.HasMany(u => u.Availability)
             .WithOne(a => a.Teacher)
             .HasForeignKey(a => a.TeacherId);
-        
+
         builder.HasMany(u => u.Spectates)
             .WithMany(u => u.SpectatedBy)
             .UsingEntity<Dictionary<string, object>>(
@@ -99,10 +118,12 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
                     j.HasData(new
                     {
                         SpectatedUserId = teacherId, // student
-                        SpectatorUserId = spectatorStudentId  // spectator
+                        SpectatorUserId = spectatorStudentId // spectator
                     });
                 });
         
+        
+
         // Seed users
         builder.HasData(
             new
@@ -114,6 +135,30 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
                 HashedPassword = BCrypt.Net.BCrypt.HashPassword("teacher", salt),
                 Phone = "+1-202-555-0101",
                 AboutMe = "Passionate about teaching mathematics.",
+                RefreshToken = (string?)null,
+                RefreshTokenExpiryTime = (DateTime?)null
+            },
+            new
+            {
+                Id = teacher2Id,
+                Name = "Robert",
+                Surname = "Smith",
+                Email = "robert.smith@example.com",
+                HashedPassword = BCrypt.Net.BCrypt.HashPassword("teacher2", salt),
+                Phone = "+1-202-555-0105",
+                AboutMe = "Physics enthusiast who loves experiments.",
+                RefreshToken = (string?)null,
+                RefreshTokenExpiryTime = (DateTime?)null
+            },
+            new
+            {
+                Id = teacher3Id,
+                Name = "Emily",
+                Surname = "Davis",
+                Email = "emily.davis@example.com",
+                HashedPassword = BCrypt.Net.BCrypt.HashPassword("teacher3", salt),
+                Phone = "+1-202-555-0106",
+                AboutMe = "English teacher passionate about literature.",
                 RefreshToken = (string?)null,
                 RefreshTokenExpiryTime = (DateTime?)null
             },
@@ -166,9 +211,11 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
             r.ToTable("UserRoles");
 
             r.HasData(
-                new { UserId = teacherId,          RoleName = Role.Teacher.RoleName },
-                new { UserId = student1Id,         RoleName = Role.Student.RoleName },
-                new { UserId = student2Id,         RoleName = Role.Student.RoleName },
+                new { UserId = teacherId, RoleName = Role.Teacher.RoleName },
+                new { UserId = teacher2Id, RoleName = Role.Teacher.RoleName },
+                new { UserId = teacher3Id, RoleName = Role.Teacher.RoleName },
+                new { UserId = student1Id, RoleName = Role.Student.RoleName },
+                new { UserId = student2Id, RoleName = Role.Student.RoleName },
                 new { UserId = spectatorStudentId, RoleName = Role.Student.RoleName },
                 new { UserId = spectatorStudentId, RoleName = Role.Spectator.RoleName }
             );
