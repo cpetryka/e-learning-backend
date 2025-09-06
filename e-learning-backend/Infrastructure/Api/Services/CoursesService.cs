@@ -29,7 +29,8 @@ public class CoursesService : ICoursesService
         string[]? languages,
         int? priceFrom,
         int? priceTo,
-        Guid? teacherId)
+        Guid? teacherId,
+        string? query)
     {
         var courses = await _courseRepository.GetAllAsync();
 
@@ -47,6 +48,7 @@ public class CoursesService : ICoursesService
             .Where(c =>
                 !priceFrom.HasValue || c.Variants.Any(v => v.Rate.Amount >= priceFrom.Value))
             .Where(c => !priceTo.HasValue || c.Variants.Any(v => v.Rate.Amount <= priceTo.Value))
+            .Where(c => string.IsNullOrEmpty(query) || c.MatchesSearchQuery(query))
             .ToList();
 
         return filtered.Select(c => new CourseWidgetDTO

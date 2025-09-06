@@ -12,7 +12,8 @@ public interface ICoursesService
         string[]? languages,
         int? priceFrom,
         int? priceTo,
-        Guid? teacherId
+        Guid? teacherId,
+        string? query
     );
     
     Task<IEnumerable<CourseWidgetDTO>> GetCoursesBasedOnQuery(string query);

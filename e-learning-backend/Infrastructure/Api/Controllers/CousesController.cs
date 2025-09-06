@@ -26,7 +26,8 @@ public class CoursesController : ControllerBase
         [FromQuery] string[]? languages,
         [FromQuery] int? priceFrom,
         [FromQuery] int? priceTo,
-        [FromQuery] Guid? teacherId)
+        [FromQuery] Guid? teacherId,
+        [FromQuery] string? query)
     {
         var courses = await _coursesService.GetCoursesAsync(
             categories,
@@ -34,7 +35,8 @@ public class CoursesController : ControllerBase
             languages,
             priceFrom,
             priceTo,
-            teacherId);
+            teacherId,
+            query);
 
         return Ok(courses);
     }
