@@ -38,7 +38,14 @@ public class CoursesController : ControllerBase
 
         return Ok(courses);
     }
-   
+    
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<CourseWidgetDTO>>> GetCoursesBasedOnSearchQuery(
+        [FromQuery] string query)
+    {
+        var courses = await _coursesService.GetCoursesBasedOnQuery(query);
+        return Ok(courses);
+    }
     
     [HttpGet("{courseId}")]
     public async Task<ActionResult<CourseDetailsDTO>> GetCourseDetails(Guid courseId)

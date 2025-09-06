@@ -14,6 +14,8 @@ public interface ICoursesService
         int? priceTo,
         Guid? teacherId
     );
+    
+    Task<IEnumerable<CourseWidgetDTO>> GetCoursesBasedOnQuery(string query);
 
     Task<CourseDetailsDTO?> GetCourseDetailsAsync(Guid courseId);
     Task<IReadOnlyCollection<CourseCategory>> GetAllDistinctCategoriesAsync();

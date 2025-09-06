@@ -21,7 +21,7 @@ public class Course
     public User Teacher { get; set; }
 
     private readonly List<CourseVariant> _variants = new();
-    public IReadOnlyCollection<CourseVariant> Variants => _variants.AsReadOnly();
+    public IReadOnlyCollection<CourseVariant> Variants => _variants;
     
     private readonly HashSet<Participation> _participations = new();
     public IReadOnlyCollection<Participation> Participations => _participations;
@@ -102,4 +102,20 @@ public class Course
         _participations.Remove(participation);
     }
     public void SetProfilePicture(ProfilePicture picture) => ProfilePicture = picture;
+
+    private string ToPlainText()
+    {
+        return Name.ToLower() + " " + Category.Name.ToLower() + " " + Description.ToLower() + " " 
+               + Teacher.Name.ToLower() + " " + Teacher.Surname.ToLower();
+    }
+    
+    public bool MatchesSearchQuery(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            return false;
+        }
+
+        return this.ToPlainText().Contains(query.ToLower());
+    }
 }
