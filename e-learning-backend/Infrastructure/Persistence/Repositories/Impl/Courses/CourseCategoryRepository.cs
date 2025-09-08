@@ -10,31 +10,27 @@ public class CourseCategoryRepository : ICourseCategoryRepository
 
     public CourseCategoryRepository(ApplicationContext context) => _context = context;
 
-   
+
     public async Task<CourseCategory?> GetByIdAsync(Guid id)
         => await _context.CourseCategories
             .SingleOrDefaultAsync(c => c.Id == id);
 
-    
     public async Task<IEnumerable<CourseCategory>> GetAllAsync()
         => await _context.CourseCategories
             .ToListAsync();
 
-    
     public async Task AddAsync(CourseCategory category)
     {
         await _context.CourseCategories.AddAsync(category);
         await _context.SaveChangesAsync();
     }
 
-    
     public async Task UpdateAsync(CourseCategory category)
     {
         _context.CourseCategories.Update(category);
         await _context.SaveChangesAsync();
     }
 
-    
     public async Task DeleteAsync(Guid id)
     {
         var category = await _context.CourseCategories.FindAsync(id);

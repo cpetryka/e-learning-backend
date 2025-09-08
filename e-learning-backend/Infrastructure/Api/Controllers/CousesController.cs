@@ -40,7 +40,7 @@ public class CoursesController : ControllerBase
 
         return Ok(courses);
     }
-    
+
     [HttpGet("search")]
     public async Task<ActionResult<IEnumerable<CourseWidgetDTO>>> GetCoursesBasedOnSearchQuery(
         [FromQuery] string query)
@@ -48,7 +48,7 @@ public class CoursesController : ControllerBase
         var courses = await _coursesService.GetCoursesBasedOnQuery(query);
         return Ok(courses);
     }
-    
+
     [HttpGet("{courseId}")]
     public async Task<ActionResult<CourseDetailsDTO>> GetCourseDetails(Guid courseId)
     {
@@ -58,25 +58,28 @@ public class CoursesController : ControllerBase
 
         return Ok(courseDetails);
     }
-    
+
     [HttpGet("categories")]
     public async Task<ActionResult<IReadOnlyCollection<CourseCategory>>> GetDistinctCategories()
     {
         var categories = await _coursesService.GetAllDistinctCategoriesAsync();
         return Ok(categories);
     }
+
     [HttpGet("levels")]
     public async Task<ActionResult<IReadOnlyCollection<CourseLevel>>> GetDistinctLevels()
     {
         var levels = await _coursesService.GetAllDistinctLevelsAsync();
         return Ok(levels);
     }
+
     [HttpGet("languages")]
     public async Task<ActionResult<IReadOnlyCollection<CourseLanguage>>> GetDistinctLanguages()
     {
         var languages = await _coursesService.GetAllDistinctLanguagesAsync();
         return Ok(languages);
     }
+
     [HttpPost("{courseId}/profile-picture/upload")]
     [Authorize]
     public async Task<IActionResult> UploadCourseProfilePicture(Guid courseId, IFormFile file)

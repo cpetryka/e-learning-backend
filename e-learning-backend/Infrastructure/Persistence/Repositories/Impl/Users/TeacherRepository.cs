@@ -39,72 +39,71 @@ public class TeacherRepository : ITeacherRepository
     }
 
     public async Task<List<TeacherAvailabilityDTO>> GetTeacherAvailabilityAsync(Guid teacherId)
-{
-    var teacherAvailability = await _context.Availabilities
-        .Include(a => a.TimeSlots)
-        .Where(a => a.TeacherId == teacherId)
-        .ToListAsync();
-
-    var today = DateTime.Today;
-    var currentDayOfWeek = (int)today.DayOfWeek;
-    var mondayOffset = currentDayOfWeek == 0 ? -6 : -(currentDayOfWeek - 1);
-    var startDate = DateOnly.FromDateTime(today.AddDays(mondayOffset));
-
-    var daysRange = Enumerable.Range(0, 35)
-        .Select(offset => startDate.AddDays(offset))
-        .ToList();
-
-    var availabilityDtos = daysRange.Select(day =>
     {
-        // Dni przed dzisiejszym -> puste
-        if (day < DateOnly.FromDateTime(today))
-        {
-            return new TeacherAvailabilityDTO
-            {
-                Day = day,
-                Timeslots = new List<TeacherAvailabilityDTO.TimeslotDTO>()
-            };
-        }
+        var teacherAvailability = await _context.Availabilities
+            .Include(a => a.TimeSlots)
+            .Where(a => a.TeacherId == teacherId)
+            .ToListAsync();
 
-        var dayAvailability = teacherAvailability.FirstOrDefault(a => DateOnly.FromDateTime(a.Date) == day);
+        var today = DateTime.Today;
+        var currentDayOfWeek = (int)today.DayOfWeek;
+        var mondayOffset = currentDayOfWeek == 0 ? -6 : -(currentDayOfWeek - 1);
+        var startDate = DateOnly.FromDateTime(today.AddDays(mondayOffset));
 
-        if (dayAvailability == null)
-        {
-            return new TeacherAvailabilityDTO
-            {
-                Day = day,
-                Timeslots = new List<TeacherAvailabilityDTO.TimeslotDTO>()
-            };
-        }
-
-        // Timesloty dla dnia aktualnego - filtrujemy te, które już minęły
-        var timeslots = dayAvailability.TimeSlots
-            .OrderBy(t => t.StartTime)
-            .Select(t => new TeacherAvailabilityDTO.TimeslotDTO
-            {
-                TimeFrom = TimeOnly.FromDateTime(t.StartTime),
-                TimeUntil = TimeOnly.FromDateTime(t.EndTime)
-            })
+        var daysRange = Enumerable.Range(0, 35)
+            .Select(offset => startDate.AddDays(offset))
             .ToList();
 
-        // Jeśli to dzisiejszy dzień, odfiltruj przeszłe sloty
-        if (day == DateOnly.FromDateTime(today))
+        var availabilityDtos = daysRange.Select(day =>
         {
-            var currentTime = DateTime.Now.TimeOfDay;
-            timeslots = timeslots
-                .Where(ts => ts.TimeUntil > TimeOnly.FromTimeSpan(currentTime))
+            // Dni przed dzisiejszym -> puste
+            if (day < DateOnly.FromDateTime(today))
+            {
+                return new TeacherAvailabilityDTO
+                {
+                    Day = day,
+                    Timeslots = new List<TeacherAvailabilityDTO.TimeslotDTO>()
+                };
+            }
+
+            var dayAvailability =
+                teacherAvailability.FirstOrDefault(a => DateOnly.FromDateTime(a.Date) == day);
+
+            if (dayAvailability == null)
+            {
+                return new TeacherAvailabilityDTO
+                {
+                    Day = day,
+                    Timeslots = new List<TeacherAvailabilityDTO.TimeslotDTO>()
+                };
+            }
+
+            // Timesloty dla dnia aktualnego - filtrujemy te, które już minęły
+            var timeslots = dayAvailability.TimeSlots
+                .OrderBy(t => t.StartTime)
+                .Select(t => new TeacherAvailabilityDTO.TimeslotDTO
+                {
+                    TimeFrom = TimeOnly.FromDateTime(t.StartTime),
+                    TimeUntil = TimeOnly.FromDateTime(t.EndTime)
+                })
                 .ToList();
-        }
 
-        return new TeacherAvailabilityDTO
-        {
-            Day = day,
-            Timeslots = timeslots
-        };
-    }).ToList();
+            // Jeśli to dzisiejszy dzień, odfiltruj przeszłe sloty
+            if (day == DateOnly.FromDateTime(today))
+            {
+                var currentTime = DateTime.Now.TimeOfDay;
+                timeslots = timeslots
+                    .Where(ts => ts.TimeUntil > TimeOnly.FromTimeSpan(currentTime))
+                    .ToList();
+            }
 
-    return availabilityDtos;
-}
+            return new TeacherAvailabilityDTO
+            {
+                Day = day,
+                Timeslots = timeslots
+            };
+        }).ToList();
 
-
+        return availabilityDtos;
+    }
 }

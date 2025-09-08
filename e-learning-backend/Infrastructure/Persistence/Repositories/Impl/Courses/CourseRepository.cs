@@ -10,7 +10,7 @@ public class CourseRepository : ICourseRepository
 
     public CourseRepository(ApplicationContext context) => _context = context;
 
-   
+
     public async Task<Course?> GetByIdAsync(Guid courseId)
     {
         return await _context.Courses
@@ -25,9 +25,6 @@ public class CourseRepository : ICourseRepository
             .FirstOrDefaultAsync(c => c.Id == courseId);
     }
 
-
-
-    
     public async Task<IEnumerable<Course>> GetAllAsync()
     {
         return await _context.Courses
@@ -43,7 +40,7 @@ public class CourseRepository : ICourseRepository
             .ThenInclude(p => p.Review)
             .ToListAsync();
     }
-    
+
     public async Task<IReadOnlyCollection<CourseCategory>> GetAllDistinctCategoriesAsync()
     {
         return await _context.Courses
@@ -52,7 +49,7 @@ public class CourseRepository : ICourseRepository
             .Distinct()
             .ToListAsync();
     }
-    
+
     public async Task<IReadOnlyCollection<CourseLevel>> GetAllDistinctLevelsAsync()
     {
         return await _context.Courses
@@ -62,7 +59,7 @@ public class CourseRepository : ICourseRepository
             .Distinct()
             .ToListAsync();
     }
-    
+
     public async Task<IReadOnlyCollection<CourseLanguage>> GetAllDistinctLanguagesAsync()
     {
         return await _context.Courses
@@ -72,21 +69,21 @@ public class CourseRepository : ICourseRepository
             .Distinct()
             .ToListAsync();
     }
-    
+
     public async Task AddAsync(Course course)
     {
         await _context.Courses.AddAsync(course);
         await _context.SaveChangesAsync();
     }
 
-    
+
     public async Task UpdateAsync(Course course)
     {
         _context.Courses.Update(course);
         await _context.SaveChangesAsync();
     }
 
-    
+
     public async Task DeleteAsync(Guid id)
     {
         var course = await _context.Courses.FindAsync(id);

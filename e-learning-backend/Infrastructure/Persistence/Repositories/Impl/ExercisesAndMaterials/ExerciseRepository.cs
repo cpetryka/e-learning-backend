@@ -10,35 +10,35 @@ public class ExerciseRepository : IExerciseRepository
 
     public ExerciseRepository(ApplicationContext context) => _context = context;
 
-    
+
     public async Task<Exercise?> GetByIdAsync(Guid id)
         => await _context.Exercises
             .Include(e => e.Class)
             .Include(e => e.ExerciseResources)
             .SingleOrDefaultAsync(e => e.Id == id);
 
-    
+
     public async Task<IEnumerable<Exercise>> GetAllAsync()
         => await _context.Exercises
             .Include(e => e.Class)
             .Include(e => e.ExerciseResources)
             .ToListAsync();
 
-   
+
     public async Task AddAsync(Exercise exercise)
     {
         await _context.Exercises.AddAsync(exercise);
         await _context.SaveChangesAsync();
     }
 
-    
+
     public async Task UpdateAsync(Exercise exercise)
     {
         _context.Exercises.Update(exercise);
         await _context.SaveChangesAsync();
     }
 
-    
+
     public async Task DeleteAsync(Guid id)
     {
         var exercise = await _context.Exercises.FindAsync(id);

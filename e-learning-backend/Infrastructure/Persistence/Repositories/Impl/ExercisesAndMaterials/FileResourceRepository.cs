@@ -11,7 +11,7 @@ public class FileResourceRepository : IFileResourceRepository
     public FileResourceRepository(ApplicationContext context)
         => _context = context;
 
-   
+
     public async Task<FileResource?> GetByIdAsync(Guid id)
         => await _context.FileResources
             .Include(f => f.User)
@@ -19,7 +19,7 @@ public class FileResourceRepository : IFileResourceRepository
             .Include(f => f.ExerciseResources)
             .SingleOrDefaultAsync(f => f.Id == id);
 
-   
+
     public async Task<IEnumerable<FileResource>> GetAllAsync()
         => await _context.FileResources
             .Include(f => f.User)
@@ -27,21 +27,21 @@ public class FileResourceRepository : IFileResourceRepository
             .Include(f => f.ExerciseResources)
             .ToListAsync();
 
-    
+
     public async Task AddAsync(FileResource file)
     {
         await _context.FileResources.AddAsync(file);
         await _context.SaveChangesAsync();
     }
 
-    
+
     public async Task UpdateAsync(FileResource file)
     {
         _context.FileResources.Update(file);
         await _context.SaveChangesAsync();
     }
 
-    
+
     public async Task DeleteAsync(Guid id)
     {
         var file = await _context.FileResources.FindAsync(id);

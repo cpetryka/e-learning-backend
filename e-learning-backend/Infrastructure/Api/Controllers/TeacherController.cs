@@ -27,14 +27,14 @@ public class TeacherController : ControllerBase
 
         return Ok(teacher);
     }
-    
+
     [HttpGet("{teacherId}/reviews")]
     public async Task<IActionResult> GetTeacherReviews(Guid teacherId)
     {
         var reviews = await _teacherService.GetTeacherReviewsAsync(teacherId);
         return Ok(reviews);
     }
-    
+
     [HttpGet("{teacherId}/availability")]
     public async Task<ActionResult<List<TeacherAvailabilityDTO>>> GetAvailability(Guid teacherId)
     {

@@ -10,36 +10,32 @@ public class ClassRepository : IClassRepository
 
     public ClassRepository(ApplicationContext context) => _context = context;
 
-    
+
     public async Task<Class?> GetByIdAsync(Guid id)
         => await _context.Classes
             .Include(c => c.Exercises)
             .Include(c => c.Quizzes)
             .Include(c => c.Files)
             .SingleOrDefaultAsync(c => c.Id == id);
-
-   
+    
     public async Task<IEnumerable<Class>> GetAllAsync()
         => await _context.Classes
             .Include(c => c.Exercises)
             .Include(c => c.Quizzes)
             .Include(c => c.Files)
             .ToListAsync();
-
-  
+    
     public async Task AddAsync(Class cls)
     {
         await _context.Classes.AddAsync(cls);
         await _context.SaveChangesAsync();
     }
-
-   
+    
     public async Task UpdateAsync(Class cls)
     {
         _context.Classes.Update(cls);
         await _context.SaveChangesAsync();
     }
-
     
     public async Task DeleteAsync(Guid id)
     {

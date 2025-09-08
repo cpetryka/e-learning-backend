@@ -19,30 +19,31 @@ public class SecurityService : ISecurityService
 
     public SecurityService(ApplicationContext context, IConfiguration configuration)
     {
-        _context       = context;
+        _context = context;
         _configuration = configuration;
     }
 
     public async Task<AuthorizationResultDto> RegisterAsync(RegisterUserDto dto)
     {
         if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
-            return new AuthorizationResultDto { Success = false, Errors = new[] { "User already exists" } };
+            return new AuthorizationResultDto
+                { Success = false, Errors = new[] { "User already exists" } };
 
         // create domain user
         var domainUser = new User(
-            name:     dto.Name,
-            surname:  dto.Surname,
-            email:    dto.Email,
+            name: dto.Name,
+            surname: dto.Surname,
+            email: dto.Email,
             hashedPassword: BCrypt.Net.BCrypt.HashPassword(dto.Password),
-            phone:         dto.Phone,
+            phone: dto.Phone,
             Role.FromString(dto.InitialRoleStr.Trim()));
 
         // generate tokens
-        var accessToken  = GenerateAccessToken(domainUser);
+        var accessToken = GenerateAccessToken(domainUser);
         var refreshToken = GenerateRefreshToken();
 
         // persist new user
-        domainUser.RefreshToken           = refreshToken;
+        domainUser.RefreshToken = refreshToken;
         domainUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(1);
 
         _context.Users.Add(domainUser);
@@ -51,8 +52,8 @@ public class SecurityService : ISecurityService
         return new AuthorizationResultDto
         {
             UserId = domainUser.Id.ToString(),
-            Success      = true,
-            AccessToken  = accessToken,
+            Success = true,
+            AccessToken = accessToken,
             RefreshToken = refreshToken
         };
     }
@@ -68,23 +69,23 @@ public class SecurityService : ISecurityService
             return new AuthorizationResultDto
             {
                 Success = false,
-                Errors  = new[] { "Invalid e-mail or password" }
+                Errors = new[] { "Invalid e-mail or password" }
             };
         }
 
-        var accessToken  = GenerateAccessToken(user);
+        var accessToken = GenerateAccessToken(user);
         var refreshToken = GenerateRefreshToken();
         var roles = user.Roles.Select(r => r.RoleName).ToList();
-        
-        user.RefreshToken           = refreshToken;
+
+        user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(1);
         await _context.SaveChangesAsync();
 
         return new AuthorizationResultDto
         {
             UserId = user.Id.ToString(),
-            Success      = true,
-            AccessToken  = accessToken,
+            Success = true,
+            AccessToken = accessToken,
             RefreshToken = refreshToken,
             Roles = roles
         };
@@ -101,22 +102,22 @@ public class SecurityService : ISecurityService
             return new AuthorizationResultDto
             {
                 Success = false,
-                Errors  = new[] { "Invalid or expired refresh token" }
+                Errors = new[] { "Invalid or expired refresh token" }
             };
         }
 
-        var newAccessToken  = GenerateAccessToken(user);
+        var newAccessToken = GenerateAccessToken(user);
         var newRefreshToken = GenerateRefreshToken();
 
-        user.RefreshToken           = newRefreshToken;
+        user.RefreshToken = newRefreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(1);
         await _context.SaveChangesAsync();
 
         return new AuthorizationResultDto
         {
             UserId = user.Id.ToString(),
-            Success      = true,
-            AccessToken  = newAccessToken,
+            Success = true,
+            AccessToken = newAccessToken,
             RefreshToken = newRefreshToken,
             Roles = user.Roles.Select(r => r.RoleName).ToList()
         };
@@ -138,7 +139,7 @@ public class SecurityService : ISecurityService
         {
             claims.Add(new Claim(ClaimTypes.Role, role.RoleName));
         }*/
-        
+
         var roleNames = user.Roles.Select(r => r.RoleName).ToList();
         var rolesJson = JsonSerializer.Serialize(roleNames);
 
@@ -147,8 +148,8 @@ public class SecurityService : ISecurityService
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject            = new ClaimsIdentity(claims),
-            Expires            = DateTime.UtcNow.AddMinutes(15),
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddMinutes(15),
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(keyBytes),
                 SecurityAlgorithms.HmacSha256Signature
@@ -156,10 +157,10 @@ public class SecurityService : ISecurityService
         };
 
         var handler = new JwtSecurityTokenHandler();
-        var token   = handler.CreateToken(tokenDescriptor);
+        var token = handler.CreateToken(tokenDescriptor);
         return handler.WriteToken(token);
     }
-    
+
     public async Task LogoutAsync(Guid userId)
     {
         var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == userId);
@@ -169,7 +170,6 @@ public class SecurityService : ISecurityService
         user.RefreshTokenExpiryTime = null;
         await _context.SaveChangesAsync();
     }
-
 
     private string GenerateRefreshToken()
         => Guid.NewGuid().ToString("N");

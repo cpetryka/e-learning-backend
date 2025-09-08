@@ -17,9 +17,8 @@ public class StudentsController : ControllerBase
     {
         _studentsService = studentsService;
     }
-  
+
     [HttpGet("{studentId:guid}")]
-    
     public async Task<IActionResult> GetStudentWithCourses(Guid studentId)
     {
         var student = await _studentsService.GetStudentWithCoursesAsync(studentId);

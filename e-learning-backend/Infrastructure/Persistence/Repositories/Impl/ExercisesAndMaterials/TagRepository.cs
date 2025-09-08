@@ -11,35 +11,35 @@ public class TagRepository : ITagRepository
     public TagRepository(ApplicationContext context)
         => _context = context;
 
-    
+
     public async Task<Tag?> GetByIdAsync(Guid id)
         => await _context.Tags
             .Include(t => t.Teacher)
             .Include(t => t.Files)
             .SingleOrDefaultAsync(t => t.Id == id);
 
-    
+
     public async Task<IEnumerable<Tag>> GetAllAsync()
         => await _context.Tags
             .Include(t => t.Teacher)
             .Include(t => t.Files)
             .ToListAsync();
 
-   
+
     public async Task AddAsync(Tag tag)
     {
         await _context.Tags.AddAsync(tag);
         await _context.SaveChangesAsync();
     }
 
-    
+
     public async Task UpdateAsync(Tag tag)
     {
         _context.Tags.Update(tag);
         await _context.SaveChangesAsync();
     }
 
-   
+
     public async Task DeleteAsync(Guid id)
     {
         var tag = await _context.Tags.FindAsync(id);
@@ -50,7 +50,7 @@ public class TagRepository : ITagRepository
         }
     }
 
-    
+
     public async Task<IEnumerable<Tag>> GetByTeacherIdAsync(Guid teacherId)
         => await _context.Tags
             .Where(t => t.TeacherId == teacherId)

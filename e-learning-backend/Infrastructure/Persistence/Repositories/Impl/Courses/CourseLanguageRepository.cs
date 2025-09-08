@@ -10,30 +10,25 @@ public class CourseLanguageRepository : ICourseLanguageRepository
 
     public CourseLanguageRepository(ApplicationContext context) => _context = context;
 
-    
     public async Task<CourseLanguage?> GetByIdAsync(Guid id)
         => await _context.CourseLanguages
             .SingleOrDefaultAsync(l => l.Id == id);
 
-    
     public async Task<IEnumerable<CourseLanguage>> GetAllAsync()
         => await _context.CourseLanguages
             .ToListAsync();
-
     
     public async Task AddAsync(CourseLanguage language)
     {
         await _context.CourseLanguages.AddAsync(language);
         await _context.SaveChangesAsync();
     }
-
     
     public async Task UpdateAsync(CourseLanguage language)
     {
         _context.CourseLanguages.Update(language);
         await _context.SaveChangesAsync();
     }
-
     
     public async Task DeleteAsync(Guid id)
     {

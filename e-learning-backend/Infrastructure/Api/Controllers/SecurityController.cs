@@ -40,7 +40,7 @@ public class SecurityController : ControllerBase
         if (!authorizationResult.Success)
             return BadRequest(authorizationResult.Errors);
 
-        
+
         SetTokenCookies(authorizationResult.RefreshToken!);
 
         return Ok(new
@@ -49,14 +49,14 @@ public class SecurityController : ControllerBase
             Roles = authorizationResult.Roles
         });
     }
-    
+
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
         if (!Request.Cookies.TryGetValue("RefreshToken", out var refreshToken))
             return BadRequest(new[] { "No refresh token found" });
 
-        
+
         var user = await _securityService.RefreshTokenAsync(refreshToken);
         if (!user.Success)
         {
@@ -64,7 +64,7 @@ public class SecurityController : ControllerBase
             return Ok(new { Message = "Logged out" });
         }
 
-        
+
         var userId = Guid.Parse(user.UserId);
         await _securityService.LogoutAsync(userId);
 
@@ -74,7 +74,7 @@ public class SecurityController : ControllerBase
         return Ok(new { Message = "Logged out" });
     }
 
-    
+
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh()
     {
@@ -95,10 +95,9 @@ public class SecurityController : ControllerBase
         });
     }
 
-    
-    private void SetTokenCookies( string refreshToken)
+
+    private void SetTokenCookies(string refreshToken)
     {
-        
         Response.Cookies.Append("RefreshToken", refreshToken, new CookieOptions
         {
             HttpOnly = true,
@@ -107,6 +106,4 @@ public class SecurityController : ControllerBase
             Expires = DateTime.UtcNow.AddHours(1)
         });
     }
-
-    
 }

@@ -7,7 +7,6 @@ namespace e_learning_backend.Infrastructure.Persistence.Repositories;
 
 public class StudnetsRepository : IStudentsRepository
 {
-    
     private readonly ApplicationContext _context;
 
     public StudnetsRepository(ApplicationContext context)

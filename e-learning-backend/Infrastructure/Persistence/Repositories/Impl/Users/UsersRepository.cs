@@ -14,16 +14,18 @@ public class UsersRepository : IUsersRepository
         => await _context.Users
             .Include(u => u.Roles)
             .SingleOrDefaultAsync(u => u.Id == id);
-    
+
     public async Task<IEnumerable<User>> GetAllAsync()
         => await _context.Users
             .Include(u => u.Roles)
             .ToListAsync();
+
     public async Task AddAsync(User user)
     {
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
     }
+
     public async Task UpdateAsync(User user)
     {
         _context.Users.Update(user);
