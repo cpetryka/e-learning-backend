@@ -4,7 +4,7 @@ using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 
-namespace e_learning_backend.Infrastructure.Security.Impl;
+namespace e_learning_backend.Application.Services;
 
 public class CoursesService : ICoursesService
 {
@@ -105,11 +105,11 @@ public class CoursesService : ICoursesService
             .DefaultIfEmpty(0)
             .Average() ?? 0;
     }
-    
+
     public async Task<IEnumerable<CourseWidgetDTO>> GetCoursesBasedOnQuery(string query)
     {
         var courses = await _courseRepository.GetAllAsync();
-        
+
         return courses
             .Where(course => course.MatchesSearchQuery(query))
             .Select(c => new CourseWidgetDTO

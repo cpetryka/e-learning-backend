@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace e_learning_backend.Infrastructure.Api.Controllers;
 
 using e_learning_backend.Infrastructure.Api.DTO;
-using e_learning_backend.Infrastructure.Api.Services;
+using e_learning_backend.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]

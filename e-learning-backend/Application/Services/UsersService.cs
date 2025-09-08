@@ -4,7 +4,7 @@ using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 
-namespace e_learning_backend.Infrastructure.Security.Impl;
+namespace e_learning_backend.Application.Services;
 
 public class UsersService : IUsersService
 {
@@ -35,7 +35,8 @@ public class UsersService : IUsersService
         };
     }
 
-    public async Task<(bool Success, string Message, ProfilePicture? ProfilePicture)> UploadProfilePictureAsync(Guid userId, IFormFile file)
+    public async Task<(bool Success, string Message, ProfilePicture? ProfilePicture)>
+        UploadProfilePictureAsync(Guid userId, IFormFile file)
     {
         if (file == null || file.Length == 0)
             return (false, "No file uploaded.", null);
@@ -59,7 +60,8 @@ public class UsersService : IUsersService
         using (var stream = new FileStream(filePath, FileMode.Create))
             await file.CopyToAsync(stream);
 
-        var profilePicture = new ProfilePicture(fileName, Path.Combine("uploads", "users", userId.ToString(), fileName));
+        var profilePicture = new ProfilePicture(fileName,
+            Path.Combine("uploads", "users", userId.ToString(), fileName));
         user.SetProfilePicture(profilePicture);
         await _usersRepository.UpdateAsync(user);
 

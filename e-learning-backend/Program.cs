@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using System.Text;
-using e_learning_backend.Infrastructure.Api.Services;
+using e_learning_backend.Application.Services;
 using e_learning_backend.Infrastructure.Configuration;
 using e_learning_backend.Infrastructure.Configuration.Impl;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
@@ -9,7 +9,7 @@ using e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
 using e_learning_backend.Infrastructure.Persistence.Services;
 using e_learning_backend.Infrastructure.Security.Impl;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
-using e_learning_backend.Infrastructure.Security.Impl.Services;
+using e_learning_backend.Infrastructure.Security.Impl;
 using e_learning_backend.Infrastructure.Transformers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;

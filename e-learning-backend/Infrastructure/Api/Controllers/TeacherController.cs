@@ -1,6 +1,6 @@
 ﻿using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
-using e_learning_backend.Infrastructure.Security.Impl.Services;
+using e_learning_backend.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace e_learning_backend.Infrastructure.Api.Controllers;

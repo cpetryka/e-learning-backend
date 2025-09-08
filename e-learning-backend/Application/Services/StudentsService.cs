@@ -2,7 +2,7 @@
 using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 
-namespace e_learning_backend.Infrastructure.Api.Services;
+namespace e_learning_backend.Application.Services;
 
 public class StudentsService : IStudentsService
 {

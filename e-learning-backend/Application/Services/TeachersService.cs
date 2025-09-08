@@ -2,7 +2,7 @@
 using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 
-namespace e_learning_backend.Infrastructure.Security.Impl.Services;
+namespace e_learning_backend.Application.Services;
 
 public class TeachersService : ITeacherService
 {
@@ -34,7 +34,6 @@ public class TeachersService : ITeacherService
                 ? "http://localhost:5249/" + teacher.ProfilePicture.FilePath.Replace("\\", "/")
                 : null
         };
-
     }
 
     public async Task<IEnumerable<TeacherReviewDTO>> GetTeacherReviewsAsync(Guid teacherId)
