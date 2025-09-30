@@ -1,4 +1,5 @@
-﻿using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
+﻿using e_learning_backend.Infrastructure.Persistence.Repositories;
+using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace e_learning_backend.Infrastructure.Api.Controllers;
@@ -12,10 +13,12 @@ using Microsoft.AspNetCore.Mvc;
 public class StudentsController : ControllerBase
 {
     private readonly IStudentsService _studentsService;
+    private readonly IParticipationRepository _participationRepository;
 
-    public StudentsController(IStudentsService studentsService)
+    public StudentsController(IStudentsService studentsService, IParticipationRepository participationRepository)
     {
         _studentsService = studentsService;
+        _participationRepository = participationRepository;
     }
 
     [HttpGet("{studentId:guid}")]
@@ -27,5 +30,18 @@ public class StudentsController : ControllerBase
             return NotFound();
 
         return Ok(student);
+    }
+    
+    [HttpGet("{studentId:guid}/participations")]
+    public async Task<IActionResult> GetStudentParticipations(Guid studentId)
+    {
+        var participations = await _participationRepository.GetBriefByUserIdAsync(studentId);
+        
+        var participationList = participations.ToList();
+
+        if (participationList.Count == 0)
+            return NotFound(); // lub return Ok(participationList);
+
+        return Ok(participationList);
     }
 }

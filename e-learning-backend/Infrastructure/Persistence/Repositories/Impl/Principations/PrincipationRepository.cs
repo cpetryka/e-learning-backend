@@ -1,4 +1,5 @@
 ﻿using e_learning_backend.Domain.Participations;
+using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,6 +60,19 @@ public class ParticipationRepository : IParticipationRepository
             .Include(p => p.Classes)
             .ToListAsync();
 
+    public async Task<IEnumerable<ParticipationBriefDTO>> GetBriefByUserIdAsync(Guid studentId)
+        =>
+            await _context.Participations
+                .Where(p => p.UserId == studentId)
+                .Select(p => new ParticipationBriefDTO
+                {
+                    CourseId = p.CourseId,
+                    UserId = p.UserId,
+                    CourseName = p.Course.Name
+                })
+                .Distinct()
+                .ToListAsync();
+    
     public async Task<IEnumerable<Participation>> GetByCourseIdAsync(Guid courseId)
         => await _context.Participations
             .Where(p => p.CourseId == courseId)
