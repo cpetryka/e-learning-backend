@@ -148,6 +148,7 @@ builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 builder.Services.AddScoped<IStudentsRepository, StudnetsRepository>();
 builder.Services.AddScoped<IParticipationRepository, ParticipationRepository>();
+builder.Services.AddScoped<IClassRepository, ClassRepository>();
 
 
 builder.Services.AddScoped<ISecurityService, SecurityService>();

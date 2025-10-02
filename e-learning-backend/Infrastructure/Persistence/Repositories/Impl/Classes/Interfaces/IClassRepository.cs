@@ -9,4 +9,7 @@ public interface IClassRepository
     Task AddAsync(Class cls);
     Task UpdateAsync(Class cls);
     Task DeleteAsync(Guid id);
+
+    Task<IEnumerable<Class>> GetByUserAndCoursesInDateRangeAsync(Guid userId,
+        IEnumerable<Guid> courseIds, DateTime from, DateTime to);
 }

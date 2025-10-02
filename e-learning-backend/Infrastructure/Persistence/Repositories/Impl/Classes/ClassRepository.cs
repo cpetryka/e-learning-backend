@@ -46,4 +46,28 @@ public class ClassRepository : IClassRepository
             await _context.SaveChangesAsync();
         }
     }
+    
+public async Task<IEnumerable<Class>> GetByUserAndCoursesInDateRangeAsync(
+    Guid studentId,
+    IEnumerable<Guid> courseIds,
+    DateTime from,
+    DateTime to)
+{
+    var classes = await _context.Classes
+        .Include(c => c.Status)
+        .Include(c => c.Exercises)
+        .Include(c => c.Quizzes)
+        .Include(c => c.Files)
+        .Include(c => c.Links)
+        .AsSplitQuery()
+        .Where(c => courseIds.Contains(c.CourseId) &&
+                    _context.Participations.Any(p => p.UserId == studentId && p.CourseId == c.CourseId) &&
+                    c.StartTime >= from &&
+                    c.StartTime <= to)
+        .ToListAsync();
+    
+    return classes;
+}
+
+
 }

@@ -20,6 +20,17 @@ public class ParticipationRepository : IParticipationRepository
             .Include(p => p.Classes)
             .SingleOrDefaultAsync(p => p.UserId == userId && p.CourseId == courseId);
 
+    public async Task<IEnumerable<Participation>> GetByIdsAsync(Guid userId, IEnumerable<Guid> courseIds)
+    {
+        return await _context.Participations
+            .Include(p => p.User)
+            .Include(p => p.Course)
+            .Include(p => p.Review)
+            .Include(p => p.Classes)
+            .Where(p => p.UserId == userId && courseIds.Contains(p.CourseId))
+            .ToListAsync();
+    }
+        
     public async Task<IEnumerable<Participation>> GetAllAsync()
         => await _context.Participations
             .Include(p => p.User)
@@ -59,7 +70,7 @@ public class ParticipationRepository : IParticipationRepository
             .Include(p => p.Review)
             .Include(p => p.Classes)
             .ToListAsync();
-
+    
     public async Task<IEnumerable<ParticipationBriefDTO>> GetBriefByUserIdAsync(Guid studentId)
         =>
             await _context.Participations

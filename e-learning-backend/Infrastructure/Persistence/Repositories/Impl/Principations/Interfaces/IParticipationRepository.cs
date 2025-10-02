@@ -6,6 +6,7 @@ namespace e_learning_backend.Infrastructure.Persistence.Repositories;
 public interface IParticipationRepository
 {
     Task<Participation?> GetByIdAsync(Guid userId, Guid courseId);
+    Task<IEnumerable<Participation>> GetByIdsAsync(Guid userId, IEnumerable<Guid> courseIds);
     Task<IEnumerable<Participation>> GetAllAsync();
     Task AddAsync(Participation participation);
     Task UpdateAsync(Participation participation);

@@ -40,8 +40,23 @@ public class StudentsController : ControllerBase
         var participationList = participations.ToList();
 
         if (participationList.Count == 0)
-            return NotFound(); // lub return Ok(participationList);
+            return NotFound();
 
         return Ok(participationList);
+    }
+    
+    [HttpGet("{studentId:guid}/timeline")]
+    public async Task<IActionResult> GetStudentTimeline(
+        Guid studentId,
+        [FromQuery] DateTime? from = null,
+        [FromQuery] DateTime? to = null,
+        [FromQuery] List<Guid>? participationIds = null)
+    {
+        var startDate = from ?? DateTime.UtcNow.AddDays(-30);
+        var endDate = to ?? DateTime.UtcNow;
+
+        var timeline = await _studentsService.GetTimelineAsync(studentId, participationIds, startDate, endDate);
+
+        return Ok(timeline);
     }
 }
