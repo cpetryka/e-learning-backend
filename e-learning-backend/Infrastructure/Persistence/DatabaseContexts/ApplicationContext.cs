@@ -37,6 +37,7 @@ public class ApplicationContext : DbContext
     public DbSet<Exercise> Exercises { get; set; }
     public DbSet<FileResource> FileResources { get; set; }
     public DbSet<ExerciseResource> ExerciseResources { get; set; }
+    public DbSet<LinkResource> LinkResources { get; set; }
     public DbSet<Tag> Tags { get; set; }
     
     public DbSet<QuestionCategory> QuestionCategories { get; set; }
@@ -68,6 +69,7 @@ public class ApplicationContext : DbContext
         modelBuilder.ApplyConfiguration(new ExerciseEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new FileResourceEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new ExerciseResourceEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new LinkResourceEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new TagEntityTypeConfiguration());
 
         modelBuilder.ApplyConfiguration(new QuestionCategoryEntityTypeConfiguration());

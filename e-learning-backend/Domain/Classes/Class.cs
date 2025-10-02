@@ -13,7 +13,6 @@ public class Class
     public string? Comment { get; private set; }
     public string? LinkToMeeting { get; private set; }
     public ClassStatus Status { get; private set; }
-    public HashSet<string> Links { get; } = new();
     
     public Guid UserId { get; set; }
     public Guid CourseId { get; set; }
@@ -27,6 +26,9 @@ public class Class
     
     private readonly HashSet<FileResource> _files = new();
     public IReadOnlyCollection<FileResource> Files => _files;
+    
+    private readonly HashSet<LinkResource> _links = new();
+    public IReadOnlyCollection<LinkResource> Links => _links;
     
     public Class() { }
     public Class(
@@ -119,29 +121,6 @@ public class Class
         }
 
         _quizzes.Remove(quiz);
-    }
-    
-    public void AddLink(string link)
-    {
-        if (string.IsNullOrWhiteSpace(link))
-        {
-            throw new ArgumentException("Link cannot be null or empty.", nameof(link));
-        }
-        
-        Links.Add(link);
-    }
-    
-    public void RemoveLink(string link)
-    {
-        if (string.IsNullOrWhiteSpace(link))
-        {
-            throw new ArgumentException("Link cannot be null or empty.", nameof(link));
-        }
-        
-        if (!Links.Remove(link))
-        {
-            throw new InvalidOperationException("Link does not exist in the class.");
-        }
     }
     
     public void AddFile(FileResource file) 
