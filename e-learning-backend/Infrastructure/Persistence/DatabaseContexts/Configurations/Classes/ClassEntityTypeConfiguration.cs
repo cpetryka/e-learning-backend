@@ -42,11 +42,24 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 {
                     j.HasKey("ClassId", "FileResourceId");
 
-                    j.HasData(new
-                    {
-                        ClassId = Guid.Parse("43333333-3333-3333-3333-333333333333"),
-                        FileResourceId = Guid.Parse("ff555555-5555-5555-5555-555555555555")
-                    });
+                    j.HasData(
+                        new {
+                            ClassId = Guid.Parse("43333333-3333-3333-3333-333333333333"),
+                            FileResourceId = Guid.Parse("ff555555-5555-5555-5555-555555555555")
+                        },
+                        new {
+                            ClassId = Guid.Parse("53333333-3333-3333-3333-333333333333"),
+                            FileResourceId = Guid.Parse("ff555555-5555-5555-5555-555555555555")
+                        },
+                        new {
+                            ClassId = Guid.Parse("73333333-3333-3333-3333-333333333333"),
+                            FileResourceId = Guid.Parse("ff555555-5555-5555-5555-555555555555")
+                        },
+                        new {
+                            ClassId = Guid.Parse("93333333-3333-3333-3333-333333333333"),
+                            FileResourceId = Guid.Parse("ff555555-5555-5555-5555-555555555555")
+                        }
+                    );
                 });
 
         builder.HasMany(c => c.Links)
