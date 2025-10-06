@@ -78,7 +78,7 @@ public class SecurityService : ISecurityService
         var roles = user.Roles.Select(r => r.RoleName).ToList();
 
         user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(1);
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(24);
         await _context.SaveChangesAsync();
 
         return new AuthorizationResultDto
@@ -110,7 +110,7 @@ public class SecurityService : ISecurityService
         var newRefreshToken = GenerateRefreshToken();
 
         user.RefreshToken = newRefreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(1);
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(24);
         await _context.SaveChangesAsync();
 
         return new AuthorizationResultDto
@@ -149,7 +149,7 @@ public class SecurityService : ISecurityService
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(15),
+            Expires = DateTime.UtcNow.AddHours(1),
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(keyBytes),
                 SecurityAlgorithms.HmacSha256Signature
