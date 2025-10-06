@@ -65,6 +65,7 @@ public class StudentsService : IStudentsService
             Links = c.Links?.Select(l => l.Link).ToHashSet() ?? new HashSet<string>(),
             UserId = studentId,
             CourseId = c.CourseId,
+            CourseName = c.Participation.Course.Name,
             Exercises = c.Exercises.Select(e => new ExercisePreviewDto
             {
                 Id = e.Id,
@@ -79,7 +80,10 @@ public class StudentsService : IStudentsService
             Files = c.Files.Select(f => new FilePreviewDto
             {
                 Id = f.Id,
-                Name = f.Name
+                Name = f.Name,
+                Path = f.Path,
+                CourseName = c.Participation.Course.Name,
+                ClassDate = c.StartTime
             })
         });
     }

@@ -10,6 +10,7 @@ public class ClassBriefDto
     
     public Guid UserId { get; set; }
     public Guid CourseId { get; set; }
+    public string CourseName { get; set; } = default!;
 
     public IEnumerable<ExercisePreviewDto> Exercises { get; set; } = new List<ExercisePreviewDto>();
     public IEnumerable<QuizPreviewDto> Quizzes { get; set; } = new List<QuizPreviewDto>();
@@ -33,4 +34,7 @@ public class FilePreviewDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = default!;
+    public string Path { get; set; } = default!;
+    public string CourseName { get; set; }
+    public DateTime ClassDate { get; set; }
 }

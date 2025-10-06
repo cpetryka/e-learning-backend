@@ -59,6 +59,8 @@ public async Task<IEnumerable<Class>> GetByUserAndCoursesInDateRangeAsync(
         .Include(c => c.Quizzes)
         .Include(c => c.Files)
         .Include(c => c.Links)
+        .Include(c => c.Participation)
+            .ThenInclude(p => p.Course)
         .AsSplitQuery()
         .Where(c => courseIds.Contains(c.CourseId) &&
                     _context.Participations.Any(p => p.UserId == studentId && p.CourseId == c.CourseId) &&
