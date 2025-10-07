@@ -13,7 +13,7 @@ namespace e_learning_backend.Infrastructure.Api;
 public class CoursesController : ControllerBase
 {
     private readonly ICoursesService _coursesService;
-
+    
     public CoursesController(ICoursesService coursesService)
     {
         _coursesService = coursesService;
@@ -58,6 +58,14 @@ public class CoursesController : ControllerBase
 
         return Ok(courseDetails);
     }
+    
+    [HttpGet("{courseId}/teacher/availability")]
+    public async Task<IActionResult> GetAvailabilityByCourseId(Guid courseId)
+    {
+        var availability = await _coursesService.GetTeacherAvailabilityByCourseId(courseId);
+        return Ok(availability);
+    }
+
 
     [HttpGet("categories")]
     public async Task<ActionResult<IReadOnlyCollection<CourseCategory>>> GetDistinctCategories()

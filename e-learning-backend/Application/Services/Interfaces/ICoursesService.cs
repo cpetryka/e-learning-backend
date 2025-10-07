@@ -22,5 +22,6 @@ public interface ICoursesService
     Task<IReadOnlyCollection<CourseCategory>> GetAllDistinctCategoriesAsync();
     Task<IReadOnlyCollection<CourseLevel>> GetAllDistinctLevelsAsync();
     Task<IReadOnlyCollection<CourseLanguage>> GetAllDistinctLanguagesAsync();
+    Task<List<TeacherAvailabilityDTO>> GetTeacherAvailabilityByCourseId(Guid courseId);
     Task<(bool Success, string Message, ProfilePicture? ProfilePicture)> UploadProfilePictureAsync(Guid courseId, Guid userId, IFormFile file);
 }

@@ -105,6 +105,18 @@ public class CoursesService : ICoursesService
             .DefaultIfEmpty(0)
             .Average() ?? 0;
     }
+    
+    public async Task<List<TeacherAvailabilityDTO>> GetTeacherAvailabilityByCourseId(Guid courseId)
+    {
+        var course = await _courseRepository.GetByIdAsync(courseId);
+        if (course is null || course.Teacher is null)
+            return new List<TeacherAvailabilityDTO>();
+        var teacherId = course.Teacher.Id;
+        return await _teacherService.GetTeacherAvailabilityAsync(teacherId);
+    }
+
+
+
 
     public async Task<IEnumerable<CourseWidgetDTO>> GetCoursesBasedOnQuery(string query)
     {
