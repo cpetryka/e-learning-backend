@@ -147,6 +147,7 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
                 HashedPassword = BCrypt.Net.BCrypt.HashPassword("teacher2", salt),
                 Phone = "+1-202-555-0105",
                 AboutMe = "Physics enthusiast who loves experiments.",
+              
                 RefreshToken = (string?)null,
                 RefreshTokenExpiryTime = (DateTime?)null
             },
@@ -218,6 +219,41 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
                 new { UserId = student2Id, RoleName = Role.Student.RoleName },
                 new { UserId = spectatorStudentId, RoleName = Role.Student.RoleName },
                 new { UserId = spectatorStudentId, RoleName = Role.Spectator.RoleName }
+            );
+        });
+        
+        builder.OwnsOne(u => u.ProfilePicture, pp =>
+        {
+            pp.Property(p => p.FileName)
+                .HasMaxLength(255)
+                .HasColumnName("ProfilePictureFileName");
+
+            pp.Property(p => p.FilePath)
+                .HasMaxLength(500)
+                .HasColumnName("ProfilePictureFilePath");
+
+            pp.Property(p => p.UploadedAt)
+                .HasColumnName("ProfilePictureUploadedAt");
+            
+            pp.HasData(
+                new {
+                    UserId = teacherId,
+                    FileName = "profile-picture.jpg",
+                    FilePath = @"uploads\users\11111111-1111-1111-1111-111111111111\profile-picture.jpg",
+                    UploadedAt = DateTime.SpecifyKind(DateTime.Parse("2000-01-01 00:00:00"), DateTimeKind.Utc)
+                },
+                new {
+                    UserId = teacher2Id,
+                    FileName = "profile-picture.jpg",
+                    FilePath = @"uploads\users\555e5555-5555-5555-5555-555555555555\profile-picture.jpg",
+                    UploadedAt = DateTime.SpecifyKind(DateTime.Parse("2000-01-01 00:00:00"), DateTimeKind.Utc)
+                },
+                new {
+                    UserId = teacher3Id,
+                    FileName = "profile-picture.jpg",
+                    FilePath = @"uploads\users\666e6666-6666-6666-6666-666666666666\profile-picture.jpg",
+                    UploadedAt = DateTime.SpecifyKind(DateTime.Parse("2000-01-01 00:00:00"), DateTimeKind.Utc)
+                }
             );
         });
     }
