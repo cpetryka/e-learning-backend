@@ -102,7 +102,7 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting2",
                 ClassStatusId = statusScheduledId,
                 UserId = student1Id,
-                CourseId = courseId
+                CourseId = Guid.Parse("c29ad7cb-dede-4ff6-b119-70dbad602f90")
             },
             new
             {

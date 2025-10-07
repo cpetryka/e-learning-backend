@@ -35,6 +35,4 @@ public class FilePreviewDto
     public Guid Id { get; set; }
     public string Name { get; set; } = default!;
     public string Path { get; set; } = default!;
-    public string CourseName { get; set; }
-    public DateTime ClassDate { get; set; }
 }

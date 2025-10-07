@@ -41,7 +41,7 @@ public class ExerciseEntityTypeConfiguration : IEntityTypeConfiguration<Exercise
             Grade = 4.50,
             Comment = "Good job on the assignment!",
             Status = ExerciseStatus.Graded,
-            ClassId = Guid.Parse("43333333-3333-3333-3333-333333333333")
+            ClassId = Guid.Parse("63333333-3333-3333-3333-333333333333")
         });
     }
 }

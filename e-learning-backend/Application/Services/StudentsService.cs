@@ -81,9 +81,7 @@ public class StudentsService : IStudentsService
             {
                 Id = f.Id,
                 Name = f.Name,
-                Path = f.Path,
-                CourseName = c.Participation.Course.Name,
-                ClassDate = c.StartTime
+                Path = f.Path
             })
         });
     }
