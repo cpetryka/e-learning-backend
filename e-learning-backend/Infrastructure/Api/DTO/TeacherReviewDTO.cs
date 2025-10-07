@@ -2,6 +2,7 @@
 
 public class TeacherReviewDTO
 {
+    public Guid ReviewId { get; set; }
     public string ReviewerName { get; set; }
     public string ReviewerSurname { get; set; }
     public int StarsNumber { get; set; }
