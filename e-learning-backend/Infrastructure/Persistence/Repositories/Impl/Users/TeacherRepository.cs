@@ -30,6 +30,7 @@ public class TeacherRepository : ITeacherRepository
             .Where(p => p.Course.TeacherId == teacherId && p.Review != null)
             .Select(p => new TeacherReviewDTO
             {
+                ReviewId = p.Review.Id,
                 ReviewerName = p.User.Name,
                 ReviewerSurname = p.User.Surname,
                 StarsNumber = p.Review!.StarsNumber,
