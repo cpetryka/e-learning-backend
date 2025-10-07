@@ -1,4 +1,5 @@
-﻿using e_learning_backend.Domain.Classes;
+﻿using e_learning_backend.API.DTOs;
+using e_learning_backend.Domain.Classes;
 
 namespace e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
 
@@ -12,4 +13,8 @@ public interface IClassRepository
 
     Task<IEnumerable<Class>> GetByUserAndCoursesInDateRangeAsync(Guid userId,
         IEnumerable<Guid> courseIds, DateTime from, DateTime to);
+
+    Task<IEnumerable<ClassDTO>> GetUpcomingClassesForStudentAsync(Guid userId);
+    Task<IEnumerable<ClassDTO>> GetUpcomingClassesForTeacherAsync(Guid userId);
+
 }
