@@ -45,7 +45,7 @@ public class TagEntityTypeConfiguration : IEntityTypeConfiguration<Tag>
                         new
                         {
                             TagId = Guid.Parse("aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), // Matematyka
-                            FileResourceId = Guid.Parse("ff555555-5555-5555-5555-555555555555")
+                            FileResourceId = Guid.Parse("ff555555-5555-5555-5555-555553555555")
                         }
                     );
                 }

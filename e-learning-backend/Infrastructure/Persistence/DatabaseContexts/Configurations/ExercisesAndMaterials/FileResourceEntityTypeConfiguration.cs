@@ -4,7 +4,7 @@ using e_learning_backend.Domain.ExercisesAndMaterials;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-public class FileResourceEntityTypeConfiguration : IEntityTypeConfiguration<FileResource>
+public class  FileResourceEntityTypeConfiguration : IEntityTypeConfiguration<FileResource>
 {
     public void Configure(EntityTypeBuilder<FileResource> builder)
     {
@@ -28,7 +28,7 @@ public class FileResourceEntityTypeConfiguration : IEntityTypeConfiguration<File
         
         builder.HasData(new
         {
-            Id = Guid.Parse("ff555555-5555-5555-5555-555555555555"),
+            Id = Guid.Parse("ff555555-5555-5555-5555-555553555555"),
             Name = "example.pdf",
             Path = "/uploads/example.pdf",
             AddedAt = new DateTime(2025, 7, 11, 10, 0, 0, DateTimeKind.Utc),

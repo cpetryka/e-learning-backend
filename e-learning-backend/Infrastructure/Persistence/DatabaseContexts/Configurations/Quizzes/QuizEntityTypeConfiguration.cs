@@ -19,7 +19,7 @@ public class QuizEntityTypeConfiguration : IEntityTypeConfiguration<Quiz>
             {
                 Id = Guid.Parse("40000000-0000-0000-0000-000000000001"),
                 MultipleChoice = true,
-                ClassId = Guid.Parse("73333333-3333-3333-3333-333333333333")
+                ClassId = Guid.Parse("58752bc5-b060-489f-8bca-4649dd909668")
             }
         );
     }
