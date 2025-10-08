@@ -6,6 +6,7 @@ using e_learning_backend.Infrastructure.Configuration.Impl;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
+using e_learning_backend.Infrastructure.Persistence.Repositories.Impl.Users;
 using e_learning_backend.Infrastructure.Persistence.Services;
 using e_learning_backend.Infrastructure.Security.Impl;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
@@ -150,9 +151,10 @@ builder.Services.AddScoped<IStudentsRepository, StudnetsRepository>();
 builder.Services.AddScoped<IParticipationRepository, ParticipationRepository>();
 builder.Services.AddScoped<IClassRepository, ClassRepository>();
 builder.Services.AddScoped<IClassRepository, ClassRepository>();
+builder.Services.AddScoped<ISpectatorsRepository, SpectatorsRepository>();
 
 
-
+builder.Services.AddScoped<ISpectatorsService, SpectatorsService>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddScoped<ICoursesService, CoursesService>();
 builder.Services.AddScoped<IUsersService, UsersService>();

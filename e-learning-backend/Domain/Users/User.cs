@@ -380,7 +380,7 @@ public class User
     }
 
     /// <summary>
-    ///     Adds a user as a spectator to this user.
+    /// Adds a user as a spectator to this user.
     /// This establishes a bidirectional relationship where this user is spectated by the given user,
     /// and the given user spectates this user.
     /// </summary>
@@ -395,7 +395,7 @@ public class User
             throw new ArgumentNullException(nameof(user));
         }
 
-        if (!Roles.Contains(Role.Student))
+        if (!this._roles.Contains(Role.Student))
         {
             throw new InvalidOperationException("Only users with the Student role can have spectators.");
         }

@@ -8,4 +8,6 @@ public interface IUsersService
     Task<AboutMeDTO?> GetAboutMeAsync(Guid userId);
 
     Task<(bool Success, string Message, ProfilePicture? ProfilePicture)> UploadProfilePictureAsync(Guid userId, IFormFile file);
+    Task<bool> ExistsAsync(Guid userId);
+    Task<Guid?> GetIdByEmailAsync(string email);
 }
