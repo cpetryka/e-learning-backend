@@ -394,11 +394,11 @@ public class User
         {
             throw new ArgumentNullException(nameof(user));
         }
-
-        if (!this._roles.Contains(Role.Student))
-        {
-            throw new InvalidOperationException("Only users with the Student role can have spectators.");
-        }
+        //
+        // if (!this._roles.Contains(Role.Student))
+        // {
+        //     throw new InvalidOperationException("Only users with the Student role can have spectators.");
+        // }
 
         _spectatedBy.Add(user);
         user._spectates.Add(this);
