@@ -31,4 +31,18 @@ public class UsersRepository : IUsersRepository
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
     }
+    
+    public Task<bool> ExistsAsync(Guid userId)
+        => _context.Users.AsNoTracking().AnyAsync(u => u.Id == userId);
+    
+    public async Task<Guid?> GetIdByEmailAsync(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email)) return null;
+        var normalized = email.Trim().ToLowerInvariant();
+
+        return await _context.Users.AsNoTracking()
+            .Where(u => u.Email.ToLower() == normalized)
+            .Select(u => (Guid?)u.Id)
+            .SingleOrDefaultAsync();
+    }
 }

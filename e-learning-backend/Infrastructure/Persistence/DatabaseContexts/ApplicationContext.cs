@@ -45,6 +45,7 @@ public class ApplicationContext : DbContext
     public DbSet<Question> Questions { get; set; }
     public DbSet<Quiz> Quizzes { get; set; }
     public DbSet<TeacherQuestionAccess> TeacherQuestionAccesses { get; set; }
+    public DbSet<SpectatorInvite> SpectatorInvites { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -77,5 +78,7 @@ public class ApplicationContext : DbContext
         modelBuilder.ApplyConfiguration(new QuestionEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new QuizEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new TeacherQuestionAccessEntityTypeConfiguration());
+
+        modelBuilder.ApplyConfiguration(new SpectatorInvitesEntityTypeConfiguration());
     }
 }

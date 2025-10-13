@@ -3,6 +3,9 @@ using e_learning_backend.Domain.Users.ValueObjects;
 using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace e_learning_backend.Application.Services;
 
@@ -67,4 +70,8 @@ public class UsersService : IUsersService
 
         return (true, "File uploaded successfully.", profilePicture);
     }
+    public Task<bool> ExistsAsync(Guid userId)
+        => _usersRepository.ExistsAsync(userId);
+    public Task<Guid?> GetIdByEmailAsync(string email) 
+        => _usersRepository.GetIdByEmailAsync(email);
 }

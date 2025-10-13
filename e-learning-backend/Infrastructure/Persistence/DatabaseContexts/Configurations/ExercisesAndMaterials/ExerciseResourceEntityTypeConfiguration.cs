@@ -27,8 +27,8 @@ public class ExerciseResourceEntityTypeConfiguration : IEntityTypeConfiguration<
         
         builder.HasData(new
         {
-            ExerciseId = Guid.Parse("ee111111-1111-1111-1111-111111111111"),
-            FileId = Guid.Parse("ff555555-5555-5555-5555-555555555555"),
+            ExerciseId = Guid.Parse("8b4ef5ee-83fa-464f-a1be-cae5180db6ff"),
+            FileId = Guid.Parse("ff555555-5555-5555-5555-555553555555"),
             Type = ExerciseResourceType.Content
         });
 

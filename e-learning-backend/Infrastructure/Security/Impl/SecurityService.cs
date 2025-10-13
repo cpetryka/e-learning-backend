@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using e_learning_backend.Domain.Users;
@@ -7,6 +8,7 @@ using e_learning_backend.Domain.Users.ValueObjects;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using e_learning_backend.Infrastructure.Persistence.Services;
 using e_learning_backend.Infrastructure.Persistence.Services.DTO;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -173,4 +175,23 @@ public class SecurityService : ISecurityService
 
     private string GenerateRefreshToken()
         => Guid.NewGuid().ToString("N");
+    
+    // --------------------------------------------------------------------------------------------------------
+    /// <summary>
+    /// Generates a cryptographically secure, URL-safe token for spectator invitations.
+    /// </summary>
+    /// <param name="bytes">
+    /// The number of random bytes to use when generating the token.  
+    /// Defaults to <c>32</c>, which provides strong entropy suitable for security-sensitive operations.
+    /// </param>
+    /// <returns>
+    /// A Base64 URL-encoded string representing the secure random token, safe to use in URLs or query parameters.
+    /// </returns>
+    public static string CreateSpectatorInviteSecureToken(int bytes = 32)
+    {
+        var data = new byte[bytes];
+        RandomNumberGenerator.Fill(data);
+        return WebEncoders.Base64UrlEncode(data);
+    }
+
 }

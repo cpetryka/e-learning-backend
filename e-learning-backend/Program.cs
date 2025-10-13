@@ -6,11 +6,15 @@ using e_learning_backend.Infrastructure.Configuration.Impl;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
+using e_learning_backend.Infrastructure.Persistence.Repositories.Impl.Interfaces;
+using e_learning_backend.Infrastructure.Persistence.Repositories.Impl.Users;
 using e_learning_backend.Infrastructure.Persistence.Services;
 using e_learning_backend.Infrastructure.Security.Impl;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 using e_learning_backend.Infrastructure.Security.Impl;
 using e_learning_backend.Infrastructure.Transformers;
+using E_Learning.Domain.Common.Interfaces;
+using E_Learning.Infrastructure.Email;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +23,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ITeacherRepository = e_learning_backend.Infrastructure.Persistence.Repositories.ITeacherRepository;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -149,13 +154,32 @@ builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 builder.Services.AddScoped<IStudentsRepository, StudnetsRepository>();
 builder.Services.AddScoped<IParticipationRepository, ParticipationRepository>();
 builder.Services.AddScoped<IClassRepository, ClassRepository>();
+builder.Services.AddScoped<IClassRepository, ClassRepository>();
+builder.Services.AddScoped<ISpectatorsRepository, SpectatorsRepository>();
 
 
+builder.Services.AddScoped<ISpectatorsService, SpectatorsService>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddScoped<ICoursesService, CoursesService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<ITeacherService, TeachersService>();
 builder.Services.AddScoped<IStudentsService, StudentsService>();
+builder.Services.AddScoped<IClassesService, ClassesService>();
+builder.Services.AddSingleton<IEmailTemplateService, EmailTemplateService>();
+builder.Services.AddScoped<ISpectatorInviteRepository, SpectatorInviteRepository>();
+builder.Services.AddScoped<ISpectatorInviteService, SpectatorInviteService>();
+
+
+
+builder.Services.AddScoped<ISpectatorInviteService, SpectatorInviteService>();
+
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+
+// --------------------------------------------------------------------------------------------------------
+// EMAIL CONFIGURATION
+// --------------------------------------------------------------------------------------------------------
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
 // --------------------------------------------------------------------------------------------------------
 // WEB APPLICATION CONFIGURATION: MIDDLEWARES, ROUTING, AUTHORIZATION, EXCEPTION HANDLING, ETC.

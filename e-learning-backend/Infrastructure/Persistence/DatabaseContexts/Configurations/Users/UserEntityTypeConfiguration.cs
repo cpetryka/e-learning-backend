@@ -1,4 +1,4 @@
-using e_learning_backend.Domain.Users;
+﻿using e_learning_backend.Domain.Users;
 using e_learning_backend.Domain.Users.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -12,7 +12,7 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
         var teacherId = Guid.Parse("11111111-1111-1111-1111-111111111111");
         var teacher2Id = Guid.Parse("555e5555-5555-5555-5555-555555555555");
         var teacher3Id = Guid.Parse("666e6666-6666-6666-6666-666666666666");
-        
+
         var student1Id = Guid.Parse("22222222-2222-2222-2222-222222222222");
         var student2Id = Guid.Parse("33333333-3333-3333-3333-333333333333");
         var spectatorStudentId = Guid.Parse("44444444-4444-4444-4444-444444444444");
@@ -51,7 +51,7 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(500);
 
         builder.Property(x => x.RefreshTokenExpiryTime);
-        
+
         builder.OwnsOne(u => u.ProfilePicture, pp =>
         {
             pp.Property(p => p.FileName)
@@ -117,12 +117,15 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
 
                     j.HasData(new
                     {
-                        SpectatedUserId = teacherId, // student
+                        SpectatedUserId = student1Id, // student
                         SpectatorUserId = spectatorStudentId // spectator
+                    },new
+                    {
+                        SpectatedUserId = student1Id, // student
+                        SpectatorUserId = teacherId // spectator
                     });
                 });
-        
-        
+
 
         // Seed users
         builder.HasData(
@@ -147,7 +150,7 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
                 HashedPassword = BCrypt.Net.BCrypt.HashPassword("teacher2", salt),
                 Phone = "+1-202-555-0105",
                 AboutMe = "Physics enthusiast who loves experiments.",
-              
+
                 RefreshToken = (string?)null,
                 RefreshTokenExpiryTime = (DateTime?)null
             },
@@ -213,6 +216,7 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
 
             r.HasData(
                 new { UserId = teacherId, RoleName = Role.Teacher.RoleName },
+                new { UserId = teacherId, RoleName = Role.Student.RoleName },
                 new { UserId = teacher2Id, RoleName = Role.Teacher.RoleName },
                 new { UserId = teacher3Id, RoleName = Role.Teacher.RoleName },
                 new { UserId = student1Id, RoleName = Role.Student.RoleName },
@@ -221,7 +225,7 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
                 new { UserId = spectatorStudentId, RoleName = Role.Spectator.RoleName }
             );
         });
-        
+
         builder.OwnsOne(u => u.ProfilePicture, pp =>
         {
             pp.Property(p => p.FileName)
@@ -234,21 +238,24 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
 
             pp.Property(p => p.UploadedAt)
                 .HasColumnName("ProfilePictureUploadedAt");
-            
+
             pp.HasData(
-                new {
+                new
+                {
                     UserId = teacherId,
                     FileName = "profile-picture.jpg",
                     FilePath = @"uploads\users\11111111-1111-1111-1111-111111111111\profile-picture.jpg",
                     UploadedAt = DateTime.SpecifyKind(DateTime.Parse("2000-01-01 00:00:00"), DateTimeKind.Utc)
                 },
-                new {
+                new
+                {
                     UserId = teacher2Id,
                     FileName = "profile-picture.jpg",
                     FilePath = @"uploads\users\555e5555-5555-5555-5555-555555555555\profile-picture.jpg",
                     UploadedAt = DateTime.SpecifyKind(DateTime.Parse("2000-01-01 00:00:00"), DateTimeKind.Utc)
                 },
-                new {
+                new
+                {
                     UserId = teacher3Id,
                     FileName = "profile-picture.jpg",
                     FilePath = @"uploads\users\666e6666-6666-6666-6666-666666666666\profile-picture.jpg",
