@@ -7,4 +7,8 @@ public interface ITeacherService
     Task<TeacherDTO?> GetTeacherAsync(Guid teacherId);
     Task<IEnumerable<TeacherReviewDTO>> GetTeacherReviewsAsync(Guid teacherId);
     Task<List<TeacherAvailabilityDTO>> GetTeacherAvailabilityAsync(Guid teacherId);
+    Task<IEnumerable<StudentBriefDTO>> GetStudentsByTeacherIdAsync(Guid teacherId);
+    Task<IEnumerable<CourseBriefDTO>> GetCoursesByTeacherIdAsync(Guid teacherId);
+    Task<IEnumerable<StudentBriefDTO>> GetStudentsByTeacherIdAndCourseIdAsync(Guid teacherId, Guid courseId);
+    Task<IEnumerable<CourseBriefDTO>> GetCoursesByTeacherIdAndStudentIdAsync(Guid teacherId, Guid studentId);
 }

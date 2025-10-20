@@ -46,4 +46,24 @@ public class TeachersService : ITeacherService
     {
         return await _teacherRepository.GetTeacherAvailabilityAsync(teacherId);
     }
+    
+    public async Task<IEnumerable<StudentBriefDTO>> GetStudentsByTeacherIdAsync(Guid teacherId)
+    {
+        return await _teacherRepository.GetStudentsByTeacherIdAsync(teacherId);
+    }
+    
+    public async Task<IEnumerable<CourseBriefDTO>> GetCoursesByTeacherIdAsync(Guid teacherId)
+    {
+        return await _teacherRepository.GetCoursesByTeacherIdAsync(teacherId);
+    }
+    
+    public async Task<IEnumerable<StudentBriefDTO>> GetStudentsByTeacherIdAndCourseIdAsync(Guid teacherId, Guid courseId)
+    {
+        return await _teacherRepository.GetStudentsByTeacherIdAndCourseIdAsync(teacherId, courseId);
+    }
+    
+    public async Task<IEnumerable<CourseBriefDTO>> GetCoursesByTeacherIdAndStudentIdAsync(Guid teacherId, Guid studentId)
+    {
+        return await _teacherRepository.GetCoursesByTeacherIdAndStudentIdAsync(teacherId, studentId);
+    }
 }
