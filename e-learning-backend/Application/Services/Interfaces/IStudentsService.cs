@@ -12,4 +12,6 @@ public interface IStudentsService
         IEnumerable<Guid>? participationIds,
         DateTime from,
         DateTime to);
+    
+    Task<IEnumerable<CourseBriefDTO>> GetStudentCoursesAsync(Guid studentId);
 }
