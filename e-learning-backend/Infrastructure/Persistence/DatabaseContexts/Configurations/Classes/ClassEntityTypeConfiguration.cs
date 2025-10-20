@@ -1577,6 +1577,56 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
             ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
             UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
             CourseId = Guid.Parse("78f0e23b-1b9a-4b07-9191-7f2f332e3ee8")
+        },
+        new
+        {
+            Id = Guid.Parse("74950363-d223-486b-9f33-cc0460b24371"),
+            StartTime = new DateTime(2025, 11, 1, 9, 41, 28, 555, DateTimeKind.Utc),
+            Comment = "Follow-up tasks",
+            LinkToMeeting = "https://example.com/meeting/e9f6b8ab",
+            ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
+            UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+            CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+        },
+        new
+        {
+            Id = Guid.Parse("96115b32-35bb-4795-8acb-ef64c8351075"),
+            StartTime = new DateTime(2026, 1, 12, 7, 10, 52, 417, DateTimeKind.Utc),
+            Comment = "Follow-up tasks",
+            LinkToMeeting = "https://example.com/meeting/f4540cab",
+            ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
+            UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+            CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+        },
+        new
+        {
+            Id = Guid.Parse("13227742-f9f5-497d-8e38-09f5321dd5ec"),
+            StartTime = new DateTime(2025, 12, 10, 3, 57, 8, 73, DateTimeKind.Utc),
+            Comment = "Follow-up tasks",
+            LinkToMeeting = "https://example.com/meeting/9238a4ab",
+            ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
+            UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+            CourseId = Guid.Parse("b13306f3-05fd-4f45-bdeb-8b3f9e90a4bb")
+        },
+        new
+        {
+            Id = Guid.Parse("755881d1-fa2a-42e5-9139-175a8d75592b"),
+            StartTime = new DateTime(2025, 10, 12, 3, 57, 8, 73, DateTimeKind.Utc),
+            Comment = "Follow-up tasks",
+            LinkToMeeting = "https://example.com/meeting/9238a4ab",
+            ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
+            UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+            CourseId = Guid.Parse("b13306f3-05fd-4f45-bdeb-8b3f9e90a4bb")
+        },
+        new
+        {
+            Id = Guid.Parse("f9e2f25f-384d-4c9f-9b85-f390d825a9cf"),
+            StartTime = new DateTime(2025, 10, 10, 3, 57, 8, 73, DateTimeKind.Utc),
+            Comment = "Follow-up tasks",
+            LinkToMeeting = "https://example.com/meeting/9238a4ab",
+            ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
+            UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+            CourseId = Guid.Parse("b13306f3-05fd-4f45-bdeb-8b3f9e90a4bb")
         }
 );
     }
