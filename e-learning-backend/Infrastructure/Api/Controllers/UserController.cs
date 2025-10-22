@@ -30,25 +30,5 @@ public class UsersController : ControllerBase
         if (aboutMe == null) return NotFound();
         return Ok(aboutMe);
     }
-
-    [HttpPost("profile-picture/upload")]
-    [Authorize]
-    public async Task<IActionResult> UploadProfilePicture(IFormFile file)
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (userIdClaim == null || !Guid.TryParse(userIdClaim, out var userId))
-            return Unauthorized();
-
-        var result = await _usersService.UploadProfilePictureAsync(userId, file);
-
-        if (!result.Success)
-            return BadRequest(result.Message);
-
-        return Ok(new
-        {
-            fileName = result.ProfilePicture?.FileName,
-            filePath = result.ProfilePicture?.FilePath,
-            uploadedAt = result.ProfilePicture?.UploadedAt
-        });
-    }
+    
 }

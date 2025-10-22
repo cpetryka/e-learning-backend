@@ -1,8 +1,13 @@
 using System.Security.Claims;
 using System.Text;
+using e_learning_backend.Application.Files;
+using e_learning_backend.Application.Files.Validation;
+using e_learning_backend.Application.Files.Validation.Interfaces;
 using e_learning_backend.Application.Services;
+using e_learning_backend.Application.Services.Interfaces;
 using e_learning_backend.Infrastructure.Configuration;
 using e_learning_backend.Infrastructure.Configuration.Impl;
+using e_learning_backend.Infrastructure.FileStorage;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
@@ -11,7 +16,6 @@ using e_learning_backend.Infrastructure.Persistence.Repositories.Impl.Users;
 using e_learning_backend.Infrastructure.Persistence.Services;
 using e_learning_backend.Infrastructure.Security.Impl;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
-using e_learning_backend.Infrastructure.Security.Impl;
 using e_learning_backend.Infrastructure.Transformers;
 using E_Learning.Domain.Common.Interfaces;
 using E_Learning.Infrastructure.Email;
@@ -21,9 +25,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using ITeacherRepository = e_learning_backend.Infrastructure.Persistence.Repositories.ITeacherRepository;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
+using ITeacherRepository = e_learning_backend.Infrastructure.Persistence.Repositories.ITeacherRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
@@ -113,11 +116,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("spectator", p => p.RequireRole("spectator"));
 });
 
-// Add Swagger with bearer‐token support
+// Swagger + bearer
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "E-LEARNING", Version = "v1" });
-
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -127,17 +129,12 @@ builder.Services.AddSwaggerGen(c =>
         BearerFormat = "JWT",
         Scheme = "Bearer"
     });
-
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
             Array.Empty<string>()
         }
@@ -145,7 +142,21 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // --------------------------------------------------------------------------------------------------------
-// "BEANS" CONFIGURATION
+// FILE SERVER ROOTS 
+// --------------------------------------------------------------------------------------------------------
+var webRoot = builder.Environment.WebRootPath;
+if (string.IsNullOrEmpty(webRoot))
+{
+    webRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+}
+
+Directory.CreateDirectory(webRoot);
+
+var uploadsPath = Path.Combine(webRoot, "uploads");
+Directory.CreateDirectory(uploadsPath);
+
+// --------------------------------------------------------------------------------------------------------
+// "BEANS" CONFIGURATION (DI)
 // --------------------------------------------------------------------------------------------------------
 builder.Services.AddSingleton<IJsonConfigurationProvider, JsonConfigurationProvider>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
@@ -154,8 +165,10 @@ builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 builder.Services.AddScoped<IStudentsRepository, StudnetsRepository>();
 builder.Services.AddScoped<IParticipationRepository, ParticipationRepository>();
 builder.Services.AddScoped<IClassRepository, ClassRepository>();
-builder.Services.AddScoped<IClassRepository, ClassRepository>();
 builder.Services.AddScoped<ISpectatorsRepository, SpectatorsRepository>();
+builder.Services.AddScoped<IFileResourceRepository, FileResourceRepository>();
+
+builder.Services.AddScoped<IUsersFilesService, UsersFilesService>();
 builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
 
 builder.Services.AddScoped<ISpectatorsService, SpectatorsService>();
@@ -165,24 +178,30 @@ builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<ITeacherService, TeachersService>();
 builder.Services.AddScoped<IStudentsService, StudentsService>();
 builder.Services.AddScoped<IClassesService, ClassesService>();
+
 builder.Services.AddSingleton<IEmailTemplateService, EmailTemplateService>();
 builder.Services.AddScoped<ISpectatorInviteRepository, SpectatorInviteRepository>();
 builder.Services.AddScoped<ISpectatorInviteService, SpectatorInviteService>();
 
-
-
-builder.Services.AddScoped<ISpectatorInviteService, SpectatorInviteService>();
-
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
-// --------------------------------------------------------------------------------------------------------
+// Pliki: storage + walidator rozszerzeń
+builder.Services.AddSingleton<IFileStorage, LocalDiskFileStorage>();
+builder.Services.AddSingleton<IFileExtensionValidator.IAssignmentExtensionValidator, AssignmentExtensionValidator>();
+builder.Services.AddSingleton<IFileExtensionValidator.IProfilePictureExtensionValidator, ProfilePictureValidator>();
+
+
 // EMAIL CONFIGURATION
-// --------------------------------------------------------------------------------------------------------
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
-builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
 // --------------------------------------------------------------------------------------------------------
-// WEB APPLICATION CONFIGURATION: MIDDLEWARES, ROUTING, AUTHORIZATION, EXCEPTION HANDLING, ETC.
+//  FILE UPLOAD CONFIGURATION
+// --------------------------------------------------------------------------------------------------------
+builder.Services.Configure<FileUploadOptions>(builder.Configuration.GetSection("FileUpload"));
+builder.Services.PostConfigure<FileUploadOptions>(opts => opts.RootPath = uploadsPath);
+
+// --------------------------------------------------------------------------------------------------------
+// BUILD
 // --------------------------------------------------------------------------------------------------------
 var app = builder.Build();
 
@@ -192,24 +211,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-var webRoot = builder.Environment.WebRootPath;
-if (string.IsNullOrEmpty(webRoot))
-{
-    webRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-}
-
-
-if (!Directory.Exists(webRoot))
-{
-    Directory.CreateDirectory(webRoot);
-}
-
-var uploadsPath = Path.Combine(webRoot, "uploads");
-if (!Directory.Exists(uploadsPath))
-{
-    Directory.CreateDirectory(uploadsPath);
-}
-
+// --------------------------------------------------------------------------------------------------------
+// STATIC FILES: /uploads -> wwwroot/uploads
+// --------------------------------------------------------------------------------------------------------
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(uploadsPath),
@@ -217,9 +221,10 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 
+// --------------------------------------------------------------------------------------------------------
+// PIPELINE
+// --------------------------------------------------------------------------------------------------------
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-
 app.UseRouting();
 
 app.UseCors("AllowFrontend");

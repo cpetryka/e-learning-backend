@@ -1,4 +1,5 @@
 ﻿using e_learning_backend.Domain.ExercisesAndMaterials;
+using e_learning_backend.Domain.Users;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,7 +27,15 @@ public class FileResourceRepository : IFileResourceRepository
             .Include(f => f.Tags)
             .Include(f => f.ExerciseResources)
             .ToListAsync();
-
+    
+    
+    public async Task<IEnumerable<FileResource>> GetByUserIdAsync(Guid userId, CancellationToken ct = default)
+        => await _context.FileResources
+            .AsNoTracking()
+            .Where(f => f.UserId == userId)
+            .OrderByDescending(f => f.AddedAt)
+            .ToListAsync(ct);
+    
 
     public async Task AddAsync(FileResource file)
     {
