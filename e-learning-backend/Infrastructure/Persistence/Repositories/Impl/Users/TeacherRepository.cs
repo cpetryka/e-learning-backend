@@ -107,7 +107,7 @@ public class TeacherRepository : ITeacherRepository
 
         return availabilityDtos;
     }
-    
+
     public async Task<IEnumerable<StudentBriefDTO>> GetStudentsByTeacherIdAsync(Guid teacherId)
     {
         return await _context.Participations
@@ -122,7 +122,7 @@ public class TeacherRepository : ITeacherRepository
             })
             .ToListAsync();
     }
-    
+
     public async Task<IEnumerable<CourseBriefDTO>> GetCoursesByTeacherIdAsync(Guid teacherId)
     {
         return await _context.Courses
@@ -135,8 +135,9 @@ public class TeacherRepository : ITeacherRepository
             })
             .ToListAsync();
     }
-    
-    public async Task<IEnumerable<StudentBriefDTO>> GetStudentsByTeacherIdAndCourseIdAsync(Guid teacherId, Guid courseId)
+
+    public async Task<IEnumerable<StudentBriefDTO>> GetStudentsByTeacherIdAndCourseIdAsync(Guid teacherId,
+        Guid courseId)
     {
         return await _context.Participations
             .Where(p => p.Course.TeacherId == teacherId && p.CourseId == courseId)
@@ -150,8 +151,9 @@ public class TeacherRepository : ITeacherRepository
             })
             .ToListAsync();
     }
-    
-    public async Task<IEnumerable<CourseBriefDTO>> GetCoursesByTeacherIdAndStudentIdAsync(Guid teacherId, Guid studentId)
+
+    public async Task<IEnumerable<CourseBriefDTO>> GetCoursesByTeacherIdAndStudentIdAsync(Guid teacherId,
+        Guid studentId)
     {
         return await _context.Participations
             .Where(p => p.Course.TeacherId == teacherId && p.UserId == studentId)
@@ -164,4 +166,60 @@ public class TeacherRepository : ITeacherRepository
             })
             .ToListAsync();
     }
+
+
+    public async Task<IEnumerable<ClassWithStudentsDTO>> GetClassesWithStudentsByTeacherIdAsync(Guid teacherId)
+    {
+        // 1) Unikalne kursy prowadzone przez nauczyciela (bez kolekcji -> Distinct bez problemu)
+        var courses = await _context.Courses
+            .AsNoTracking()
+            .Where(c => c.TeacherId == teacherId)
+            .Select(c => new { c.Id, c.Name })
+            .ToListAsync();
+
+        var courseIds = courses.Select(c => c.Id).ToList();
+
+        
+        var studentsFlat = await _context.Participations
+            .AsNoTracking()
+            .Where(p => courseIds.Contains(p.CourseId))
+            .Select(p => new
+            {
+                p.CourseId,
+                UserId = p.User.Id,
+                p.User.Name,
+                p.User.Surname
+            })
+            .ToListAsync();
+
+       
+        var studentsByCourse = studentsFlat
+            .GroupBy(x => x.CourseId)
+            .ToDictionary(
+                g => g.Key,
+                g => g.GroupBy(x => x.UserId)
+                    .Select(g2 => new StudentBriefDTO
+                    {
+                        Id = g2.Key,
+                        Name = g2.First().Name ?? string.Empty,
+                        Surname = g2.First().Surname ?? string.Empty
+                    })
+                    .ToList()
+            );
+
+       
+        var result = courses.Select(c => new ClassWithStudentsDTO
+            {
+                CourseId = c.Id,                        
+                CourseName = c.Name ?? string.Empty,
+                Students = studentsByCourse.TryGetValue(c.Id, out var list)
+                    ? list
+                    : new List<StudentBriefDTO>()
+            })
+            .ToList();
+
+        return result;
+    }
+
+
 }

@@ -1,6 +1,8 @@
-﻿using e_learning_backend.Infrastructure.Api.DTO;
+﻿using System.Security.Claims;
+using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 using e_learning_backend.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace e_learning_backend.Infrastructure.Api.Controllers;
@@ -71,5 +73,22 @@ public class TeacherController : ControllerBase
     {
         var students = await _teacherService.GetCoursesByTeacherIdAndStudentIdAsync(teacherId, studentId);
         return Ok(students);
+    }
+    
+    
+    [HttpGet("classes-with-students")]
+    public async Task<IActionResult> GetClassesWithStudents(CancellationToken ct)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (userIdClaim == null)
+            return Unauthorized("Missing NameIdentifier claim in token.");
+
+        if (!Guid.TryParse(userIdClaim, out var teacherId))
+            return Unauthorized("Invalid user ID in token.");
+
+        var result = await _teacherService.GetTeacherClassesWithStudentsAsync(teacherId, ct);
+
+        return Ok(result);
     }
 }

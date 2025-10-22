@@ -66,4 +66,11 @@ public class TeachersService : ITeacherService
     {
         return await _teacherRepository.GetCoursesByTeacherIdAndStudentIdAsync(teacherId, studentId);
     }
+
+    public async Task<IReadOnlyList<ClassWithStudentsDTO>> GetTeacherClassesWithStudentsAsync(Guid teacherId, CancellationToken cancellationToken = default)
+    {
+        var data = await _teacherRepository.GetClassesWithStudentsByTeacherIdAsync(teacherId);
+        var list = data?.ToList() ?? new List<ClassWithStudentsDTO>();
+        return list;
+    }
 }
