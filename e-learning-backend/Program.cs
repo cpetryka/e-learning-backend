@@ -169,6 +169,8 @@ builder.Services.AddScoped<ISpectatorsRepository, SpectatorsRepository>();
 builder.Services.AddScoped<IFileResourceRepository, FileResourceRepository>();
 
 builder.Services.AddScoped<IUsersFilesService, UsersFilesService>();
+builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
+
 builder.Services.AddScoped<ISpectatorsService, SpectatorsService>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddScoped<ICoursesService, CoursesService>();

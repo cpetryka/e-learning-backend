@@ -29,7 +29,7 @@ public class StudentsService : IStudentsService
         {
             Name = $"{student.Name} {student.Surname}",
             CoursesBrief = student.Participations
-                .Select(p => new StudentDTO.CourseBriefDTO
+                .Select(p => new CourseBriefDTO
                 {
                     Id = p.Course.Id,
                     Name = p.Course.Name
@@ -86,4 +86,8 @@ public class StudentsService : IStudentsService
         });
     }
 
+    public async Task<IEnumerable<CourseBriefDTO>> GetStudentCoursesAsync(Guid studentId)
+    {
+        return await _studentsRepository.GetStudentCourses(studentId);
+    }
 }

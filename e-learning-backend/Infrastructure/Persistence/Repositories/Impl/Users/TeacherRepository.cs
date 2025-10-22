@@ -107,4 +107,61 @@ public class TeacherRepository : ITeacherRepository
 
         return availabilityDtos;
     }
+    
+    public async Task<IEnumerable<StudentBriefDTO>> GetStudentsByTeacherIdAsync(Guid teacherId)
+    {
+        return await _context.Participations
+            .Where(p => p.Course.TeacherId == teacherId)
+            .Select(p => p.User)
+            .Distinct()
+            .Select(s => new StudentBriefDTO
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Surname = s.Surname
+            })
+            .ToListAsync();
+    }
+    
+    public async Task<IEnumerable<CourseBriefDTO>> GetCoursesByTeacherIdAsync(Guid teacherId)
+    {
+        return await _context.Courses
+            .Where(c => c.TeacherId == teacherId)
+            .Distinct()
+            .Select(c => new CourseBriefDTO
+            {
+                Id = c.Id,
+                Name = c.Name
+            })
+            .ToListAsync();
+    }
+    
+    public async Task<IEnumerable<StudentBriefDTO>> GetStudentsByTeacherIdAndCourseIdAsync(Guid teacherId, Guid courseId)
+    {
+        return await _context.Participations
+            .Where(p => p.Course.TeacherId == teacherId && p.CourseId == courseId)
+            .Select(p => p.User)
+            .Distinct()
+            .Select(s => new StudentBriefDTO
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Surname = s.Surname
+            })
+            .ToListAsync();
+    }
+    
+    public async Task<IEnumerable<CourseBriefDTO>> GetCoursesByTeacherIdAndStudentIdAsync(Guid teacherId, Guid studentId)
+    {
+        return await _context.Participations
+            .Where(p => p.Course.TeacherId == teacherId && p.UserId == studentId)
+            .Select(p => p.Course)
+            .Distinct()
+            .Select(c => new CourseBriefDTO
+            {
+                Id = c.Id,
+                Name = c.Name
+            })
+            .ToListAsync();
+    }
 }

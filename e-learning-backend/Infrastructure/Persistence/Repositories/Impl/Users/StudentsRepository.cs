@@ -1,5 +1,6 @@
 ﻿using e_learning_backend.Domain.Users;
 using e_learning_backend.Domain.Users.ValueObjects;
+using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,5 +23,18 @@ public class StudnetsRepository : IStudentsRepository
             .Where(u => u.Id == studentId)
             .Where(u => u.Roles.Any(r => r.RoleName == Role.Student.RoleName))
             .FirstOrDefaultAsync();
+    }
+    
+    public async Task<IEnumerable<CourseBriefDTO>> GetStudentCourses(Guid studentId)
+    {
+        return await _context.Participations
+            .Where(p => p.UserId == studentId)
+            .Distinct()
+            .Select(p => new CourseBriefDTO
+            {
+                Id = p.Course.Id,
+                Name = p.Course.Name
+            })
+            .ToListAsync();
     }
 }

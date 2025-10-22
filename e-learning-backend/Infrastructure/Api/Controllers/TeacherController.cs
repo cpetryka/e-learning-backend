@@ -44,4 +44,32 @@ public class TeacherController : ControllerBase
 
         return Ok(availability);
     }
+    
+    [HttpGet("{teacherId}/students")]
+    public async Task<ActionResult<List<TeacherAvailabilityDTO>>> GetStudents(Guid teacherId)
+    {
+        var students = await _teacherService.GetStudentsByTeacherIdAsync(teacherId);
+        return Ok(students);
+    }
+    
+    [HttpGet("{teacherId}/courses")]
+    public async Task<ActionResult<List<TeacherAvailabilityDTO>>> GetCourses(Guid teacherId)
+    {
+        var courses = await _teacherService.GetCoursesByTeacherIdAsync(teacherId);
+        return Ok(courses);
+    }
+    
+    [HttpGet("{teacherId:guid}/courses/{courseId:guid}/students")]
+    public async Task<IActionResult> GetStudentsInCourse(Guid teacherId, Guid courseId)
+    {
+        var students = await _teacherService.GetStudentsByTeacherIdAndCourseIdAsync(teacherId, courseId);
+        return Ok(students);
+    }
+    
+    [HttpGet("{teacherId:guid}/students/{studentId:guid}/courses")]
+    public async Task<IActionResult> GetCoursesOfStudent(Guid teacherId, Guid studentId)
+    {
+        var students = await _teacherService.GetCoursesByTeacherIdAndStudentIdAsync(teacherId, studentId);
+        return Ok(students);
+    }
 }

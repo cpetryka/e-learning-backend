@@ -1,4 +1,6 @@
 ﻿using e_learning_backend.Domain.ExercisesAndMaterials;
+using e_learning_backend.Domain.ExercisesAndMaterials.ValueObjects;
+using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -47,5 +49,25 @@ public class ExerciseRepository : IExerciseRepository
             _context.Exercises.Remove(exercise);
             await _context.SaveChangesAsync();
         }
+    }
+
+    public async Task<IEnumerable<ExerciseBriefDTO>> GetAllUnsolvedExercisesByUserId(Guid userId)
+    {
+        return await _context.Exercises
+            .Include(e => e.Class)
+                .ThenInclude(c => c.Participation)
+            .Include(e => e.ExerciseResources)
+            .Where(e =>
+                (e.Status == ExerciseStatus.Unsolved || e.Status == ExerciseStatus.SolutionAdded)
+                && e.Class.Participation.UserId == userId)
+            .Select(e => new ExerciseBriefDTO
+            {
+                Id = e.Id,
+                CourseId = e.Class.CourseId,
+                CourseName = e.Class.Participation.Course.Name,
+                ClassStartTime = e.Class.StartTime,
+                ExerciseStatus = e.Status.ToString()
+            })
+            .ToListAsync();
     }
 }
