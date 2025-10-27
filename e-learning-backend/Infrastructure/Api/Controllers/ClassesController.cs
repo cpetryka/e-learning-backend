@@ -23,8 +23,8 @@ public class ClassesController :ControllerBase
     
     
     [Authorize]
-    [HttpGet("upcoming")]
-    public async Task<ActionResult<IEnumerable<ClassDTO>>> GetMyUpcomingClassesAsync()
+    [HttpGet("upcoming-as-student")]
+    public async Task<ActionResult<IEnumerable<ClassDTO>>> GetMyUpcomingAsStudentClassesAsync()
     {
         var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdStr, out var userId))
@@ -37,13 +37,39 @@ public class ClassesController :ControllerBase
             .ToList();
 
         IEnumerable<ClassDTO> result;
+        if (roles.Any(r => r.Equals("student", StringComparison.OrdinalIgnoreCase)))
+        {
+            result = await _classesService.GetUpcomingClassesForStudentAsync(userId);
+        }
+        else
+        {
+            return Forbid();
+        }
+
+        if (result == null || !result.Any())
+            return NotFound("No upcoming classes found for the current user.");
+
+        return Ok(result);
+    }
+    
+    [Authorize]
+    [HttpGet("upcoming-as-teacher")]
+    public async Task<ActionResult<IEnumerable<ClassDTO>>> GetMyUpcomingAsTeacherClassesAsync()
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdStr, out var userId))
+            return Unauthorized();
+
+        
+        var roles = User.FindAll(ClaimTypes.Role)
+            .Select(c => c.Value)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        IEnumerable<ClassDTO> result;
         if (roles.Any(r => r.Equals("teacher", StringComparison.OrdinalIgnoreCase)))
         {
             result = await _classesService.GetUpcomingClassesForTeacherAsync(userId);
-        }
-        else if (roles.Any(r => r.Equals("student", StringComparison.OrdinalIgnoreCase)))
-        {
-            result = await _classesService.GetUpcomingClassesForStudentAsync(userId);
         }
         else
         {
