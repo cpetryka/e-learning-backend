@@ -8,4 +8,5 @@ public interface ISecurityService
     Task<AuthorizationResultDto> LoginAsync(LoginUserDto loginUserDto);
     Task<AuthorizationResultDto> RefreshTokenAsync(string refreshToken);
     Task LogoutAsync(Guid userId);
+    Task LogoutByRefreshTokenAsync(string refreshToken);
 }
