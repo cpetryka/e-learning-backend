@@ -2,6 +2,7 @@
 using System.Text.Json;
 using e_learning_backend.API.DTOs;
 using e_learning_backend.Domain.Classes;
+using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -11,17 +12,16 @@ namespace e_learning_backend.Infrastructure.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-
-public class ClassesController :ControllerBase
+public class ClassesController : ControllerBase
 {
     private readonly IClassesService _classesService;
-    
+
     public ClassesController(IClassesService classesService, ILogger<ClassesController> logger)
     {
         _classesService = classesService;
     }
-    
-    
+
+
     [Authorize]
     [HttpGet("upcoming-as-student")]
     public async Task<ActionResult<IEnumerable<ClassDTO>>> GetMyUpcomingAsStudentClassesAsync()
@@ -51,7 +51,7 @@ public class ClassesController :ControllerBase
 
         return Ok(result);
     }
-    
+
     [Authorize]
     [HttpGet("upcoming-as-teacher")]
     public async Task<ActionResult<IEnumerable<ClassDTO>>> GetMyUpcomingAsTeacherClassesAsync()
@@ -60,7 +60,7 @@ public class ClassesController :ControllerBase
         if (!Guid.TryParse(userIdStr, out var userId))
             return Unauthorized();
 
-        
+
         var roles = User.FindAll(ClaimTypes.Role)
             .Select(c => c.Value)
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -81,5 +81,17 @@ public class ClassesController :ControllerBase
 
         return Ok(result);
     }
+    
+    [HttpGet("{classId:guid}")]
+    public async Task<ActionResult<ClassBriefDto>> GetClassDetails(Guid classId)
+    {
+        var classDetails = await _classesService.GetClassBriefAsync(classId);
 
+        if (classDetails == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(classDetails);
+    }
 }

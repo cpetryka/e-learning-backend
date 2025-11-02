@@ -221,5 +221,29 @@ public class TeacherRepository : ITeacherRepository
         return result;
     }
 
-
+    public async Task<IEnumerable<TeacherUpcomingClass>> GetUpcomingClassesAsync(Guid teacherId,
+        DateOnly start, DateOnly end)
+    {
+        return await _context.Classes
+            .Include(c => c.Participation)
+            .ThenInclude(c => c.Course)
+            .Include(c => c.Participation)
+            .ThenInclude(c => c.User)
+            .Where(c => c.Participation.Course.TeacherId == teacherId &&
+                        DateOnly.FromDateTime(c.StartTime) >= start &&
+                        DateOnly.FromDateTime(c.StartTime.AddHours(1)) <= end)
+            .Select(c => new TeacherUpcomingClass
+            {
+                ClassId = c.Id,
+                StudentId = c.UserId,
+                StudentName = c.Participation.User.Name + " " + c.Participation.User.Surname,
+                CourseId = c.Participation.Course.Id,
+                CourseName = c.Participation.Course.Name,
+                ClassDate = DateOnly.FromDateTime(c.StartTime),
+                ClassStartTime = TimeOnly.FromDateTime(c.StartTime),
+                ClassEndTime = TimeOnly.FromDateTime(c.StartTime.AddHours(1))
+            })
+            .ToListAsync();
+        
+    }
 }

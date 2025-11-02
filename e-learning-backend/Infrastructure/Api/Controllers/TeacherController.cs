@@ -91,4 +91,11 @@ public class TeacherController : ControllerBase
 
         return Ok(result);
     }
+    
+    [HttpGet("{teacherId}/upcoming-classes")]
+    public async Task<ActionResult<List<TeacherUpcomingClass>>> GetUpcomingClasses(Guid teacherId, [FromQuery] DateOnly start, [FromQuery] DateOnly end)
+    {
+        var upcomingClasses = await _teacherService.GetUpcomingClassesAsync(teacherId, start, end);
+        return Ok(upcomingClasses);
+    }
 }
