@@ -17,6 +17,10 @@ public class ClassRepository : IClassRepository
             .Include(c => c.Exercises)
             .Include(c => c.Quizzes)
             .Include(c => c.Files)
+            .Include(c => c.Participation)
+                .ThenInclude(p => p.Course)
+            .Include(c => c.Links)
+            .Include(c => c.Status)
             .SingleOrDefaultAsync(c => c.Id == id);
 
     public async Task<IEnumerable<Class>> GetAllAsync()
