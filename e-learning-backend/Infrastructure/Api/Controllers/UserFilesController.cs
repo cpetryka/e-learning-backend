@@ -18,6 +18,7 @@ public class UserFilesController : ControllerBase
     
     
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> Get(CancellationToken ct)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -30,6 +31,7 @@ public class UserFilesController : ControllerBase
     [HttpPost]
     [RequestSizeLimit(50 * 1024 * 1024)]
     [Consumes("multipart/form-data")]
+    [Authorize]
     public async Task<IActionResult> Post(IFormFile file, CancellationToken ct)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -43,6 +45,7 @@ public class UserFilesController : ControllerBase
     [HttpPost("profile-picture")]
     [RequestSizeLimit(5 * 1024 * 1024)] // maks. 5 MB dla zdjęcia profilowego
     [Consumes("multipart/form-data")]
+    [Authorize]
     public async Task<IActionResult> UploadProfilePicture(IFormFile file, CancellationToken ct)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -68,6 +71,30 @@ public class UserFilesController : ControllerBase
         }
     }
 
+    [HttpGet("tags")]
+    [Authorize]
+    public async Task<IActionResult> GetTags()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userId, out var currentUserId))
+            return Unauthorized("Invalid or missing user identifier.");
+        
+        var result = await _service.GetUserFileTags(Guid.Parse(userId), CancellationToken.None);
+        return Ok(result);
+    }
 
-    
+    [HttpDelete]
+    [Authorize]
+    public async Task<IActionResult> Delete(Guid fileId, CancellationToken ct)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userId, out var currentUserId))
+            return Unauthorized("Invalid or missing user identifier.");
+        var deleted = await _service.DeleteFile(Guid.Parse(userId), fileId);
+        return Ok(deleted);
+        
+    }
+
+
+
 }

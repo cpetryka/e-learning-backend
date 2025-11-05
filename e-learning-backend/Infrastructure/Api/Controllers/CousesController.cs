@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using e_learning_backend.Application;
 using e_learning_backend.Domain.Courses;
 using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
@@ -20,26 +21,31 @@ public class CoursesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<CourseWidgetDTO>>> GetCourses(
+    public async Task<ActionResult<PagedResult<CourseWidgetDTO>>> GetCourses(
         [FromQuery] string[]? categories,
         [FromQuery] string[]? levels,
         [FromQuery] string[]? languages,
         [FromQuery] int? priceFrom,
         [FromQuery] int? priceTo,
         [FromQuery] Guid? teacherId,
-        [FromQuery] string? query)
+        [FromQuery] string? query,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10)
     {
-        var courses = await _coursesService.GetCoursesAsync(
+        var pagedResult = await _coursesService.GetCoursesAsync(
             categories,
             levels,
             languages,
             priceFrom,
             priceTo,
             teacherId,
-            query);
+            query,
+            pageNumber,
+            pageSize);
 
-        return Ok(courses);
+        return Ok(pagedResult);
     }
+
 
     [HttpGet("search")]
     public async Task<ActionResult<IEnumerable<CourseWidgetDTO>>> GetCoursesBasedOnSearchQuery(

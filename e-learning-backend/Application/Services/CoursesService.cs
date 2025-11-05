@@ -3,6 +3,7 @@ using e_learning_backend.Domain.Users.ValueObjects;
 using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace e_learning_backend.Application.Services;
 
@@ -23,77 +24,77 @@ public class CoursesService : ICoursesService
         _env = env;
     }
 
-    public async Task<IEnumerable<CourseWidgetDTO>> GetCoursesAsync(
-        string[]? categories,
-        string[]? levels,
-        string[]? languages,
-        int? priceFrom,
-        int? priceTo,
-        Guid? teacherId,
-        string? query)
-    {
-        var courses = await _courseRepository.GetAllAsync();
-
-        var filtered = courses
-            .Where(c =>
-                categories == null || categories.Length == 0 ||
-                categories.Contains(c.Category.Name))
-            .Where(c => !teacherId.HasValue || c.TeacherId == teacherId.Value)
-            .Where(c =>
-                levels == null || levels.Length == 0 ||
-                c.Variants.Any(v => levels.Contains(v.Level.Name)))
-            .Where(c =>
-                languages == null || languages.Length == 0 ||
-                c.Variants.Any(v => languages.Contains(v.Language.Name)))
-            .Where(c =>
-                !priceFrom.HasValue || c.Variants.Any(v => v.Rate.Amount >= priceFrom.Value))
-            .Where(c => !priceTo.HasValue || c.Variants.Any(v => v.Rate.Amount <= priceTo.Value))
-            .Where(c => string.IsNullOrEmpty(query) || c.MatchesSearchQuery(query))
-            .ToList();
-
-        return filtered.Select(c => new CourseWidgetDTO
-        {
-            Id = c.Id,
-            Name = c.Name,
-            Description = c.Description,
-            TeacherName = c.Teacher?.Name ?? "Unknown",
-            TeacherSurname = c.Teacher?.Surname ?? "Unknown",
-            TeacherId = c.Teacher?.Id ?? Guid.Empty,
-            Rating = c.Participations != null && c.Participations.Any(p => p.Review != null)
-                ? c.Participations
-                    .Where(p => p.Review != null)
-                    .Average(p => p.Review!.StarsNumber)
-                : 0,
-
-            MinimumCoursePrice = c.Variants.Any(v => v.Rate != null)
-                ? c.Variants.Min(v => v.Rate!.Amount)
-                : 0,
-
-            MaximumCoursePrice = c.Variants.Any(v => v.Rate != null)
-                ? c.Variants.Max(v => v.Rate!.Amount)
-                : 0,
-
-            LevelVariants = c.Variants
-                .Where(v =>
-                    v.Level != null &&
-                    (levels == null || levels.Length == 0 || levels.Contains(v.Level.Name)))
-                .Select(v => v.Level!.Name)
-                .Distinct()
-                .ToArray(),
-
-            LanguageVariants = c.Variants
-                .Where(v =>
-                    v.Language != null &&
-                    (languages == null || languages.Length == 0 ||
-                     languages.Contains(v.Language.Name)))
-                .Select(v => v.Language!.Name)
-                .Distinct()
-                .ToArray(),
-            ProfilePictureUrl = c.ProfilePicture != null
-                ? "http://localhost:5249/" + c.ProfilePicture.FilePath.Replace("\\", "/")
-                : null
-        }).ToList();
-    }
+    // public async Task<IEnumerable<CourseWidgetDTO>> GetCoursesAsync(
+    //     string[]? categories,
+    //     string[]? levels,
+    //     string[]? languages,
+    //     int? priceFrom,
+    //     int? priceTo,
+    //     Guid? teacherId,
+    //     string? query)
+    // {
+    //     var courses = await _courseRepository.GetAllAsync();
+    //
+    //     var filtered = courses
+    //         .Where(c =>
+    //             categories == null || categories.Length == 0 ||
+    //             categories.Contains(c.Category.Name))
+    //         .Where(c => !teacherId.HasValue || c.TeacherId == teacherId.Value)
+    //         .Where(c =>
+    //             levels == null || levels.Length == 0 ||
+    //             c.Variants.Any(v => levels.Contains(v.Level.Name)))
+    //         .Where(c =>
+    //             languages == null || languages.Length == 0 ||
+    //             c.Variants.Any(v => languages.Contains(v.Language.Name)))
+    //         .Where(c =>
+    //             !priceFrom.HasValue || c.Variants.Any(v => v.Rate.Amount >= priceFrom.Value))
+    //         .Where(c => !priceTo.HasValue || c.Variants.Any(v => v.Rate.Amount <= priceTo.Value))
+    //         .Where(c => string.IsNullOrEmpty(query) || c.MatchesSearchQuery(query))
+    //         .ToList();
+    //
+    //     return filtered.Select(c => new CourseWidgetDTO
+    //     {
+    //         Id = c.Id,
+    //         Name = c.Name,
+    //         Description = c.Description,
+    //         TeacherName = c.Teacher?.Name ?? "Unknown",
+    //         TeacherSurname = c.Teacher?.Surname ?? "Unknown",
+    //         TeacherId = c.Teacher?.Id ?? Guid.Empty,
+    //         Rating = c.Participations != null && c.Participations.Any(p => p.Review != null)
+    //             ? c.Participations
+    //                 .Where(p => p.Review != null)
+    //                 .Average(p => p.Review!.StarsNumber)
+    //             : 0,
+    //
+    //         MinimumCoursePrice = c.Variants.Any(v => v.Rate != null)
+    //             ? c.Variants.Min(v => v.Rate!.Amount)
+    //             : 0,
+    //
+    //         MaximumCoursePrice = c.Variants.Any(v => v.Rate != null)
+    //             ? c.Variants.Max(v => v.Rate!.Amount)
+    //             : 0,
+    //
+    //         LevelVariants = c.Variants
+    //             .Where(v =>
+    //                 v.Level != null &&
+    //                 (levels == null || levels.Length == 0 || levels.Contains(v.Level.Name)))
+    //             .Select(v => v.Level!.Name)
+    //             .Distinct()
+    //             .ToArray(),
+    //
+    //         LanguageVariants = c.Variants
+    //             .Where(v =>
+    //                 v.Language != null &&
+    //                 (languages == null || languages.Length == 0 ||
+    //                  languages.Contains(v.Language.Name)))
+    //             .Select(v => v.Language!.Name)
+    //             .Distinct()
+    //             .ToArray(),
+    //         ProfilePictureUrl = c.ProfilePicture != null
+    //             ? "http://localhost:5249/" + c.ProfilePicture.FilePath.Replace("\\", "/")
+    //             : null
+    //     }).ToList();
+    // }
 
     public async Task<double> GetCourseAverageRatingAsync(Guid courseId)
     {
@@ -114,6 +115,89 @@ public class CoursesService : ICoursesService
         var teacherId = course.Teacher.Id;
         return await _teacherService.GetTeacherAvailabilityAsync(teacherId);
     }
+
+
+public async Task<PagedResult<CourseWidgetDTO>> GetCoursesAsync(
+    string[]? categories,
+    string[]? levels,
+    string[]? languages,
+    int? priceFrom,
+    int? priceTo,
+    Guid? teacherId,
+    string? query,
+    int pageNumber,
+    int pageSize)
+{
+    // Pobieramy IQueryable zamiast całej listy
+    var coursesQuery = _courseRepository.GetAllQueryable();
+
+    // Filtry
+    if (categories != null && categories.Length > 0)
+        coursesQuery = coursesQuery.Where(c => categories.Contains(c.Category.Name));
+
+    if (levels != null && levels.Length > 0)
+        coursesQuery = coursesQuery.Where(c => c.Variants.Any(v => levels.Contains(v.Level.Name)));
+
+    if (languages != null && languages.Length > 0)
+        coursesQuery = coursesQuery.Where(c => c.Variants.Any(v => languages.Contains(v.Language.Name)));
+
+    if (priceFrom.HasValue)
+        coursesQuery = coursesQuery.Where(c => c.Variants.Any(v => v.Rate.Amount >= priceFrom.Value));
+
+    if (priceTo.HasValue)
+        coursesQuery = coursesQuery.Where(c => c.Variants.Any(v => v.Rate.Amount <= priceTo.Value));
+
+    if (teacherId.HasValue)
+        coursesQuery = coursesQuery.Where(c => c.TeacherId == teacherId.Value);
+
+    if (!string.IsNullOrWhiteSpace(query))
+        coursesQuery = coursesQuery.Where(c => c.Name.Contains(query) || c.Description.Contains(query));
+
+    // Liczymy całkowitą liczbę wyników
+    var totalCount = await coursesQuery.CountAsync();
+
+    // Paginacja i mapowanie na DTO
+    var pagedCourses = await coursesQuery
+        .OrderBy(c => c.Name) // domyślne sortowanie
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .Select(c => new CourseWidgetDTO
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Description = c.Description,
+            TeacherName = c.Teacher != null ? c.Teacher.Name : "Unknown",
+            TeacherSurname = c.Teacher != null ? c.Teacher.Surname : "Unknown",
+            TeacherId = c.Teacher != null ? c.Teacher.Id : Guid.Empty,
+            Rating = c.Participations != null && c.Participations.Any(p => p.Review != null)
+                ? c.Participations.Where(p => p.Review != null).Average(p => p.Review!.StarsNumber)
+                : 0,
+            MinimumCoursePrice = c.Variants.Any(v => v.Rate != null) ? c.Variants.Min(v => v.Rate!.Amount) : 0,
+            MaximumCoursePrice = c.Variants.Any(v => v.Rate != null) ? c.Variants.Max(v => v.Rate!.Amount) : 0,
+            LevelVariants = c.Variants
+                .Where(v => v.Level != null)
+                .Select(v => v.Level!.Name)
+                .Distinct()
+                .ToArray(),
+            LanguageVariants = c.Variants
+                .Where(v => v.Language != null)
+                .Select(v => v.Language!.Name)
+                .Distinct()
+                .ToArray(),
+            ProfilePictureUrl = c.ProfilePicture != null
+                ? "http://localhost:5249/" + c.ProfilePicture.FilePath.Replace("\\", "/")
+                : null
+        })
+        .ToListAsync();
+
+    return new PagedResult<CourseWidgetDTO>
+    {
+        Items = pagedCourses,
+        TotalCount = totalCount,
+        Page = pageNumber,
+        PageSize = pageSize
+    };
+}
 
 
 

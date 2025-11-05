@@ -40,6 +40,23 @@ public class CourseRepository : ICourseRepository
             .ThenInclude(p => p.Review)
             .ToListAsync();
     }
+    
+    public IQueryable<Course> GetAllQueryable()
+    {
+        return _context.Courses
+            .Include(c => c.Category)
+            .Include(c => c.Teacher)
+            .Include(c => c.Variants)
+            .ThenInclude(v => v.Level)
+            .Include(c => c.Variants)
+            .ThenInclude(v => v.Language)
+            .Include(c => c.Variants)
+            .ThenInclude(v => v.Rate)
+            .Include(c => c.Participations)
+            .ThenInclude(p => p.Review)
+            .AsQueryable();
+    }
+
 
     public async Task<IReadOnlyCollection<CourseCategory>> GetAllDistinctCategoriesAsync()
     {

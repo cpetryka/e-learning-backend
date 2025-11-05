@@ -12,4 +12,5 @@ public interface ICourseRepository
     Task AddAsync(Course course);
     Task UpdateAsync(Course course);
     Task DeleteAsync(Guid id);
+    IQueryable<Course> GetAllQueryable();
 }

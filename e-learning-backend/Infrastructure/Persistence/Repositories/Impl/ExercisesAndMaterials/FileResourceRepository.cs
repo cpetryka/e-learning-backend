@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
 
-public class FileResourceRepository : IFileResourceRepository
+public class FileResourceRepo3sitory : IFileResourceRepository
 {
     private readonly ApplicationContext _context;
 
-    public FileResourceRepository(ApplicationContext context)
+    public FileResourceRepo3sitory(ApplicationContext context)
         => _context = context;
 
 
@@ -27,12 +27,30 @@ public class FileResourceRepository : IFileResourceRepository
             .Include(f => f.Tags)
             .Include(f => f.ExerciseResources)
             .ToListAsync();
-    
-    
+
+
+    public async Task<bool> DeleteFileAsync(Guid id, CancellationToken ct = default)
+    {
+        var file = await _context.FileResources.FindAsync(new object?[] { id }, ct);
+        
+        if (file is null)
+            return false;
+        
+        _context.FileResources.Remove(file);
+        await _context.SaveChangesAsync(ct);
+        
+        return true;
+    }
+
+
     public async Task<IEnumerable<FileResource>> GetByUserIdAsync(Guid userId, CancellationToken ct = default)
         => await _context.FileResources
             .AsNoTracking()
             .Where(f => f.UserId == userId)
+            .Include(f => f.Tags)
+            .Include(f=>f.Classes)
+                .ThenInclude(f=>f.Participation)
+                .ThenInclude(f=>f.User)
             .OrderByDescending(f => f.AddedAt)
             .ToListAsync(ct);
     
@@ -42,22 +60,12 @@ public class FileResourceRepository : IFileResourceRepository
         await _context.FileResources.AddAsync(file);
         await _context.SaveChangesAsync();
     }
-
+    
 
     public async Task UpdateAsync(FileResource file)
     {
         _context.FileResources.Update(file);
         await _context.SaveChangesAsync();
     }
-
-
-    public async Task DeleteAsync(Guid id)
-    {
-        var file = await _context.FileResources.FindAsync(id);
-        if (file != null)
-        {
-            _context.FileResources.Remove(file);
-            await _context.SaveChangesAsync();
-        }
-    }
+    
 }

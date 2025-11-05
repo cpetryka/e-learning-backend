@@ -21,6 +21,7 @@ namespace e_learning_backend.Application.Services.Interfaces
         private readonly IFileExtensionValidator.IProfilePictureExtensionValidator _profilePicValidator;
         private readonly FileUploadOptions _opts;
         private readonly IFileResourceRepository _fileResourceRepo;
+        private readonly ITagRepository _tagRepo;
 
         public UsersFilesService(
             IFileStorage storage,
@@ -28,7 +29,8 @@ namespace e_learning_backend.Application.Services.Interfaces
             IFileExtensionValidator.IAssignmentExtensionValidator assignmentValidator,
             IFileResourceRepository fileResourceRepo,
             IOptions<FileUploadOptions> opts,
-            IFileExtensionValidator.IProfilePictureExtensionValidator profilePicValidator)
+            IFileExtensionValidator.IProfilePictureExtensionValidator profilePicValidator,
+            ITagRepository tagRepo)
         {
             _storage = storage;
             _repo = repo;
@@ -36,6 +38,7 @@ namespace e_learning_backend.Application.Services.Interfaces
             _opts = opts.Value;
             _fileResourceRepo = fileResourceRepo;
             _profilePicValidator = profilePicValidator;
+            _tagRepo = tagRepo;
         }
 
         /// <summary>
@@ -45,7 +48,7 @@ namespace e_learning_backend.Application.Services.Interfaces
         /// <param name="ct">Cancellation token for asynchronous operations.</param>
         /// <returns>A read-only list of file DTOs sorted by upload date descending.</returns>
         /// <exception cref="ArgumentException">Thrown if user ID is invalid.</exception>
-        public async Task<IReadOnlyList<FileDTO>> GetUserFilesAsync(Guid userId, CancellationToken ct = default)
+        public async Task<List<GetFileDTO>> GetUserFilesAsync(Guid userId, CancellationToken ct = default)
         {
             if (userId == Guid.Empty)
                 throw new ArgumentException("Invalid user identifier.", nameof(userId));
@@ -54,12 +57,18 @@ namespace e_learning_backend.Application.Services.Interfaces
 
             return files
                 .OrderByDescending(f => f.AddedAt)
-                .Select(f => new FileDTO
+                .Select(f => new GetFileDTO()
                 {
                     Id = f.Id,
                     FileName = f.Name,
                     RelativePath = $"/uploads/{f.Path}",
-                    UploadedAt = f.AddedAt
+                    UploadedAt = f.AddedAt,
+                    Tags = f.Tags.Select(t=> new GetFileDTO.TagDTO()
+                    {
+                        Id = t.Id,
+                        Name = t.Name,
+                        OwnerId = f.UserId
+                    }),
                 })
                 .ToList();
         }
@@ -181,6 +190,45 @@ namespace e_learning_backend.Application.Services.Interfaces
                 sizeBytes: file.Length
             );
         }
+
+        public async Task<List<GetFileDTO.TagDTO>> GetUserFileTags(Guid userId, CancellationToken ct = default)
+        {
+            var tags = await _tagRepo.GetByTeacherIdAsync(userId);
+            var result = (tags ?? Enumerable.Empty<Tag>())
+                .GroupBy(t => t.Id)          
+                .Select(g => g.First())
+                .Select(t => new GetFileDTO.TagDTO
+                {
+                    Id    = t.Id,
+                    Name  = t.Name,
+                    OwnerId = t.TeacherId
+                })
+                .ToList();
+            return result;
+        }
+        public async Task<bool> DeleteFile(Guid userId, Guid fileId, CancellationToken ct = default)
+        {
+            if (userId == Guid.Empty || fileId == Guid.Empty)
+                return false;
+
+            var file = await _fileResourceRepo.GetByIdAsync(fileId);
+            if (file is null)
+                return false;
+
+            if (file.UserId != userId)
+                return false;
+
+            var relative = file.Path ?? string.Empty;
+            
+            if (!string.IsNullOrWhiteSpace(relative))
+            {
+                await _storage.DeleteAsync(relative, ct);
+            }
+            
+            await _fileResourceRepo.DeleteFileAsync(fileId, ct);
+            return true;
+        }
+
 
         /// <summary>
         /// Sanitizes a file name by replacing disallowed characters with underscores.

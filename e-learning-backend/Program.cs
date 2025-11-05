@@ -166,7 +166,8 @@ builder.Services.AddScoped<IStudentsRepository, StudnetsRepository>();
 builder.Services.AddScoped<IParticipationRepository, ParticipationRepository>();
 builder.Services.AddScoped<IClassRepository, ClassRepository>();
 builder.Services.AddScoped<ISpectatorsRepository, SpectatorsRepository>();
-builder.Services.AddScoped<IFileResourceRepository, FileResourceRepository>();
+builder.Services.AddScoped<IFileResourceRepository, FileResourceRepo3sitory>();
+builder.Services.AddScoped<ITagRepository, TagRepository>();
 
 builder.Services.AddScoped<IUsersFilesService, UsersFilesService>();
 builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();

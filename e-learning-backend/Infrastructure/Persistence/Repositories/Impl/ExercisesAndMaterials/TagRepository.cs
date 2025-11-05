@@ -54,6 +54,6 @@ public class TagRepository : ITagRepository
     public async Task<IEnumerable<Tag>> GetByTeacherIdAsync(Guid teacherId)
         => await _context.Tags
             .Where(t => t.TeacherId == teacherId)
-            .Include(t => t.Files)
+            .Distinct()
             .ToListAsync();
 }
