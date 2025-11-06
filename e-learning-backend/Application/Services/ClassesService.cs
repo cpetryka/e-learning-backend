@@ -57,6 +57,7 @@ public class ClassesService : IClassesService
             Quizzes = cls.Quizzes.Select(qz => new QuizPreviewDto
             {
                 Id = qz.Id,
+                Title = qz.Title,
                 Score = qz.Score
             }),
 
