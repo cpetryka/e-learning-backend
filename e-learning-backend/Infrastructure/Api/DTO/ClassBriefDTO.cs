@@ -27,6 +27,7 @@ public class ExercisePreviewDto
 public class QuizPreviewDto
 {
     public Guid Id { get; set; }
+    public String Title { get; set; } = default!;
     public double? Score { get;set; }
 }
 
