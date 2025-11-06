@@ -1,4 +1,5 @@
-﻿using e_learning_backend.Domain.Users;
+﻿using e_learning_backend.Domain.ExercisesAndMaterials.ValueObjects;
+using e_learning_backend.Domain.Users;
 using e_learning_backend.Domain.Users.ValueObjects;
 using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
@@ -245,5 +246,24 @@ public class TeacherRepository : ITeacherRepository
             })
             .ToListAsync();
         
+    }
+    
+    public async Task<IEnumerable<ExerciseBriefDTO>> GetExercisesToGradeAsync(Guid teacherId)
+    {
+        return await _context.Exercises
+            .Include(e => e.Class)
+            .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.Course)
+            .Where(e => e.Class.Participation.Course.TeacherId == teacherId &&
+                        e.Status == ExerciseStatus.Submitted)
+            .Select(e => new ExerciseBriefDTO
+            {
+                Id = e.Id,
+                CourseId = e.Class.Participation.Course.Id,
+                CourseName = e.Class.Participation.Course.Name,
+                ClassStartTime = e.Class.StartTime,
+                ExerciseStatus = e.Status.ToString()
+            })
+            .ToListAsync();
     }
 }

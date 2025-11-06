@@ -1,4 +1,5 @@
 ﻿using e_learning_backend.Domain.ExercisesAndMaterials;
+using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,14 +15,14 @@ public class TagRepository : ITagRepository
 
     public async Task<Tag?> GetByIdAsync(Guid id)
         => await _context.Tags
-            .Include(t => t.Teacher)
+            .Include(t => t.User)
             .Include(t => t.Files)
             .SingleOrDefaultAsync(t => t.Id == id);
 
 
     public async Task<IEnumerable<Tag>> GetAllAsync()
         => await _context.Tags
-            .Include(t => t.Teacher)
+            .Include(t => t.User)
             .Include(t => t.Files)
             .ToListAsync();
 
@@ -50,10 +51,44 @@ public class TagRepository : ITagRepository
         }
     }
 
+    
 
-    public async Task<IEnumerable<Tag>> GetByTeacherIdAsync(Guid teacherId)
+    public async Task<IEnumerable<GetTagDTO>> GetTagsByUserIdAsync(Guid userId)
         => await _context.Tags
-            .Where(t => t.TeacherId == teacherId)
-            .Include(t => t.Files)
+            .Where(t => t.UserId == userId)
+            .Select(t => new GetTagDTO
+            {
+                Id = t.Id,
+                Name = t.Name
+            })
             .ToListAsync();
+    
+    public async Task<Guid> AddNewTagAsync(AddTagDTO addTagDto)
+    {
+        var existingTag = await _context.Tags
+            .FirstOrDefaultAsync(t => t.Name == addTagDto.Name && t.UserId == addTagDto.AddedById);
+        
+        if (existingTag != null)
+        {
+            return existingTag.Id;
+        }
+        
+        var tag = new Tag
+        (
+            id: Guid.NewGuid(),
+            name: addTagDto.Name,
+            userId: addTagDto.AddedById
+        );
+        
+        await _context.Tags.AddAsync(tag);
+        await _context.SaveChangesAsync();
+
+        return tag.Id;
+    }
+    
+    public async Task<bool> ExistAsync(string name, Guid userId)
+    {
+        return await _context.Tags
+            .AnyAsync(t => t.Name == name && t.UserId == userId);
+    }
 }

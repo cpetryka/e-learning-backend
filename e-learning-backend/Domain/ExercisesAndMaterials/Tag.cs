@@ -7,8 +7,8 @@ public class Tag
     public Guid Id { get; set; }
     public string Name { get; set; }
     
-    public Guid? TeacherId { get; set; }
-    public User? Teacher { get; set; }
+    public Guid? UserId { get; set; }
+    public User? User { get; set; }
     
     private readonly HashSet<FileResource> _files = new();
     public IReadOnlyCollection<FileResource> Files => _files;
@@ -19,9 +19,16 @@ public class Tag
     {
         Id = id;
         Name = name ?? throw new ArgumentNullException(nameof(name), "Tag name cannot be null or empty.");
-        Teacher = teacher ?? throw new ArgumentNullException(nameof(teacher), "Teacher cannot be null.");
-        TeacherId = teacher.Id;
+        User = teacher ?? throw new ArgumentNullException(nameof(teacher), "Teacher cannot be null.");
+        UserId = teacher.Id;
         teacher.AddTag(this);
+    }
+    
+    public Tag(Guid id, string name, Guid userId)
+    {
+        Id = id;
+        Name = name ?? throw new ArgumentNullException(nameof(name), "Tag name cannot be null or empty.");
+        UserId = userId;
     }
     
     public Tag(Guid id, string name)

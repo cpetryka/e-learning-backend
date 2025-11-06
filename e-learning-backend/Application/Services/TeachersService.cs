@@ -79,4 +79,9 @@ public class TeachersService : ITeacherService
     {
         return await _teacherRepository.GetUpcomingClassesAsync(teacherId, start, end);
     }
+    
+    public async Task<IEnumerable<ExerciseBriefDTO>> GetExercisesToGradeAsync(Guid teacherId)
+    {
+        return await _teacherRepository.GetExercisesToGradeAsync(teacherId);
+    }
 }

@@ -98,4 +98,11 @@ public class TeacherController : ControllerBase
         var upcomingClasses = await _teacherService.GetUpcomingClassesAsync(teacherId, start, end);
         return Ok(upcomingClasses);
     }
+    
+    [HttpGet("{teacherId}/exercises-to-grade")]
+    public async Task<IActionResult> GetExercisesToGrade(Guid teacherId)
+    {
+        var exercises = await _teacherService.GetExercisesToGradeAsync(teacherId);
+        return Ok(exercises);
+    }
 }
