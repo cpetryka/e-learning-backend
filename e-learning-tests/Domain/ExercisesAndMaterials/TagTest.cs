@@ -51,8 +51,8 @@ public class TagTests
             var tag = new Tag(Guid.NewGuid(), "TestTag", teacher);
 
             // Assert
-            Assert.AreEqual(teacher, tag.Teacher);
-            Assert.AreEqual(teacher.Id, tag.TeacherId);
+            Assert.AreEqual(teacher, tag.User);
+            Assert.AreEqual(teacher.Id, tag.UserId);
         }
 
         [TestMethod]
@@ -142,8 +142,8 @@ public class TagTests
             // Assert
             Assert.AreEqual(id, tag.Id);
             Assert.AreEqual(name, tag.Name);
-            Assert.IsNull(tag.Teacher);
-            Assert.IsNull(tag.TeacherId);
+            Assert.IsNull(tag.User);
+            Assert.IsNull(tag.UserId);
         }
         
         [TestMethod]

@@ -16,9 +16,9 @@ public class TagEntityTypeConfiguration : IEntityTypeConfiguration<Tag>
             .IsRequired();
 
         // Relacja 1..* z User (Teacher)
-        builder.HasOne(t => t.Teacher)
+        builder.HasOne(t => t.User)
             .WithMany(u => u.Tags)
-            .HasForeignKey(t => t.TeacherId)
+            .HasForeignKey(t => t.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // Relacja wiele-do-wielu z FileResource
@@ -59,18 +59,19 @@ public class TagEntityTypeConfiguration : IEntityTypeConfiguration<Tag>
             {
                 Id = Guid.Parse("aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                 Name = "Matematyka",
-                TeacherId = teacherId
+                UserId = teacherId
             },
             new 
             {
                 Id = Guid.Parse("aaaaaaa2-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
                 Name = "Fizyka",
-                TeacherId = teacherId
+                UserId = teacherId
             },
             new 
             {
                 Id = Guid.Parse("aaaaaaa3-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-                Name = "Chemia"
+                Name = "Chemia",
+                UserId = teacherId
             }
         );
     }

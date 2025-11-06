@@ -118,13 +118,13 @@ public class ExerciseEntityTypeConfiguration : IEntityTypeConfiguration<Exercise
         {
             Id = Guid.Parse("05c2069e-05f6-4be8-8339-84c67a957c66"),
             Instruction = "Prepare a short presentation on today’s topic.",
-            Status = ExerciseStatus.Unsolved,
+            Status = ExerciseStatus.Submitted,
             ClassId = Guid.Parse("08e9c9b4-5f4c-4886-a7f4-1c04c4ca0e9d")
         },
         new
         {
             Id = Guid.Parse("8c764cd7-1cbf-4653-9da6-75fa7e01cd59"),
-            Instruction = "Solve a set of applied problems.",
+            Instruction = "Solve a set of05c2069e-05f6-4be8-8339-84c67a957c66 applied problems.",
             Status = ExerciseStatus.Unsolved,
             ClassId = Guid.Parse("8443a682-f3f4-4670-90af-3d636655ad12")
         },

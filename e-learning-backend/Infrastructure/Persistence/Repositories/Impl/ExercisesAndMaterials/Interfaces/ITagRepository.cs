@@ -1,4 +1,5 @@
 ﻿using e_learning_backend.Domain.ExercisesAndMaterials;
+using e_learning_backend.Infrastructure.Api.DTO;
 
 namespace e_learning_backend.Infrastructure.Persistence.Repositories;
 
@@ -9,5 +10,7 @@ public interface ITagRepository
     Task AddAsync(Tag tag);
     Task UpdateAsync(Tag tag);
     Task DeleteAsync(Guid id);
-    Task<IEnumerable<Tag>> GetByTeacherIdAsync(Guid teacherId);
+    Task<IEnumerable<GetTagDTO>> GetTagsByUserIdAsync(Guid userId);
+    Task<Guid> AddNewTagAsync(AddTagDTO addTagDto);
+    Task<bool> ExistAsync(string name, Guid userId);
 }

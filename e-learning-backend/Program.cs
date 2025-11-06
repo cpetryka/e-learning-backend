@@ -167,6 +167,7 @@ builder.Services.AddScoped<IParticipationRepository, ParticipationRepository>();
 builder.Services.AddScoped<IClassRepository, ClassRepository>();
 builder.Services.AddScoped<ISpectatorsRepository, SpectatorsRepository>();
 builder.Services.AddScoped<IFileResourceRepository, FileResourceRepository>();
+builder.Services.AddScoped<ITagRepository, TagRepository>();
 
 builder.Services.AddScoped<IUsersFilesService, UsersFilesService>();
 builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
@@ -178,6 +179,7 @@ builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<ITeacherService, TeachersService>();
 builder.Services.AddScoped<IStudentsService, StudentsService>();
 builder.Services.AddScoped<IClassesService, ClassesService>();
+builder.Services.AddScoped<ITagsService, TagsService>();
 
 builder.Services.AddSingleton<IEmailTemplateService, EmailTemplateService>();
 builder.Services.AddScoped<ISpectatorInviteRepository, SpectatorInviteRepository>();
