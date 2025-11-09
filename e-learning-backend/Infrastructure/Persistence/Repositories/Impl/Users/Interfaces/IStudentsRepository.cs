@@ -7,4 +7,5 @@ public interface IStudentsRepository
 {
     Task<User?> GetStudentWithCoursesAsync(Guid studentId);
     Task<IEnumerable<CourseBriefDTO>> GetStudentCourses(Guid studentId);
+    Task<IEnumerable<GetExerciseDTO>> GetAllExercisesByStudentIdAsync(Guid teacherId, Guid? courseId);
 }

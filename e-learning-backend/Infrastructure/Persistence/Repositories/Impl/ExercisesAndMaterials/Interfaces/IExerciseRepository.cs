@@ -11,4 +11,5 @@ public interface IExerciseRepository
     Task UpdateAsync(Exercise exercise);
     Task DeleteAsync(Guid id);
     Task<IEnumerable<ExerciseBriefDTO>> GetAllUnsolvedExercisesByUserId(Guid userId);
+    Task<IEnumerable<GetExerciseDTO>> GetAllExercisesByTeacherId(Guid teacherId);
 }
