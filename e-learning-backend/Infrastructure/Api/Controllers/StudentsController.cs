@@ -14,11 +14,13 @@ public class StudentsController : ControllerBase
 {
     private readonly IStudentsService _studentsService;
     private readonly IParticipationRepository _participationRepository;
+    private readonly IStudentsRepository _studentsRepository;
 
-    public StudentsController(IStudentsService studentsService, IParticipationRepository participationRepository)
+    public StudentsController(IStudentsService studentsService, IParticipationRepository participationRepository, IStudentsRepository studentsRepository)
     {
         _studentsService = studentsService;
         _participationRepository = participationRepository;
+        _studentsRepository = studentsRepository;
     }
 
     [HttpGet("{studentId:guid}")]
@@ -66,5 +68,13 @@ public class StudentsController : ControllerBase
         var courses = await _studentsService.GetStudentCoursesAsync(studentId);
 
         return Ok(courses);
+    }
+    
+    [HttpGet("{studentId:guid}/exercises")]
+    public async Task<IActionResult> GetAllExercisesByStudentIdAsync(Guid studentId, [FromQuery] Guid? courseId)
+    {
+        var exercises = await _studentsRepository.GetAllExercisesByStudentIdAsync(studentId, courseId);
+
+        return Ok(exercises);
     }
 }
