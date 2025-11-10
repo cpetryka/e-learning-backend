@@ -273,6 +273,9 @@ public class TeacherRepository : ITeacherRepository
             .Include(e => e.Class)
             .ThenInclude(c => c.Participation)
             .ThenInclude(p => p.Course)
+            .Include(e => e.Class)
+            .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.User)
             .Include(e => e.ExerciseResources)
             .ThenInclude(e => e.File)
             .Where(e => e.Class.Participation.Course.TeacherId == teacherId)
@@ -281,7 +284,7 @@ public class TeacherRepository : ITeacherRepository
             .Select(e => new GetExerciseDTO()
             {
                 Id = e.Id,
-                Name = e.Class.Participation.Course.Name + " [" + e.Class.StartTime.ToString("yyyy-MM-dd") + "]",
+                Name = e.Class.Participation.Course.Name + " [" + e.Class.StartTime.ToString("yyyy-MM-dd") + "] - " + e.Class.Participation.User.Name + " " + e.Class.Participation.User.Surname,
                 CourseName = e.Class.Participation.Course.Name,
                 Status = e.Status.ToString(),
                 Graded = e.Grade != null,
