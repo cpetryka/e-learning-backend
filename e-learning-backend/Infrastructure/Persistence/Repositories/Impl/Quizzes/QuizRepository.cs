@@ -1,4 +1,5 @@
 ﻿using e_learning_backend.Domain.Quizzes;
+using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -50,4 +51,81 @@ public class QuizRepository : IQuizRepository
             .Where(q => q.ClassId == classId)
             .Include(q => q.Questions)
             .ToListAsync();
+    
+    public async Task<IEnumerable<QuizBriefDTO>> GetQuizzesAsync(
+        Guid? studentId,
+        Guid? courseId,
+        string? searchQuery)
+    {
+        return await _context.Quizzes
+            .Include(q => q.Class)
+            .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.Course)
+            .Where(q => !studentId.HasValue || q.Class.Participation.UserId == studentId.Value)
+            .Where(q => !courseId.HasValue || q.Class.Participation.CourseId == courseId.Value)
+            .Where(q => string.IsNullOrEmpty(searchQuery) || q.Title.ToLower().Contains(searchQuery.ToLower()))
+            .Select(q => new QuizBriefDTO
+            {
+                Id = q.Id,
+                Name = q.Title,
+                CourseId = q.Class.Participation.CourseId,
+                CourseName = q.Class.Participation.Course.Name,
+                QuestionNumber = q.Questions.Count,
+                Completed = q.Score.HasValue
+            })
+            .ToListAsync();
+    }
+    
+    public async Task<QuizDTO> GetQuizDetailsAsync(Guid quizId)
+    {
+        return await _context.Quizzes
+            .Include(q => q.Questions)
+            .Include(q => q.Class)
+            .ThenInclude(c => c.Participation)
+            .Select(q => new QuizDTO
+            {
+                Id = q.Id,
+                Name = q.Title,
+                ClassId = q.ClassId,
+                CourseId = q.Class.Participation.CourseId,
+                CourseName = q.Class.Participation.Course.Name,
+                TeacherId = q.Class.Participation.Course.TeacherId,
+                StudentId = q.Class.UserId,
+                IsMultipleChoice = q.MultipleChoice,
+                Score = q.Score,
+                MaxScore = q.Questions.Count
+            })
+            .SingleOrDefaultAsync(q => q.Id == quizId);
+    }
+    
+    public async Task<IEnumerable<QuizQuestionDTO>> GetQuizQuestionsAsync(Guid quizId)
+    {
+        return await _context.Quizzes
+            .Where(q => q.Id == quizId)
+            .Include(q => q.Questions)
+            .ThenInclude(qq => qq.Categories)
+            .Include(q => q.Questions)
+            .ThenInclude(qq => qq.Answers)
+            .SelectMany(q => q.Questions.Select(qq => new QuizQuestionDTO
+            {
+                Id = qq.Id,
+                Content = qq.Content,
+                Categories = qq.Categories
+                    .Select(qc => new QuestionCategoryDTO
+                    {
+                        Id = qc.Id,
+                        Name = qc.Name
+                    })
+                    .ToList(),
+                Answers = qq.Answers
+                    .Select(a => new AnswerDTO
+                    {
+                        Id = a.Id,
+                        QuestionId = qq.Id,
+                        Content = a.Content
+                    })
+                    .ToList()
+            }))
+            .ToListAsync();
+    }
 }
