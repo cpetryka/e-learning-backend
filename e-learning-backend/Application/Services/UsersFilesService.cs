@@ -41,37 +41,51 @@ namespace e_learning_backend.Application.Services.Interfaces
             _tagRepo = tagRepo;
         }
 
-        /// <summary>
-        /// Retrieves all uploaded files for a given user.
-        /// </summary>
-        /// <param name="userId">The unique identifier of the user.</param>
-        /// <param name="ct">Cancellation token for asynchronous operations.</param>
-        /// <returns>A read-only list of file DTOs sorted by upload date descending.</returns>
-        /// <exception cref="ArgumentException">Thrown if user ID is invalid.</exception>
-        public async Task<List<GetFileDTO>> GetUserFilesAsync(Guid userId, CancellationToken ct = default)
+        public async Task<List<GetFileDTO>> GetUserFilesAsync(
+            Guid userId,
+            IEnumerable<string>? tagNames = null,
+            IEnumerable<string>? fileTypes = null,
+            Guid? ownerId = null,
+            CancellationToken ct = default)
         {
-            if (userId == Guid.Empty)
-                throw new ArgumentException("Invalid user identifier.", nameof(userId));
-
             var files = await _fileResourceRepo.GetByUserIdAsync(userId, ct);
 
-            return files
-                .OrderByDescending(f => f.AddedAt)
-                .Select(f => new GetFileDTO()
-                {
-                    Id = f.Id,
-                    FileName = f.Name,
-                    RelativePath = $"/uploads/{f.Path}",
-                    UploadedAt = f.AddedAt,
-                    Tags = f.Tags.Select(t=> new GetFileDTO.TagDTO()
-                    {
-                        Id = t.Id,
-                        Name = t.Name,
-                        OwnerId = f.UserId
-                    }),
-                })
-                .ToList();
+            // Filtr: tagi po nazwie
+            if (tagNames is { } tagList && tagList.Any())
+            {
+                var tagSet = tagList
+                    .Select(t => t.Trim().ToLower())
+                    .ToHashSet();
+
+                files = files
+                    .Where(f => f.Tags.Any(tag => tagSet.Contains(tag.Name.ToLower())))
+                    .ToList();
+            }
+
+            // Filtr: typ pliku (po liście param type)
+            if (fileTypes is { } typesList && typesList.Any())
+            {
+                var normalizedTypes = typesList
+                    .Select(t => t.Trim().ToLower())
+                    .ToHashSet();
+
+                files = files
+                    .Where(f => normalizedTypes.Contains(f.FileType.ToLower()))
+                    .ToList();
+            }
+
+            // Filtr: właściciel
+            if (ownerId.HasValue)
+            {
+                files = files
+                    .Where(f => f.OwnerInfo?.Id == ownerId.Value)
+                    .ToList();
+            }
+
+            return files;
         }
+
+        
 
         /// <summary>
         /// Uploads a general file for a specific user (assignment, material, etc.).
@@ -191,21 +205,17 @@ namespace e_learning_backend.Application.Services.Interfaces
             );
         }
 
-        public async Task<List<GetFileDTO.TagDTO>> GetUserFileTags(Guid userId, CancellationToken ct = default)
+        public async Task<IEnumerable<GetFileDTO.TagDTO>> GetUserFileTags(Guid userId, CancellationToken ct = default)
         {
-            var tags = await _tagRepo.GetByTeacherIdAsync(userId);
-            var result = (tags ?? Enumerable.Empty<Tag>())
-                .GroupBy(t => t.Id)          
-                .Select(g => g.First())
-                .Select(t => new GetFileDTO.TagDTO
-                {
-                    Id    = t.Id,
-                    Name  = t.Name,
-                    OwnerId = t.TeacherId
-                })
-                .ToList();
-            return result;
+            var tags = await _tagRepo.GetByUserId(userId);
+            return tags;
         }
+        public async Task<List<string>> GetFileExtensionsByUserIdAsync(Guid userId, CancellationToken ct = default) 
+            => await _fileResourceRepo.GetFileExtensionsByUserIdAsync(userId);
+        
+        public Task<List<ClassFileOwnerDTO>> GetClassFileOwnersAsync(Guid userId, CancellationToken ct = default)
+            => _fileResourceRepo.GetClassFileOwnersAsync(userId, ct);
+        
         public async Task<bool> DeleteFile(Guid userId, Guid fileId, CancellationToken ct = default)
         {
             if (userId == Guid.Empty || fileId == Guid.Empty)
@@ -228,6 +238,8 @@ namespace e_learning_backend.Application.Services.Interfaces
             await _fileResourceRepo.DeleteFileAsync(fileId, ct);
             return true;
         }
+
+     
 
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using e_learning_backend.Domain.Users;
+﻿using System.Text.Json;
+using e_learning_backend.Domain.Users;
 using e_learning_backend.Domain.Users.ValueObjects;
 using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
@@ -13,6 +14,16 @@ public class TeacherRepository : ITeacherRepository
     public TeacherRepository(ApplicationContext context)
     {
         _context = context;
+    }
+    private class TeacherAvailabilityRow
+    {
+        public DateOnly Day { get; set; }
+        public string Timeslots { get; set; } = "[]";
+    }
+    private class RawTimeslot
+    {
+        public string TimeFrom { get; set; } = default!;
+        public string TimeUntil { get; set; } = default!;
     }
 
     public async Task<User?> GetTeacherWithDetailsAsync(Guid teacherId)
@@ -39,73 +50,121 @@ public class TeacherRepository : ITeacherRepository
             .ToListAsync();
     }
 
+
+
+    // public async Task<List<TeacherAvailabilityDTO>> GetTeacherAvailabilityAsync(Guid teacherId)
+    // {
+    //     var teacherAvailability = await _context.Availabilities
+    //         .Include(a => a.TimeSlots)
+    //         .Where(a => a.TeacherId == teacherId)
+    //         .ToListAsync();
+    //
+    //     var today = DateTime.Today;
+    //     var currentDayOfWeek = (int)today.DayOfWeek;
+    //     var mondayOffset = currentDayOfWeek == 0 ? -6 : -(currentDayOfWeek - 1);
+    //     var startDate = DateOnly.FromDateTime(today.AddDays(mondayOffset));
+    //
+    //     var daysRange = Enumerable.Range(0, 35)
+    //         .Select(offset => startDate.AddDays(offset))
+    //         .ToList();
+    //
+    //     var availabilityDtos = daysRange.Select(day =>
+    //     {
+    //         // Dni przed dzisiejszym -> puste
+    //         if (day < DateOnly.FromDateTime(today))
+    //         {
+    //             return new TeacherAvailabilityDTO
+    //             {
+    //                 Day = day,
+    //                 Timeslots = new List<TeacherAvailabilityDTO.TimeslotDTO>()
+    //             };
+    //         }
+    //
+    //         var dayAvailability =
+    //             teacherAvailability.FirstOrDefault(a => DateOnly.FromDateTime(a.Date) == day);
+    //
+    //         if (dayAvailability == null)
+    //         {
+    //             return new TeacherAvailabilityDTO
+    //             {
+    //                 Day = day,
+    //                 Timeslots = new List<TeacherAvailabilityDTO.TimeslotDTO>()
+    //             };
+    //         }
+    //
+    //         // Timesloty dla dnia aktualnego - filtrujemy te, które już minęły
+    //         var timeslots = dayAvailability.TimeSlots
+    //             .OrderBy(t => t.StartTime)
+    //             .Select(t => new TeacherAvailabilityDTO.TimeslotDTO
+    //             {
+    //                 TimeFrom = TimeOnly.FromDateTime(t.StartTime),
+    //                 TimeUntil = TimeOnly.FromDateTime(t.EndTime)
+    //             })
+    //             .ToList();
+    //
+    //         // Jeśli to dzisiejszy dzień, odfiltruj przeszłe sloty
+    //         if (day == DateOnly.FromDateTime(today))
+    //         {
+    //             var currentTime = DateTime.Now.TimeOfDay;
+    //             timeslots = timeslots
+    //                 .Where(ts => ts.TimeUntil > TimeOnly.FromTimeSpan(currentTime))
+    //                 .ToList();
+    //         }
+    //
+    //         return new TeacherAvailabilityDTO
+    //         {
+    //             Day = day,
+    //             Timeslots = timeslots
+    //         };
+    //     }).ToList();
+    //
+    //     return availabilityDtos;
+    // }
+    
     public async Task<List<TeacherAvailabilityDTO>> GetTeacherAvailabilityAsync(Guid teacherId)
     {
-        var teacherAvailability = await _context.Availabilities
-            .Include(a => a.TimeSlots)
-            .Where(a => a.TeacherId == teacherId)
+        var rows = await _context.Database
+            .SqlQueryRaw<TeacherAvailabilityRow>(
+                """
+                SELECT
+                    "Day",
+                    "Timeslots"
+                FROM get_teacher_availability({0})
+                """,
+                teacherId
+            )
             .ToListAsync();
 
-        var today = DateTime.Today;
-        var currentDayOfWeek = (int)today.DayOfWeek;
-        var mondayOffset = currentDayOfWeek == 0 ? -6 : -(currentDayOfWeek - 1);
-        var startDate = DateOnly.FromDateTime(today.AddDays(mondayOffset));
-
-        var daysRange = Enumerable.Range(0, 35)
-            .Select(offset => startDate.AddDays(offset))
-            .ToList();
-
-        var availabilityDtos = daysRange.Select(day =>
+        var jsonOptions = new JsonSerializerOptions
         {
-            // Dni przed dzisiejszym -> puste
-            if (day < DateOnly.FromDateTime(today))
-            {
-                return new TeacherAvailabilityDTO
-                {
-                    Day = day,
-                    Timeslots = new List<TeacherAvailabilityDTO.TimeslotDTO>()
-                };
-            }
+            PropertyNameCaseInsensitive = true
+        };
 
-            var dayAvailability =
-                teacherAvailability.FirstOrDefault(a => DateOnly.FromDateTime(a.Date) == day);
+        var result = rows.Select(r =>
+        {
+           
+            var raw = JsonSerializer.Deserialize<List<RawTimeslot>>(r.Timeslots ?? "[]", jsonOptions) ?? new();
 
-            if (dayAvailability == null)
-            {
-                return new TeacherAvailabilityDTO
+            var slots = raw
+                .Select(ts => new TeacherAvailabilityDTO.TimeslotDTO
                 {
-                    Day = day,
-                    Timeslots = new List<TeacherAvailabilityDTO.TimeslotDTO>()
-                };
-            }
-
-            // Timesloty dla dnia aktualnego - filtrujemy te, które już minęły
-            var timeslots = dayAvailability.TimeSlots
-                .OrderBy(t => t.StartTime)
-                .Select(t => new TeacherAvailabilityDTO.TimeslotDTO
-                {
-                    TimeFrom = TimeOnly.FromDateTime(t.StartTime),
-                    TimeUntil = TimeOnly.FromDateTime(t.EndTime)
+                    TimeFrom = TimeOnly.Parse(ts.TimeFrom),
+                    TimeUntil = TimeOnly.Parse(ts.TimeUntil)
                 })
+                // na wszelki wypadek   deduplikacja i sort jak w poprzednich przykładach
+                .DistinctBy(s => (s.TimeFrom, s.TimeUntil))
+                .OrderBy(s => s.TimeFrom)
                 .ToList();
-
-            // Jeśli to dzisiejszy dzień, odfiltruj przeszłe sloty
-            if (day == DateOnly.FromDateTime(today))
-            {
-                var currentTime = DateTime.Now.TimeOfDay;
-                timeslots = timeslots
-                    .Where(ts => ts.TimeUntil > TimeOnly.FromTimeSpan(currentTime))
-                    .ToList();
-            }
 
             return new TeacherAvailabilityDTO
             {
-                Day = day,
-                Timeslots = timeslots
+                Day = r.Day,
+                Timeslots = slots
             };
         }).ToList();
 
-        return availabilityDtos;
+        return result;
+        
     }
 
     public async Task<IEnumerable<StudentBriefDTO>> GetStudentsByTeacherIdAsync(Guid teacherId)
