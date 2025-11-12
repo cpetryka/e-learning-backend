@@ -128,4 +128,88 @@ public class QuizRepository : IQuizRepository
             }))
             .ToListAsync();
     }
+    
+    public async Task<IEnumerable<QuestionCategoryDTO>> GetUserQuestionCategoriesAsync(Guid userId)
+    {
+        return await _context.QuestionCategories
+            .Where(qc => qc.TeacherId == userId)
+            .Select(qc => new QuestionCategoryDTO
+            {
+                Id = qc.Id,
+                Name = qc.Name
+            })
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<QuizQuestionDTO>> GetUserQuestionsAsync(Guid userId, List<Guid>? categoryIds)
+    {
+        var query = _context.Questions
+            .Include(q => q.Accesses)
+            .Where(q => q.Accesses.Any(a => a.TeacherId == userId))
+            .AsQueryable();
+
+        if (categoryIds != null && categoryIds.Any())
+        {
+            query = query.Where(qq => qq.Categories.Any(qc => categoryIds.Contains(qc.Id)));
+        }
+
+        return await query
+            .Select(qq => new QuizQuestionDTO
+            {
+                Id = qq.Id,
+                Content = qq.Content,
+                Categories = qq.Categories
+                    .Select(qc => new QuestionCategoryDTO
+                    {
+                        Id = qc.Id,
+                        Name = qc.Name
+                    })
+                    .ToList()
+            })
+            .ToListAsync()
+            .ContinueWith(t => (IEnumerable<QuizQuestionDTO>)t.Result);
+    }
+
+    public async Task<QuizQuestionDTO> GetFullQuestionAsync(Guid questionId)
+    {
+        return await _context.Questions
+            .Include(q => q.Accesses)
+            .Where(q => q.Id == questionId)
+            .Select(qq => new QuizQuestionDTO
+            {
+                Id = qq.Id,
+                Content = qq.Content,
+                Categories = qq.Categories
+                    .Select(qc => new QuestionCategoryDTO
+                    {
+                        Id = qc.Id,
+                        Name = qc.Name
+                    })
+                    .ToList(),
+                Answers = qq.Answers
+                    .Select(a => new AnswerDTO
+                    {
+                        Id = a.Id,
+                        QuestionId = qq.Id,
+                        Content = a.Content,
+                        Correct = a.IsCorrect
+                    })
+                    .ToList()
+            })
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<QuestionCategoryDTO> CreateQuestionCategoryAsync(Guid userId, string categoryName)
+    {
+        var category = new QuestionCategory(Guid.NewGuid(), categoryName, "", userId);
+
+        _context.QuestionCategories.Add(category);
+        await _context.SaveChangesAsync();
+
+        return new QuestionCategoryDTO
+        {
+            Id = category.Id,
+            Name = category.Name
+        };
+    }
 }

@@ -20,4 +20,8 @@ public interface IQuizRepository
     Task<QuizDTO> GetQuizDetailsAsync(Guid quizId);
     
     Task<IEnumerable<QuizQuestionDTO>> GetQuizQuestionsAsync(Guid quizId);
+    Task<IEnumerable<QuestionCategoryDTO>> GetUserQuestionCategoriesAsync(Guid userId);
+    Task<IEnumerable<QuizQuestionDTO>> GetUserQuestionsAsync(Guid userId, List<Guid>? categoryIds);
+    Task<QuizQuestionDTO> GetFullQuestionAsync(Guid questionId);
+    Task<QuestionCategoryDTO> CreateQuestionCategoryAsync(Guid userId, string categoryName);
 }

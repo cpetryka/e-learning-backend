@@ -30,4 +30,24 @@ public class QuizzesService : IQuizzesService
     {
         return await _quizRepository.GetQuizQuestionsAsync(quizId);
     }
+    
+    public async Task<IEnumerable<QuestionCategoryDTO>> GetUserQuestionCategoriesAsync(Guid userId)
+    {
+        return await _quizRepository.GetUserQuestionCategoriesAsync(userId);
+    }
+    
+    public async Task<IEnumerable<QuizQuestionDTO>> GetUserQuestionsAsync(Guid userId, List<Guid>? categoryIds)
+    {
+        return await _quizRepository.GetUserQuestionsAsync(userId, categoryIds);
+    }
+    
+    public async Task<QuizQuestionDTO> GetFullQuestionAsync(Guid questionId)
+    {
+        return await _quizRepository.GetFullQuestionAsync(questionId);
+    }
+    
+    public async Task<QuestionCategoryDTO> CreateQuestionCategoryAsync(Guid userId, string categoryName)
+    {
+        return await _quizRepository.CreateQuestionCategoryAsync(userId, categoryName);
+    }
 }
