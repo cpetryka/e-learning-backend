@@ -73,4 +73,15 @@ public class TeachersService : ITeacherService
         var list = data?.ToList() ?? new List<ClassWithStudentsDTO>();
         return list;
     }
+    
+    public async Task<IEnumerable<TeacherUpcomingClass>> GetUpcomingClassesAsync(Guid teacherId,
+        DateOnly start, DateOnly end)
+    {
+        return await _teacherRepository.GetUpcomingClassesAsync(teacherId, start, end);
+    }
+    
+    public async Task<IEnumerable<ExerciseBriefDTO>> GetExercisesToGradeAsync(Guid teacherId)
+    {
+        return await _teacherRepository.GetExercisesToGradeAsync(teacherId);
+    }
 }

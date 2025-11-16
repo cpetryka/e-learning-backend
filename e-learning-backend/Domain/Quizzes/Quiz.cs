@@ -6,6 +6,7 @@ namespace e_learning_backend.Domain.Quizzes;
 public class Quiz
 {
     public Guid Id { get; private set; }
+    public string Title { get; private set; }
     public double? Score { get; private set; }
     public bool MultipleChoice { get; private set; }
     
@@ -17,15 +18,16 @@ public class Quiz
     
     protected Quiz() { }
     
-    public Quiz(Guid id, bool multipleChoice, Class singleClass)
+    public Quiz(Guid id, string title, bool multipleChoice, Class singleClass)
     {
         Id = id;
+        Title = title ?? throw new ArgumentNullException(nameof(title), "Title cannot be null.");
         MultipleChoice = multipleChoice;
         Class = singleClass ?? throw new ArgumentNullException(nameof(singleClass), "Class cannot be null.");
         ClassId = singleClass.Id;
     }
     
-    public Quiz(bool multipleChoice, Class singleClass) : this(Guid.NewGuid(), multipleChoice, singleClass) { }
+    public Quiz(string title, bool multipleChoice, Class singleClass) : this(Guid.NewGuid(), title, multipleChoice, singleClass) { }
     
     public void AddQuestion(Question question)
     {

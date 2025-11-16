@@ -20,4 +20,11 @@ public class ExercisesController : ControllerBase
         var exercises = await _exerciseRepository.GetAllUnsolvedExercisesByUserId(userId);
         return Ok(exercises);
     }
+    
+    [HttpGet("by-teacher/{teacherId:guid}")]
+    public async Task<IActionResult> GetAllExercisesByTeacherId(Guid teacherId)
+    {
+        var exercises = await _exerciseRepository.GetAllExercisesByTeacherId(teacherId);
+        return Ok(exercises);
+    }
 }

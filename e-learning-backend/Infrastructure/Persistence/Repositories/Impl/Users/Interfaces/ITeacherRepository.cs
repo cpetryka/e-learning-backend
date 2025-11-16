@@ -14,5 +14,8 @@ public interface ITeacherRepository
     Task<IEnumerable<StudentBriefDTO>> GetStudentsByTeacherIdAndCourseIdAsync(Guid teacherId, Guid courseId);
     Task<IEnumerable<CourseBriefDTO>> GetCoursesByTeacherIdAndStudentIdAsync(Guid teacherId, Guid studentId);
     Task<IEnumerable<ClassWithStudentsDTO>> GetClassesWithStudentsByTeacherIdAsync(Guid teacherId);
-
+    Task<IEnumerable<TeacherUpcomingClass>> GetUpcomingClassesAsync(Guid teacherId,
+        DateOnly start, DateOnly end);
+    Task<IEnumerable<ExerciseBriefDTO>> GetExercisesToGradeAsync(Guid teacherId);
+    Task<IEnumerable<GetExerciseDTO>> GetAllExercisesByTeacherIdAsync(Guid teacherId, Guid? courseId, Guid? studentId);
 }

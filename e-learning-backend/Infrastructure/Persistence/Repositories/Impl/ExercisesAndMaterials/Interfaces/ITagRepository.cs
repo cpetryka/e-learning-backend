@@ -11,4 +11,7 @@ public interface ITagRepository
     Task UpdateAsync(Tag tag);
     Task DeleteAsync(Guid id);
     Task<IEnumerable<GetFileDTO.TagDTO>> GetByUserId(Guid userId, CancellationToken ct = default);
+    Task<IEnumerable<GetTagDTO>> GetTagsByUserIdAsync(Guid userId);
+    Task<Guid> AddNewTagAsync(AddTagDTO addTagDto);
+    Task<bool> ExistAsync(string name, Guid userId);
 }

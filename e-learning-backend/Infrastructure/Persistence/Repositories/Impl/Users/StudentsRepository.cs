@@ -37,4 +37,37 @@ public class StudnetsRepository : IStudentsRepository
             })
             .ToListAsync();
     }
+    
+    public async Task<IEnumerable<GetExerciseDTO>> GetAllExercisesByStudentIdAsync(Guid studentId, Guid? courseId)
+    {
+        return await _context.Exercises
+            .Include(e => e.Class)
+            .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.Course)
+            .Include(e => e.ExerciseResources)
+            .ThenInclude(e => e.File)
+            .Where(e => e.Class.Participation.UserId == studentId)
+            .Where(e => courseId == null || e.Class.Participation.CourseId == courseId)
+            .Select(e => new GetExerciseDTO()
+            {
+                Id = e.Id,
+                Name = e.Class.Participation.Course.Name + " [" + e.Class.StartTime.ToString("yyyy-MM-dd") + "]",
+                CourseName = e.Class.Participation.Course.Name,
+                Status = e.Status.ToString(),
+                Graded = e.Grade != null,
+                Grade = e.Grade,
+                Comments = e.Comment ?? "",
+                Instruction = e.Instruction ?? "",
+                Date = e.Class.StartTime,
+                Files = e.ExerciseResources.Select(er => new GetExerciseResourceDTO()
+                {
+                    Id = er.FileId,
+                    Name = er.File.Name,
+                    Path = er.File.Path,
+                    Type = er.Type.ToString().ToLower(),
+                    UploadDate = er.File.AddedAt
+                }).ToList()
+            })
+            .ToListAsync();
+    }
 }

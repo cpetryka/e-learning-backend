@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+﻿using e_learning_backend.Domain.ExercisesAndMaterials.ValueObjects;
 using e_learning_backend.Domain.Users;
 using e_learning_backend.Domain.Users.ValueObjects;
 using e_learning_backend.Infrastructure.Api.DTO;
@@ -280,5 +281,85 @@ public class TeacherRepository : ITeacherRepository
         return result;
     }
 
-
+    public async Task<IEnumerable<TeacherUpcomingClass>> GetUpcomingClassesAsync(Guid teacherId,
+        DateOnly start, DateOnly end)
+    {
+        return await _context.Classes
+            .Include(c => c.Participation)
+            .ThenInclude(c => c.Course)
+            .Include(c => c.Participation)
+            .ThenInclude(c => c.User)
+            .Where(c => c.Participation.Course.TeacherId == teacherId &&
+                        DateOnly.FromDateTime(c.StartTime) >= start &&
+                        DateOnly.FromDateTime(c.StartTime.AddHours(1)) <= end)
+            .Select(c => new TeacherUpcomingClass
+            {
+                ClassId = c.Id,
+                StudentId = c.UserId,
+                StudentName = c.Participation.User.Name + " " + c.Participation.User.Surname,
+                CourseId = c.Participation.Course.Id,
+                CourseName = c.Participation.Course.Name,
+                ClassDate = DateOnly.FromDateTime(c.StartTime),
+                ClassStartTime = TimeOnly.FromDateTime(c.StartTime),
+                ClassEndTime = TimeOnly.FromDateTime(c.StartTime.AddHours(1))
+            })
+            .ToListAsync();
+        
+    }
+    
+    public async Task<IEnumerable<ExerciseBriefDTO>> GetExercisesToGradeAsync(Guid teacherId)
+    {
+        return await _context.Exercises
+            .Include(e => e.Class)
+            .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.Course)
+            .Where(e => e.Class.Participation.Course.TeacherId == teacherId &&
+                        e.Status == ExerciseStatus.Submitted)
+            .Select(e => new ExerciseBriefDTO
+            {
+                Id = e.Id,
+                CourseId = e.Class.Participation.Course.Id,
+                CourseName = e.Class.Participation.Course.Name,
+                ClassStartTime = e.Class.StartTime,
+                ExerciseStatus = e.Status.ToString()
+            })
+            .ToListAsync();
+    }
+    
+    public async Task<IEnumerable<GetExerciseDTO>> GetAllExercisesByTeacherIdAsync(Guid teacherId, Guid? courseId, Guid? studentId)
+    {
+        return await _context.Exercises
+            .Include(e => e.Class)
+            .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.Course)
+            .Include(e => e.Class)
+            .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.User)
+            .Include(e => e.ExerciseResources)
+            .ThenInclude(e => e.File)
+            .Where(e => e.Class.Participation.Course.TeacherId == teacherId)
+            .Where(e => courseId == null || e.Class.Participation.CourseId == courseId)
+            .Where(e => studentId == null || e.Class.Participation.UserId == studentId)
+            .Select(e => new GetExerciseDTO()
+            {
+                Id = e.Id,
+                Name = e.Class.Participation.Course.Name + " [" + e.Class.StartTime.ToString("yyyy-MM-dd") + "] - " + e.Class.Participation.User.Name + " " + e.Class.Participation.User.Surname,
+                CourseName = e.Class.Participation.Course.Name,
+                Status = e.Status.ToString(),
+                Graded = e.Grade != null,
+                Grade = e.Grade,
+                Comments = e.Comment ?? "",
+                Instruction = e.Instruction ?? "",
+                Date = e.Class.StartTime,
+                Files = e.ExerciseResources.Select(er => new GetExerciseResourceDTO()
+                {
+                    Id = er.FileId,
+                    Name = er.File.Name,
+                    Path = er.File.Path,
+                    Type = er.Type.ToString().ToLower(),
+                    UploadDate = er.File.AddedAt
+                }).ToList()
+            })
+            .ToListAsync();
+    }
 }

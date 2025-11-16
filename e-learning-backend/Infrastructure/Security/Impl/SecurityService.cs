@@ -46,7 +46,7 @@ public class SecurityService : ISecurityService
 
         // persist new user
         domainUser.RefreshToken = refreshToken;
-        domainUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(1);
+        domainUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(24);
 
         _context.Users.Add(domainUser);
         await _context.SaveChangesAsync();
@@ -123,6 +123,16 @@ public class SecurityService : ISecurityService
             RefreshToken = newRefreshToken,
             Roles = user.Roles.Select(r => r.RoleName).ToList()
         };
+    }
+    
+    public async Task LogoutByRefreshTokenAsync(string refreshToken)
+    {
+        var user = await _context.Users.SingleOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        if (user == null) return;
+
+        user.RefreshToken = null;
+        user.RefreshTokenExpiryTime = null;
+        await _context.SaveChangesAsync();
     }
 
     // --------------------------------------------------------------------------------------------------------

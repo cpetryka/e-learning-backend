@@ -75,6 +75,7 @@ public class StudentsService : IStudentsService
             Quizzes = c.Quizzes.Select(q => new QuizPreviewDto
             {
                 Id = q.Id,
+                Title = q.Title,
                 Score = q.Score
             }),
             Files = c.Files.Select(f => new FilePreviewDto

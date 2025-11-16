@@ -70,4 +70,36 @@ public class ExerciseRepository : IExerciseRepository
             })
             .ToListAsync();
     }
+    
+    public async Task<IEnumerable<GetExerciseDTO>> GetAllExercisesByTeacherId(Guid teacherId)
+    {
+        return await _context.Exercises
+            .Include(e => e.Class)
+                .ThenInclude(c => c.Participation)
+                    .ThenInclude(p => p.Course)
+            .Include(e => e.ExerciseResources)
+                .ThenInclude(e => e.File)
+            .Where(e => e.Class.Participation.Course.TeacherId == teacherId)
+            .Select(e => new GetExerciseDTO()
+            {
+                Id = e.Id,
+                Name = "",
+                CourseName = e.Class.Participation.Course.Name,
+                Status = e.Status.ToString(),
+                Graded = e.Grade != null,
+                Grade = e.Grade,
+                Comments = e.Comment ?? "",
+                Instruction = e.Instruction ?? "",
+                Date = e.Class.StartTime,
+                Files = e.ExerciseResources.Select(er => new GetExerciseResourceDTO()
+                {
+                    Id = er.FileId,
+                    Name = er.File.Name,
+                    Path = er.File.Path,
+                    Type = er.Type.ToString().ToLower(),
+                    UploadDate = er.File.AddedAt
+                }).ToList()
+            })
+            .ToListAsync();
+    }
 }

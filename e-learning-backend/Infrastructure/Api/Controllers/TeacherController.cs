@@ -2,6 +2,7 @@
 using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 using e_learning_backend.Application.Services;
+using e_learning_backend.Infrastructure.Persistence.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +12,12 @@ namespace e_learning_backend.Infrastructure.Api.Controllers;
 [Route("api/[controller]")]
 public class TeacherController : ControllerBase
 {
+    private readonly ITeacherRepository _teacherRepository;
     private readonly ITeacherService _teacherService;
 
-    public TeacherController(ITeacherService teacherService)
+    public TeacherController(ITeacherRepository teacherRepository, ITeacherService teacherService)
     {
+        _teacherRepository = teacherRepository;
         _teacherService = teacherService;
     }
 
@@ -90,5 +93,26 @@ public class TeacherController : ControllerBase
         var result = await _teacherService.GetTeacherClassesWithStudentsAsync(teacherId, ct);
 
         return Ok(result);
+    }
+    
+    [HttpGet("{teacherId}/upcoming-classes")]
+    public async Task<ActionResult<List<TeacherUpcomingClass>>> GetUpcomingClasses(Guid teacherId, [FromQuery] DateOnly start, [FromQuery] DateOnly end)
+    {
+        var upcomingClasses = await _teacherService.GetUpcomingClassesAsync(teacherId, start, end);
+        return Ok(upcomingClasses);
+    }
+    
+    [HttpGet("{teacherId}/exercises-to-grade")]
+    public async Task<IActionResult> GetExercisesToGrade(Guid teacherId)
+    {
+        var exercises = await _teacherService.GetExercisesToGradeAsync(teacherId);
+        return Ok(exercises);
+    }
+    
+    [HttpGet("{teacherId:guid}/exercises")]
+    public async Task<IActionResult> GetAllExercisesByTeacherId(Guid teacherId, [FromQuery] Guid? courseId, [FromQuery] Guid? studentId)
+    {
+        var exercises = await _teacherRepository.GetAllExercisesByTeacherIdAsync(teacherId, courseId, studentId);
+        return Ok(exercises);
     }
 }
