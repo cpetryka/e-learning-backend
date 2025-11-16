@@ -18,18 +18,33 @@ public class UserFilesController : ControllerBase
     
     
     [HttpGet]
-    public async Task<IActionResult> Get(CancellationToken ct)
+    [Authorize]
+    public async Task<IActionResult> Get(
+        [FromQuery(Name = "tags")] List<string>? tags,
+        [FromQuery(Name = "type")] List<string>? types,
+        [FromQuery] Guid? ownerId,
+        CancellationToken ct)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userId, out var currentUserId))
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdStr, out var currentUserId))
             return Unauthorized("Invalid or missing user identifier.");
-        var files = await _service.GetUserFilesAsync(Guid.Parse(userId), ct);
+
+        var files = await _service.GetUserFilesAsync(
+            currentUserId,
+            tags,
+            types,
+            ownerId,
+            ct);
+
         return Ok(files);
     }
+
+
     
     [HttpPost]
     [RequestSizeLimit(50 * 1024 * 1024)]
     [Consumes("multipart/form-data")]
+    [Authorize]
     public async Task<IActionResult> Post(IFormFile file, CancellationToken ct)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -43,6 +58,7 @@ public class UserFilesController : ControllerBase
     [HttpPost("profile-picture")]
     [RequestSizeLimit(5 * 1024 * 1024)] // maks. 5 MB dla zdjęcia profilowego
     [Consumes("multipart/form-data")]
+    [Authorize]
     public async Task<IActionResult> UploadProfilePicture(IFormFile file, CancellationToken ct)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -68,6 +84,57 @@ public class UserFilesController : ControllerBase
         }
     }
 
+    [HttpGet("tags")]
+    [Authorize]
+    public async Task<IActionResult> GetTags()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userId, out var currentUserId))
+            return Unauthorized("Invalid or missing user identifier.");
+        
+        var result = await _service.GetUserFileTags(Guid.Parse(userId), CancellationToken.None);
+        return Ok(result);
+    }
 
+    [HttpDelete]
+    [Authorize]
+    public async Task<IActionResult> Delete(Guid fileId, CancellationToken ct)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userId, out var currentUserId))
+            return Unauthorized("Invalid or missing user identifier.");
+        var deleted = await _service.DeleteFile(Guid.Parse(userId), fileId);
+        return Ok(deleted);
+        
+    }
     
+
+    [HttpGet("extensions")]
+    [Authorize]
+    public async Task<IActionResult> GetExtensions(CancellationToken ct)
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdStr, out var currentUserId))
+            return Unauthorized("Invalid or missing user identifier.");
+
+        var extensions = await _service.GetFileExtensionsByUserIdAsync(currentUserId, ct);
+        return Ok(extensions);
+    }
+    
+    [HttpGet("owners")]
+    [Authorize]
+    public async Task<IActionResult> GetClassFileOwners(CancellationToken ct)
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdStr, out var currentUserId))
+            return Unauthorized("Invalid or missing user identifier.");
+
+        var owners = await _service.GetClassFileOwnersAsync(currentUserId, ct);
+        return Ok(owners);
+    }
+
+
+
+
+
 }

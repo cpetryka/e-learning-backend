@@ -1,4 +1,5 @@
-﻿using e_learning_backend.Domain.Courses;
+﻿using e_learning_backend.Application;
+using e_learning_backend.Domain.Courses;
 using e_learning_backend.Domain.Users.ValueObjects;
 using e_learning_backend.Infrastructure.Api.DTO;
 
@@ -6,15 +7,16 @@ namespace e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 
 public interface ICoursesService
 {
-    Task<IEnumerable<CourseWidgetDTO>> GetCoursesAsync(
+    Task<PagedResult<CourseWidgetDTO>> GetCoursesAsync(
         string[]? categories,
         string[]? levels,
         string[]? languages,
         int? priceFrom,
         int? priceTo,
         Guid? teacherId,
-        string? query
-    );
+        string? query,
+        int pageNumber,
+        int pageSize);
     
     Task<IEnumerable<CourseWidgetDTO>> GetCoursesBasedOnQuery(string query);
 

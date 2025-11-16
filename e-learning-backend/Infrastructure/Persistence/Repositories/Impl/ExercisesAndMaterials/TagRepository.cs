@@ -7,6 +7,13 @@ namespace e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
 
 public class TagRepository : ITagRepository
 {
+    private class UserFileTagRow
+    {
+        public Guid TagId { get; set; }
+        public string TagName { get; set; } = default!;
+        public Guid OwnerId { get; set; }
+    }
+    
     private readonly ApplicationContext _context;
 
     public TagRepository(ApplicationContext context)
@@ -50,6 +57,36 @@ public class TagRepository : ITagRepository
             await _context.SaveChangesAsync();
         }
     }
+    
+    public async  Task<IEnumerable<GetFileDTO.TagDTO>> GetByUserId(Guid userId, CancellationToken ct = default)
+    {
+        var rows = await _context.Database
+            .SqlQueryRaw<UserFileTagRow>(
+                """
+                SELECT
+                    "TagId",
+                    "TagName",
+                    "OwnerId"
+                FROM get_user_file_tags({0})
+                """,
+                userId
+            )
+            .ToListAsync(ct);
+        
+        var result = rows
+            .Select(r => new GetFileDTO.TagDTO()
+            {
+                Id = r.TagId,
+                Name = r.TagName,
+                OwnerId = r.OwnerId
+            })
+            .ToList();
+
+        return result;
+    }
+
+
+}
 
     
 
