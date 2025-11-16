@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
 
-public class FileResourceRepo3sitory : IFileResourceRepository
+public class FileResourceRepository : IFileResourceRepository
 {
     private class UserFileRow
     {
@@ -36,7 +36,7 @@ public class FileResourceRepo3sitory : IFileResourceRepository
     
     private readonly ApplicationContext _context;
 
-    public FileResourceRepo3sitory(ApplicationContext context)
+    public FileResourceRepository(ApplicationContext context)
         => _context = context;
 
 
