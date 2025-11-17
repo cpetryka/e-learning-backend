@@ -168,6 +168,10 @@ builder.Services.AddScoped<IClassRepository, ClassRepository>();
 builder.Services.AddScoped<ISpectatorsRepository, SpectatorsRepository>();
 builder.Services.AddScoped<IFileResourceRepository, FileResourceRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
+builder.Services.AddScoped<IQuizRepository, QuizRepository>();
+builder.Services.AddScoped<IQuestionCategoryRepository, QuestionCategoryRepository>();
+builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
+builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
 
 builder.Services.AddScoped<IUsersFilesService, UsersFilesService>();
 builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
@@ -180,6 +184,7 @@ builder.Services.AddScoped<ITeacherService, TeachersService>();
 builder.Services.AddScoped<IStudentsService, StudentsService>();
 builder.Services.AddScoped<IClassesService, ClassesService>();
 builder.Services.AddScoped<ITagsService, TagsService>();
+builder.Services.AddScoped<IQuizzesService, QuizzesService>();
 
 builder.Services.AddSingleton<IEmailTemplateService, EmailTemplateService>();
 builder.Services.AddScoped<ISpectatorInviteRepository, SpectatorInviteRepository>();

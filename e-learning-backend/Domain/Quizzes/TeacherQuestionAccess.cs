@@ -24,4 +24,14 @@ public class TeacherQuestionAccess
         
         Created = created;
     }
+
+    public TeacherQuestionAccess(Guid teacherId, Question question, bool created)
+    {
+        TeacherId = teacherId;
+        
+        Question = question ?? throw new ArgumentNullException(nameof(question), "Question cannot be null.");
+        QuestionId = question.Id;
+        
+        Created = created;
+    }
 }

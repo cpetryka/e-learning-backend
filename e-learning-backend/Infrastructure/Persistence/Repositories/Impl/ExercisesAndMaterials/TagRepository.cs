@@ -94,10 +94,10 @@ public class TagRepository : ITagRepository
             })
             .ToListAsync();
     
-    public async Task<Guid> AddNewTagAsync(AddTagDTO addTagDto)
+    public async Task<Guid> AddNewTagAsync(Guid userId, AddTagDTO addTagDto)
     {
         var existingTag = await _context.Tags
-            .FirstOrDefaultAsync(t => t.Name == addTagDto.Name && t.UserId == addTagDto.AddedById);
+            .FirstOrDefaultAsync(t => t.Name == addTagDto.Name && t.UserId == userId);
         
         if (existingTag != null)
         {
@@ -108,7 +108,7 @@ public class TagRepository : ITagRepository
         (
             id: Guid.NewGuid(),
             name: addTagDto.Name,
-            userId: addTagDto.AddedById
+            userId: userId
         );
         
         await _context.Tags.AddAsync(tag);

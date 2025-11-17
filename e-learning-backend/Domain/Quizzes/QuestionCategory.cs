@@ -28,6 +28,14 @@ public class QuestionCategory
     public QuestionCategory(string name, string description, User teacher) 
         : this(Guid.NewGuid(), name, description, teacher) { }
     
+    public QuestionCategory(Guid id, string name, string description, Guid teacherId) 
+    {
+        Id = id;
+        Name = name ?? throw new ArgumentNullException(nameof(name), "Category name cannot be null or empty.");
+        Description = description ?? throw new ArgumentNullException(nameof(description), "Category description cannot be null or empty.");
+        TeacherId = teacherId;
+    }
+    
     public void AddQuestion(Question question) 
     {
         if (question == null)

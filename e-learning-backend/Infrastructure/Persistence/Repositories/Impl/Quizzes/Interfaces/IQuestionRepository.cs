@@ -11,4 +11,5 @@ public interface IQuestionRepository
     Task DeleteAsync(Guid id);
     Task<IEnumerable<Question>> GetByCategoryIdAsync(Guid categoryId);
     Task<IEnumerable<Question>> GetByQuizIdAsync(Guid quizId);
+    Task SaveChangesAsync();
 }

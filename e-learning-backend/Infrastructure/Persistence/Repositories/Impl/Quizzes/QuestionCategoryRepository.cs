@@ -17,6 +17,15 @@ public class QuestionCategoryRepository : IQuestionCategoryRepository
             .Include(c => c.Questions)
             .SingleOrDefaultAsync(c => c.Id == id);
 
+    public async Task<IEnumerable<QuestionCategory>> GetByIdsAsync(IEnumerable<Guid> ids)
+    {
+        return await _context.QuestionCategories
+            .Where(c => ids.Contains(c.Id))
+            .Include(c => c.Teacher)
+            .Include(c => c.Questions)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<QuestionCategory>> GetAllAsync()
         => await _context.QuestionCategories
             .Include(c => c.Teacher)
