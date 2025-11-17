@@ -96,6 +96,7 @@ public class ClassRepository : IClassRepository
         var untilUtc = nowUtc.AddDays(14);
 
         return await _context.Classes
+            .Include(c => c.Participation)
             .AsNoTracking()
             .Where(c => c.UserId == userId && c.StartTime >= nowUtc && c.StartTime < untilUtc)
             .Join(
@@ -107,7 +108,8 @@ public class ClassRepository : IClassRepository
                     StartTime = cls.StartTime,
                     CourseId = cls.CourseId,
                     CourseName = crs.Name,
-                    TeacherId = crs.TeacherId
+                    TeacherId = crs.TeacherId,
+                    StudentId = cls.UserId
                 })
             .OrderBy(dto => dto.StartTime)
             .ToListAsync();
@@ -134,6 +136,7 @@ public class ClassRepository : IClassRepository
         var untilUtc = nowUtc.AddDays(14);
 
         return await _context.Classes
+            .Include(c => c.Participation)
             .AsNoTracking()
             .Where(cls => cls.StartTime >= nowUtc && cls.StartTime < untilUtc)
             .Join(
@@ -148,7 +151,8 @@ public class ClassRepository : IClassRepository
                 StartTime = x.cls.StartTime,
                 CourseId  = x.cls.CourseId,
                 CourseName = x.crs.Name,
-                TeacherId = x.crs.TeacherId
+                TeacherId = x.crs.TeacherId,
+                StudentId = x.cls.Participation.UserId
             })
             .OrderBy(dto => dto.StartTime)
             .ToListAsync();
