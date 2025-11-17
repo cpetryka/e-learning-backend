@@ -10,15 +10,17 @@ public class QuizzesService : IQuizzesService
     private readonly IQuizRepository _quizRepository;
     private readonly IQuestionRepository _questionRepository;
     private readonly IQuestionCategoryRepository _questionCategoryRepository;
-    
+    private readonly IAnswerRepository _answerRepository;
+
     public QuizzesService(IQuizRepository quizRepository, IQuestionRepository questionRepository,
-        IQuestionCategoryRepository questionCategoryRepository)
+        IQuestionCategoryRepository questionCategoryRepository, IAnswerRepository answerRepository)
     {
         _quizRepository = quizRepository;
         _questionRepository = questionRepository;
         _questionCategoryRepository = questionCategoryRepository;
+        _answerRepository = answerRepository;
     }
-    
+
     public async Task<IEnumerable<QuizBriefDTO>> GetQuizzesAsync(
         Guid? studentId,
         Guid? courseId,
@@ -26,46 +28,48 @@ public class QuizzesService : IQuizzesService
     {
         return await _quizRepository.GetQuizzesAsync(studentId, courseId, searchQuery);
     }
-    
+
     public async Task<QuizDTO> GetQuizDetailsAsync(Guid quizId)
     {
         return await _quizRepository.GetQuizDetailsAsync(quizId);
     }
-    
+
     public async Task<IEnumerable<QuizQuestionDTO>> GetQuizQuestionsAsync(Guid quizId)
     {
         return await _quizRepository.GetQuizQuestionsAsync(quizId);
     }
-    
+
     public async Task<IEnumerable<QuestionCategoryDTO>> GetUserQuestionCategoriesAsync(Guid userId)
     {
         return await _quizRepository.GetUserQuestionCategoriesAsync(userId);
     }
-    
-    public async Task<IEnumerable<QuizQuestionDTO>> GetUserQuestionsAsync(Guid userId, List<Guid>? categoryIds)
+
+    public async Task<IEnumerable<QuizQuestionDTO>> GetUserQuestionsAsync(Guid userId,
+        List<Guid>? categoryIds)
     {
         return await _quizRepository.GetUserQuestionsAsync(userId, categoryIds);
     }
-    
+
     public async Task<QuizQuestionDTO> GetFullQuestionAsync(Guid questionId)
     {
         return await _quizRepository.GetFullQuestionAsync(questionId);
     }
-    
-    public async Task<QuestionCategoryDTO> CreateQuestionCategoryAsync(Guid userId, string categoryName)
+
+    public async Task<QuestionCategoryDTO> CreateQuestionCategoryAsync(Guid userId,
+        string categoryName)
     {
         return await _quizRepository.CreateQuestionCategoryAsync(userId, categoryName);
     }
-    
+
     public async Task<QuizQuestionDTO> CreateQuestionWithAnswersAsync(Guid userId,
-        CreateQuestionDTO questionDto)
+        CreateOrUpdateQuestionDTO orUpdateQuestionDto)
     {
         var question = new Question(
             id: Guid.NewGuid(),
-            content: questionDto.Content
+            content: orUpdateQuestionDto.Content
         );
 
-        foreach (var answerDto in questionDto.Answers)
+        foreach (var answerDto in orUpdateQuestionDto.Answers)
         {
             var answer = new Answer(
                 id: Guid.NewGuid(),
@@ -78,11 +82,12 @@ public class QuizzesService : IQuizzesService
 
         question.AddAccess(userId, true);
 
-        if (questionDto.CategoryIds != null && questionDto.CategoryIds.Count > 0)
+        if (orUpdateQuestionDto.CategoryIds != null && orUpdateQuestionDto.CategoryIds.Count > 0)
         {
-            var categories = await _questionCategoryRepository.GetByIdsAsync(questionDto.CategoryIds);
+            var categories =
+                await _questionCategoryRepository.GetByIdsAsync(orUpdateQuestionDto.CategoryIds);
 
-            if (categories.Count() != questionDto.CategoryIds.Count)
+            if (categories.Count() != orUpdateQuestionDto.CategoryIds.Count)
                 throw new ArgumentException("Some categories do not exist.");
 
             foreach (var category in categories)
@@ -114,6 +119,75 @@ public class QuizzesService : IQuizzesService
                     Name = c.Name
                 })
                 .ToList()
+        };
+    }
+
+    public async Task<QuizQuestionDTO> UpdateQuestionWithAnswersAsync(
+        Guid questionId,
+        Guid userId,
+        CreateOrUpdateQuestionDTO dto)
+    {
+        var question = await _questionRepository.GetByIdAsync(questionId);
+
+        if (question is null)
+        {
+            throw new ArgumentException("Question not found");
+        }
+
+        if (!question.HasEditAccess(userId))
+        {
+            throw new UnauthorizedAccessException("You have no access to edit this question");
+        }
+
+        question.UpdateContent(dto.Content);
+
+        question.ClearAnswers();
+
+        foreach (var ans in dto.Answers)
+        {
+            var answer = new Answer(
+                id: Guid.NewGuid(),
+                content: ans.Content,
+                isCorrect: ans.Correct
+            );
+
+            await _answerRepository.AddAsync(answer);
+            question.AddAnswer(answer);
+        }
+
+        question.ClearCategories();
+
+        if (dto.CategoryIds != null && dto.CategoryIds.Any())
+        {
+            var categories = await _questionCategoryRepository.GetByIdsAsync(dto.CategoryIds);
+
+            if (categories.Count() != dto.CategoryIds.Count)
+                throw new ArgumentException("Some categories do not exist.");
+
+            foreach (var cat in categories)
+                question.AddCategory(cat);
+        }
+
+        await _questionRepository.SaveChangesAsync();
+
+        return new QuizQuestionDTO
+        {
+            Id = question.Id,
+            Content = question.Content,
+            Answers = question.Answers
+                .Select(a => new AnswerDTO
+                {
+                    Id = a.Id,
+                    QuestionId = question.Id,
+                    Content = a.Content,
+                    Correct = a.IsCorrect
+                }).ToList(),
+            Categories = question.Categories
+                .Select(c => new QuestionCategoryDTO
+                {
+                    Id = c.Id,
+                    Name = c.Name
+                }).ToList()
         };
     }
 }

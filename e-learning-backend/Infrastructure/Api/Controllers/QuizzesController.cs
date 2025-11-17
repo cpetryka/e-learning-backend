@@ -119,7 +119,7 @@ public class QuizzesController : ControllerBase
     }
     
     [HttpPost("question")]
-    public async Task<ActionResult<QuizQuestionDTO>> CreateQuestion([FromBody] CreateQuestionDTO questionDto)
+    public async Task<ActionResult<QuizQuestionDTO>> CreateQuestion([FromBody] CreateOrUpdateQuestionDTO orUpdateQuestionDto)
     {
         var userId = User.GetUserId();
         
@@ -128,7 +128,25 @@ public class QuizzesController : ControllerBase
             return Unauthorized();
         }
 
-        var question = await _quizzesService.CreateQuestionWithAnswersAsync(userId.Value, questionDto);
+        var question = await _quizzesService.CreateQuestionWithAnswersAsync(userId.Value, orUpdateQuestionDto);
+
+        if (question == null)
+            return StatusCode(500, "Failed to create a question.");
+
+        return Ok(question);
+    }
+    
+    [HttpPut("question/{questionId:guid}")]
+    public async Task<ActionResult<QuizQuestionDTO>> CreateQuestion(Guid questionId, [FromBody] CreateOrUpdateQuestionDTO orUpdateQuestionDto)
+    {
+        var userId = User.GetUserId();
+        
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+
+        var question = await _quizzesService.UpdateQuestionWithAnswersAsync(questionId, userId.Value, orUpdateQuestionDto);
 
         if (question == null)
             return StatusCode(500, "Failed to create a question.");
