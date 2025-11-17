@@ -6,5 +6,5 @@ namespace e_learning_backend.Application.Services.Interfaces;
 public interface ITagsService
 {
     Task<IEnumerable<GetTagDTO>> GetTagsByUserIdAsync(Guid userId);
-    Task<Guid> AddNewTagAsync(AddTagDTO addTagDto);
+    Task<Guid> AddNewTagAsync(Guid userId, AddTagDTO addTagDto);
 }

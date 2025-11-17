@@ -18,8 +18,8 @@ public class TagsService : ITagsService
         return await _tagRepository.GetTagsByUserIdAsync(userId);
     }
     
-    public async Task<Guid> AddNewTagAsync(AddTagDTO addTagDto)
+    public async Task<Guid> AddNewTagAsync(Guid userId, AddTagDTO addTagDto)
     {
-        return await _tagRepository.AddNewTagAsync(addTagDto);
+        return await _tagRepository.AddNewTagAsync(userId, addTagDto);
     }
 }
