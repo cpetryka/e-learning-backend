@@ -207,7 +207,6 @@ public class QuizzesService : IQuizzesService
             
             if (question == null) continue; // the question does not belong to the quiz
             
-            // Poprawne odpowiedzi
             var correctAnswers = question.Answers.Where(a => a.IsCorrect).Select(a => a.Id).ToHashSet();
             var selectedAnswers = qSolution.SelectedAnswerIds.ToHashSet();
             
@@ -217,7 +216,15 @@ public class QuizzesService : IQuizzesService
             }
         }
         
-        score = (score / quiz.Questions.Count) * 100;
+        if (quiz.Questions.Count == 0)
+        {
+            score = 0;
+        }
+        else
+        {
+            score = (score / quiz.Questions.Count) * 100;
+        }
+        
         quiz.Score = score;
         await _quizRepository.SaveChangesAsync();
 

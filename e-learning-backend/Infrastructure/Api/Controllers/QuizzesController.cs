@@ -34,7 +34,7 @@ public class QuizzesController : ControllerBase
     }
     
     [HttpGet("{quizId:guid}")]
-    public async Task<ActionResult<IEnumerable<QuizBriefDTO>>> GetQuizzes(Guid quizId)
+    public async Task<ActionResult<QuizBriefDTO>> GetQuiz(Guid quizId)
     {
         var quiz = await _quizzesService.GetQuizDetailsAsync(quizId);
 
@@ -149,7 +149,7 @@ public class QuizzesController : ControllerBase
         var question = await _quizzesService.UpdateQuestionWithAnswersAsync(questionId, userId.Value, orUpdateQuestionDto);
 
         if (question == null)
-            return StatusCode(500, "Failed to create a question.");
+            return StatusCode(500, "Failed to update a question.");
 
         return Ok(question);
     }
@@ -164,11 +164,11 @@ public class QuizzesController : ControllerBase
         }
         catch (ArgumentException e)
         {
-            return NotFound(e.Message); // 404 jeśli quiz nie istnieje
+            return NotFound(e.Message); // 404 if the quiz does not exist
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message); // 400 dla innych błędów
+            return BadRequest(e.Message); // 400 for other errors
         }
     }
 }
