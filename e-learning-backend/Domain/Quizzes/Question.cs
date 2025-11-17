@@ -39,6 +39,11 @@ public class Question
         _categories.Add(category);
         category.AddQuestion(this);
     }
+
+    public void AddCategory(Guid categoryId)
+    {
+        
+    }
     
     public void RemoveCategory(QuestionCategory category)
     {
@@ -90,6 +95,18 @@ public class Question
 
         _accesses.Add(access);
         access.Question = this;
+    }
+
+    public void AddAccess(Guid teacherId, bool created)
+    {
+        var access = new TeacherQuestionAccess
+        (
+            teacherId: teacherId,
+            question: this,
+            created: created
+        );
+        
+        _accesses.Add(access);
     }
     
     public void RemoveAccess(TeacherQuestionAccess access)

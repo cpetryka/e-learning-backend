@@ -117,4 +117,22 @@ public class QuizzesController : ControllerBase
 
         return Ok(category);
     }
+    
+    [HttpPost("question")]
+    public async Task<ActionResult<QuizQuestionDTO>> CreateQuestion([FromBody] CreateQuestionDTO questionDto)
+    {
+        var userId = User.GetUserId();
+        
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+
+        var question = await _quizzesService.CreateQuestionWithAnswersAsync(userId.Value, questionDto);
+
+        if (question == null)
+            return StatusCode(500, "Failed to create a question.");
+
+        return Ok(question);
+    }
 }
