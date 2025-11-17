@@ -106,6 +106,13 @@ public class QuizzesService : IQuizzesService
                     Content = a.Content,
                     Correct = a.IsCorrect
                 })
+                .ToList(),
+            Categories = question.Categories
+                .Select(c => new QuestionCategoryDTO
+                {
+                    Id = c.Id,
+                    Name = c.Name
+                })
                 .ToList()
         };
     }
