@@ -16,6 +16,7 @@ public class QuizRepository : IQuizRepository
         => await _context.Quizzes
             .Include(q => q.Class)
             .Include(q => q.Questions)
+            .ThenInclude(question => question.Answers)
             .SingleOrDefaultAsync(q => q.Id == id);
 
     public async Task<IEnumerable<Quiz>> GetAllAsync()
@@ -212,4 +213,6 @@ public class QuizRepository : IQuizRepository
             Name = category.Name
         };
     }
+    
+    public Task SaveChangesAsync() => _context.SaveChangesAsync();
 }

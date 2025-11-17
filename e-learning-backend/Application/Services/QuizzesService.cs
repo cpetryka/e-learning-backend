@@ -190,4 +190,37 @@ public class QuizzesService : IQuizzesService
                 }).ToList()
         };
     }
+    
+    public async Task<double> SubmitQuizSolutionAsync(Guid quizId, QuizSolutionDTO solutionDto)
+    {
+        var quiz = await _quizRepository.GetByIdAsync(quizId);
+        
+        if (quiz == null)
+            throw new ArgumentException("Quiz not found");
+
+        double score = 0;
+
+        foreach (var qSolution in solutionDto.Answers)
+        {
+            var question = quiz.Questions
+                .FirstOrDefault(q => q.Id == qSolution.QuestionId);
+            
+            if (question == null) continue; // the question does not belong to the quiz
+            
+            // Poprawne odpowiedzi
+            var correctAnswers = question.Answers.Where(a => a.IsCorrect).Select(a => a.Id).ToHashSet();
+            var selectedAnswers = qSolution.SelectedAnswerIds.ToHashSet();
+            
+            if (selectedAnswers.SetEquals(correctAnswers))
+            {
+                score += 1;
+            }
+        }
+        
+        score = (score / quiz.Questions.Count) * 100;
+        quiz.Score = score;
+        await _quizRepository.SaveChangesAsync();
+
+        return score;
+    }
 }

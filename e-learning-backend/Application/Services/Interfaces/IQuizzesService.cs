@@ -23,4 +23,6 @@ public interface IQuizzesService
         Guid questionId,
         Guid userId,
         CreateOrUpdateQuestionDTO dto);
+
+    Task<double> SubmitQuizSolutionAsync(Guid quizId, QuizSolutionDTO solutionDto);
 }

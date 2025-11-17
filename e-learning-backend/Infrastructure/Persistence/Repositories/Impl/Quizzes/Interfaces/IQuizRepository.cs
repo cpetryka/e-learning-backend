@@ -24,4 +24,5 @@ public interface IQuizRepository
     Task<IEnumerable<QuizQuestionDTO>> GetUserQuestionsAsync(Guid userId, List<Guid>? categoryIds);
     Task<QuizQuestionDTO> GetFullQuestionAsync(Guid questionId);
     Task<QuestionCategoryDTO> CreateQuestionCategoryAsync(Guid userId, string categoryName);
+    Task SaveChangesAsync();
 }

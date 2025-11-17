@@ -153,4 +153,22 @@ public class QuizzesController : ControllerBase
 
         return Ok(question);
     }
+    
+    [HttpPost("{quizId:guid}/solution")]
+    public async Task<IActionResult> SubmitSolution(Guid quizId, [FromBody] QuizSolutionDTO solutionDto)
+    {
+        try
+        {
+            double score = await _quizzesService.SubmitQuizSolutionAsync(quizId, solutionDto);
+            return Created(string.Empty, score); // 201 Created
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message); // 404 jeśli quiz nie istnieje
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message); // 400 dla innych błędów
+        }
+    }
 }

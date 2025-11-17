@@ -7,7 +7,7 @@ public class Quiz
 {
     public Guid Id { get; private set; }
     public string Title { get; private set; }
-    public double? Score { get; private set; }
+    public double? Score { get; set; }
     public bool MultipleChoice { get; private set; }
     
     public Guid ClassId { get; private set; }
