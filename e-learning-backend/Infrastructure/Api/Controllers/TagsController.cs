@@ -40,6 +40,6 @@ public class TagsController : ControllerBase
         } 
         
         var tagId = await _tagsService.AddNewTagAsync(userId.Value, addTagDto);
-        return Ok(new { TagId = tagId });
+        return Created($"/api/tags", tagId);
     }
 }
