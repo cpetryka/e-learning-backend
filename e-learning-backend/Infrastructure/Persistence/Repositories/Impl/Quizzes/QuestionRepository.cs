@@ -62,4 +62,6 @@ public class QuestionRepository : IQuestionRepository
             .Include(q => q.Quizzes)
             .Include(q => q.Answers)
             .ToListAsync();
+    
+    public Task SaveChangesAsync() => _context.SaveChangesAsync();
 }

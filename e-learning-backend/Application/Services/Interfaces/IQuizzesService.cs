@@ -1,28 +1,28 @@
-﻿using e_learning_backend.Domain.Quizzes;
 using e_learning_backend.Infrastructure.Api.DTO;
 
-namespace e_learning_backend.Infrastructure.Persistence.Repositories;
+namespace e_learning_backend.Application.Services.Interfaces;
 
-public interface IQuizRepository
+public interface IQuizzesService
 {
-    Task<Quiz?> GetByIdAsync(Guid id);
-    Task<IEnumerable<Quiz>> GetAllAsync();
-    Task AddAsync(Quiz quiz);
-    Task UpdateAsync(Quiz quiz);
-    Task DeleteAsync(Guid id);
-    Task<IEnumerable<Quiz>> GetByClassIdAsync(Guid classId);
-
     Task<IEnumerable<QuizBriefDTO>> GetQuizzesAsync(
         Guid? studentId,
         Guid? courseId,
         string? searchQuery);
-    
+
     Task<QuizDTO> GetQuizDetailsAsync(Guid quizId);
-    
     Task<IEnumerable<QuizQuestionDTO>> GetQuizQuestionsAsync(Guid quizId);
     Task<IEnumerable<QuestionCategoryDTO>> GetUserQuestionCategoriesAsync(Guid userId);
     Task<IEnumerable<QuizQuestionDTO>> GetUserQuestionsAsync(Guid userId, List<Guid>? categoryIds);
     Task<QuizQuestionDTO> GetFullQuestionAsync(Guid questionId);
     Task<QuestionCategoryDTO> CreateQuestionCategoryAsync(Guid userId, string categoryName);
-    Task SaveChangesAsync();
+
+    Task<QuizQuestionDTO> CreateQuestionWithAnswersAsync(Guid userId,
+        CreateOrUpdateQuestionDTO orUpdateQuestionDto);
+
+    Task<QuizQuestionDTO> UpdateQuestionWithAnswersAsync(
+        Guid questionId,
+        Guid userId,
+        CreateOrUpdateQuestionDTO dto);
+
+    Task<double> SubmitQuizSolutionAsync(Guid quizId, QuizSolutionDTO solutionDto);
 }

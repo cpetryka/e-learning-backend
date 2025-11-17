@@ -29,6 +29,35 @@ public class Question
     
     public Question(string content) : this(Guid.NewGuid(), content) { }
     
+    public bool HasEditAccess(Guid userId) 
+        => _accesses.Any(access => access.TeacherId == userId && access.Created);
+    
+    public void UpdateContent(string newContent)
+    {
+        if (string.IsNullOrWhiteSpace(newContent))
+        {
+            throw new ArgumentException("Content cannot be null or empty.", nameof(newContent));
+        }
+
+        Content = newContent;
+    }
+    
+    public void ClearCategories()
+    {
+        foreach (var category in _categories.ToList())
+        {
+            RemoveCategory(category);
+        }
+    }
+    
+    public void ClearAnswers()
+    {
+        foreach (var answer in _answers.ToList())
+        {
+            RemoveAnswer(answer);
+        }
+    }
+    
     public void AddCategory(QuestionCategory category)
     {
         if (category == null)
@@ -90,6 +119,18 @@ public class Question
 
         _accesses.Add(access);
         access.Question = this;
+    }
+
+    public void AddAccess(Guid teacherId, bool created)
+    {
+        var access = new TeacherQuestionAccess
+        (
+            teacherId: teacherId,
+            question: this,
+            created: created
+        );
+        
+        _accesses.Add(access);
     }
     
     public void RemoveAccess(TeacherQuestionAccess access)
