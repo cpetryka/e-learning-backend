@@ -254,6 +254,26 @@ public class TeacherRepository : ITeacherRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<QuizSummaryDTO>> GetQuizzesByTeacherIdAndStudentIdAsync(
+        Guid teacherId, Guid studentId, Guid? courseId)
+    {
+        return await _context.Quizzes
+            .Include(e => e.Class)
+                .ThenInclude(c => c.Participation)
+                    .ThenInclude(p => p.Course)
+            .Where(e => e.Class.Participation.Course.TeacherId == teacherId &&
+                        e.Class.Participation.UserId == studentId)
+            .Where(e => courseId == null || e.Class.Participation.CourseId == courseId)
+            .Select(e => new QuizSummaryDTO
+            {
+                Id = e.Id,
+                Name = e.Title,
+                Completed = e.Score != null,
+                CourseName = e.Class.Participation.Course.Name,
+                Type = "quiz"
+            })
+            .ToListAsync();
+    }
 
     public async Task<IEnumerable<ClassWithStudentsDTO>> GetClassesWithStudentsByTeacherIdAsync(Guid teacherId)
     {

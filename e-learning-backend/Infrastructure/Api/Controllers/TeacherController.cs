@@ -85,6 +85,13 @@ public class TeacherController : ControllerBase
         return Ok(students);
     }
     
+    [HttpGet("{teacherId:guid}/students/{studentId:guid}/quizzes")]
+    public async Task<IActionResult> GetQuizzesOfStudent(Guid teacherId, Guid studentId, [FromQuery] Guid? courseId)
+    {
+        var students = await _teacherService.GetQuizzesByTeacherIdAndStudentIdAsync(teacherId, studentId, courseId);
+        return Ok(students);
+    }
+    
     
     [HttpGet("classes-with-students")]
     public async Task<IActionResult> GetClassesWithStudents(CancellationToken ct)

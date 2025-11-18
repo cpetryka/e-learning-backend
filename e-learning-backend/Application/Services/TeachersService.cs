@@ -73,6 +73,13 @@ public class TeachersService : ITeacherService
         return await _teacherRepository.GetExercisesByTeacherIdAndStudentIdAsync(
             teacherId, studentId, courseId);
     }
+    
+    public async Task<IEnumerable<QuizSummaryDTO>> GetQuizzesByTeacherIdAndStudentIdAsync(
+        Guid teacherId, Guid studentId, Guid? courseId)
+    {
+        return await _teacherRepository.GetQuizzesByTeacherIdAndStudentIdAsync(
+            teacherId, studentId, courseId);
+    }
 
     public async Task<IReadOnlyList<ClassWithStudentsDTO>> GetTeacherClassesWithStudentsAsync(Guid teacherId, CancellationToken cancellationToken = default)
     {
