@@ -40,50 +40,43 @@ namespace e_learning_backend.Application.Services.Interfaces
             _profilePicValidator = profilePicValidator;
             _tagRepo = tagRepo;
         }
-
-        public async Task<List<GetFileDTO>> GetUserFilesAsync(
+        
+        
+        
+        public async Task<PagedResult<GetFileDTO>> GetUserFilesAsync(
             Guid userId,
-            IEnumerable<string>? tagNames = null,
+            IEnumerable<Guid>? tags = null,
             IEnumerable<string>? fileTypes = null,
-            Guid? ownerId = null,
+            Guid? studentId = null,
+            Guid? courseId = null,
+            IEnumerable<Guid>? ownerId = null,
+            int page = 1,
+            int pageSize = 20,
             CancellationToken ct = default)
         {
-            var files = await _fileResourceRepo.GetByUserIdAsync(userId, ct);
+            var (items, totalCount) = await _fileResourceRepo.GetFilesConnectedToUser(
+                userId,
+                tags,
+                fileTypes,
+                studentId,
+                courseId,
+                ownerId,
+                page,
+                pageSize,
+                ct);
 
-            // Filtr: tagi po nazwie
-            if (tagNames is { } tagList && tagList.Any())
+            return new PagedResult<GetFileDTO>
             {
-                var tagSet = tagList
-                    .Select(t => t.Trim().ToLower())
-                    .ToHashSet();
-
-                files = files
-                    .Where(f => f.Tags.Any(tag => tagSet.Contains(tag.Name.ToLower())))
-                    .ToList();
-            }
-
-            // Filtr: typ pliku (po liście param type)
-            if (fileTypes is { } typesList && typesList.Any())
-            {
-                var normalizedTypes = typesList
-                    .Select(t => t.Trim().ToLower())
-                    .ToHashSet();
-
-                files = files
-                    .Where(f => normalizedTypes.Contains(f.FileType.ToLower()))
-                    .ToList();
-            }
-
-            // Filtr: właściciel
-            if (ownerId.HasValue)
-            {
-                files = files
-                    .Where(f => f.OwnerInfo?.Id == ownerId.Value)
-                    .ToList();
-            }
-
-            return files;
+                Items = items,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
         }
+
+
+
+
 
         
 
@@ -133,7 +126,7 @@ namespace e_learning_backend.Application.Services.Interfaces
             var entity = new FileResource(
                 id: fileId,
                 name: safeName,
-                path: relativePathWithinUploads,
+                path: "uploads/"+relativePathWithinUploads,
                 addedAt: DateTime.UtcNow,
                 user: user);
 
@@ -204,6 +197,8 @@ namespace e_learning_backend.Application.Services.Interfaces
                 sizeBytes: file.Length
             );
         }
+
+    
 
         public async Task<IEnumerable<GetFileDTO.TagDTO>> GetUserFileTags(Guid userId, CancellationToken ct = default)
         {

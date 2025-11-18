@@ -20,26 +20,32 @@ public class UserFilesController : ControllerBase
     [HttpGet]
     [Authorize]
     public async Task<IActionResult> Get(
-        [FromQuery(Name = "tags")] List<string>? tags,
-        [FromQuery(Name = "type")] List<string>? types,
-        [FromQuery] Guid? ownerId,
-        CancellationToken ct)
+        [FromQuery] IEnumerable<Guid>? tags,
+        [FromQuery] IEnumerable<string>? types,
+        [FromQuery] Guid? studentId,
+        [FromQuery] Guid? courseId,
+        [FromQuery] IEnumerable<Guid>? createdBy,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken ct = default)
     {
         var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdStr, out var currentUserId))
             return Unauthorized("Invalid or missing user identifier.");
 
-        var files = await _service.GetUserFilesAsync(
+        var result = await _service.GetUserFilesAsync(
             currentUserId,
             tags,
             types,
-            ownerId,
+            studentId,
+            courseId,
+            createdBy,
+            page,
+            pageSize,
             ct);
 
-        return Ok(files);
+        return Ok(result);
     }
-
-
     
     [HttpPost]
     [RequestSizeLimit(50 * 1024 * 1024)]

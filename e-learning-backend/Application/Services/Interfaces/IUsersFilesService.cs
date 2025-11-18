@@ -8,11 +8,15 @@ public interface IUsersFilesService
 
     Task<UserFileUploadResultDTO> UploadProfilePictureAsync(Guid userId, IFormFile file, CancellationToken ct = default);
 
-   Task<List<GetFileDTO>> GetUserFilesAsync(
+    Task<PagedResult<GetFileDTO>> GetUserFilesAsync(
         Guid userId,
-        IEnumerable<string>? tagNames = null,
+        IEnumerable<Guid>? tags = null,
         IEnumerable<string>? fileTypes = null,
-        Guid? ownerId = null,
+        Guid? studentId = null,
+        Guid? courseId = null,
+        IEnumerable<Guid>? ownerId = null,
+        int page = 1,
+        int pageSize = 20,
         CancellationToken ct = default);
 
     Task<IEnumerable<GetFileDTO.TagDTO>> GetUserFileTags(Guid userId, CancellationToken ct = default);

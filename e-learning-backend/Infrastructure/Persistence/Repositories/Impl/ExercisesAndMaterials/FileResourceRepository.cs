@@ -3,6 +3,7 @@ using e_learning_backend.Domain.ExercisesAndMaterials;
 using e_learning_backend.Domain.Users;
 using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 
 namespace e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
@@ -70,47 +71,113 @@ public class FileResourceRepository : IFileResourceRepository
     }
 
 
-    public async Task<List<GetFileDTO>> GetByUserIdAsync(Guid userId, CancellationToken ct = default)
-    {
-        
+   public async Task<(List<GetFileDTO>,int TotalCount)> GetFilesConnectedToUser(
+    Guid userId,
+    IEnumerable<Guid>? tagIds = null,
+    IEnumerable<string>? types = null,
+    Guid? studentId = null,
+    Guid? courseId = null,
+    IEnumerable<Guid>? ownerIds = null,
+    int page = 1,
+    int pageSize = 20,
+    CancellationToken ct = default)
+{
+    
+    if (page < 1) page = 1;
+    if (pageSize <= 0) pageSize = 20;
+    var offset = (page - 1) * pageSize;
+    
+    
+    var tagIdArray = tagIds?
+        .Where(id => id != Guid.Empty)
+        .Distinct()
+        .ToArray();
+
+    if (tagIdArray is { Length: 0 })
+        tagIdArray = null;
+
+    
+    var typeArray = types?
+        .Select(t => t.Trim().ToLower())
+        .Where(t => !string.IsNullOrWhiteSpace(t))
+        .Distinct()
+        .ToArray();
+
+    if (typeArray is { Length: 0 })
+        typeArray = null;
+
+    // właściciele (ownerIds / createdBy)
+    var ownerArray = ownerIds?
+        .Where(id => id != Guid.Empty)
+        .Distinct()
+        .ToArray();
+
+    if (ownerArray is { Length: 0 })
+        ownerArray = null;
+
     var rows = await _context.Database
-            .SqlQueryRaw<UserFileRow>(
-                """
-                SELECT
-                    "FileId",
-                    "FileName",
-                    "RelativePath",
-                    "UploadedAt",
-                    "Tags",
-                    "ParticipationUsers",
-                    "OwnerInfo",
-                    "Courses"
-                FROM get_user_files({0})
-                """,
-                userId
-            )
-            .ToListAsync(ct);
+        .SqlQueryRaw<UserFileRow>(
+            """
+            SELECT
+                "FileId",
+                "FileName",
+                "RelativePath",
+                "UploadedAt",
+                "Tags",
+                "ParticipationUsers",
+                "OwnerInfo",
+                "Courses"
+            FROM get_user_files({0}, {1}, {2}, {3}, {4}, {5})
+            ORDER BY "UploadedAt" DESC
+            LIMIT {6} OFFSET {7}
+            """,
+            userId, // {0}
+            tagIdArray, // {1}
+            typeArray, // {2}
+            studentId, // {3}
+            courseId, // {4}
+            ownerArray, // {5}
+            pageSize, // {6}
+            offset // {7}
+        ).ToListAsync(ct);
+    
+    var totalCount = await _context.Database
+        .SqlQueryRaw<int>(
+            """
+            SELECT COUNT(*) AS "Value"
+            FROM get_user_files({0}, {1}, {2}, {3}, {4}, {5})
+            """,
+            userId,
+            tagIdArray,
+            typeArray,
+            studentId,
+            courseId,
+            ownerArray
+        )
+        .SingleAsync(ct);
 
-        var jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-        var result = rows.Select(r => new GetFileDTO
-        {
-            Id = r.FileId,
-            FileName = r.FileName,
-            RelativePath = r.RelativePath,
-            UploadedAt = r.UploadedAt,
-            Tags = JsonSerializer.Deserialize<List<GetFileDTO.TagDTO>>(r.Tags, jsonOptions) ?? new(),
-            ParticipationUsers =
-                JsonSerializer.Deserialize<List<GetFileDTO.UserDTO>>(r.ParticipationUsers, jsonOptions) ??   new(),
-            OwnerInfo = JsonSerializer.Deserialize<GetFileDTO.UserDTO>(r.OwnerInfo ?? "{}", jsonOptions) ?? new(),
-            Courses = JsonSerializer.Deserialize<List<GetFileDTO.CourseDTO>>(r.Courses, jsonOptions) ?? new(),
-            
-        }).ToList();
 
-        return result;
-    }
+    var jsonOptions = new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
+    var result = rows.Select(r => new GetFileDTO
+    {
+        Id = r.FileId,
+        FileName = r.FileName,
+        RelativePath = r.RelativePath,
+        UploadedAt = r.UploadedAt,
+        Tags = JsonSerializer.Deserialize<List<GetFileDTO.TagDTO>>(r.Tags, jsonOptions) ?? new(),
+        ParticipationUsers =
+            JsonSerializer.Deserialize<List<GetFileDTO.UserDTO>>(r.ParticipationUsers, jsonOptions) ?? new(),
+        OwnerInfo = JsonSerializer.Deserialize<GetFileDTO.UserDTO>(r.OwnerInfo ?? "{}", jsonOptions) ?? new(),
+        Courses = JsonSerializer.Deserialize<List<GetFileDTO.CourseDTO>>(r.Courses, jsonOptions) ?? new(),
+    }).ToList();
+
+    return (result, totalCount);
+}
+
     
     public async Task<List<string>> GetFileExtensionsByUserIdAsync(Guid userId, CancellationToken ct = default)
     {
