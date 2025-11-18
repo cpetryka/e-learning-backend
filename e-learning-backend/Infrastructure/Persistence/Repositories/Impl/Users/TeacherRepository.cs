@@ -234,9 +234,6 @@ public class TeacherRepository : ITeacherRepository
             .Include(e => e.Class)
                 .ThenInclude(c => c.Participation)
                     .ThenInclude(p => p.Course)
-            .Include(e => e.Class)
-                .ThenInclude(c => c.Participation)
-                    .ThenInclude(p => p.User)
             .Where(e => e.Class.Participation.Course.TeacherId == teacherId &&
                         e.Class.Participation.UserId == studentId)
             .Where(e => courseId == null || e.Class.Participation.CourseId == courseId)

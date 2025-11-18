@@ -9,5 +9,5 @@ public class ExerciseDTO
     public string Status { get; set; } = string.Empty;
     public bool Graded { get; set; }
     public double? Grade { get; set; }
-    public string? Comments { get; set; } = string.Empty;
+    public string? Comments { get; set; }
 }

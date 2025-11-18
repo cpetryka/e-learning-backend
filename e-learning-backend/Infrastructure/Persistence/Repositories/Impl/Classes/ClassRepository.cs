@@ -88,6 +88,7 @@ public class ClassRepository : IClassRepository
     ///   <item><description>The associated course ID (<c>CourseId</c>).</description></item>
     ///   <item><description>The course name (<c>CourseName</c>).</description></item>
     ///   <item><description>The teacher ID responsible for the course (<c>TeacherId</c>).</description></item>
+    ///   <item><description>The student ID enrolled in the class (<c>StudentId</c>).</description></item>
     /// </list>
     /// </returns>
     public async Task<IEnumerable<ClassDTO>> GetUpcomingClassesForStudentAsync(Guid userId)
@@ -128,6 +129,7 @@ public class ClassRepository : IClassRepository
     ///   <item><description>The related course ID (<c>CourseId</c>).</description></item>
     ///   <item><description>The course name (<c>CourseName</c>).</description></item>
     ///   <item><description>The teacher ID (<c>TeacherId</c>), corresponding to the current teacher.</description></item>
+    ///   <item><description>The student ID enrolled in the class (<c>StudentId</c>).</description></item>
     /// </list>
     /// </returns>
     public async Task<IEnumerable<ClassDTO>> GetUpcomingClassesForTeacherAsync(Guid teacherId)
