@@ -7,4 +7,5 @@ public sealed class ClassDTO
     public Guid CourseId { get; set; }
     public string CourseName { get; set; } = string.Empty;
     public Guid TeacherId { get; set; }
+    public Guid StudentId { get; set; }
 }

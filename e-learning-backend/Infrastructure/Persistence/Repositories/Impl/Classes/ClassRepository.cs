@@ -88,6 +88,7 @@ public class ClassRepository : IClassRepository
     ///   <item><description>The associated course ID (<c>CourseId</c>).</description></item>
     ///   <item><description>The course name (<c>CourseName</c>).</description></item>
     ///   <item><description>The teacher ID responsible for the course (<c>TeacherId</c>).</description></item>
+    ///   <item><description>The student ID enrolled in the class (<c>StudentId</c>).</description></item>
     /// </list>
     /// </returns>
     public async Task<IEnumerable<ClassDTO>> GetUpcomingClassesForStudentAsync(Guid userId)
@@ -96,6 +97,7 @@ public class ClassRepository : IClassRepository
         var untilUtc = nowUtc.AddDays(14);
 
         return await _context.Classes
+            .Include(c => c.Participation)
             .AsNoTracking()
             .Where(c => c.UserId == userId && c.StartTime >= nowUtc && c.StartTime < untilUtc)
             .Join(
@@ -107,7 +109,8 @@ public class ClassRepository : IClassRepository
                     StartTime = cls.StartTime,
                     CourseId = cls.CourseId,
                     CourseName = crs.Name,
-                    TeacherId = crs.TeacherId
+                    TeacherId = crs.TeacherId,
+                    StudentId = cls.UserId
                 })
             .OrderBy(dto => dto.StartTime)
             .ToListAsync();
@@ -126,6 +129,7 @@ public class ClassRepository : IClassRepository
     ///   <item><description>The related course ID (<c>CourseId</c>).</description></item>
     ///   <item><description>The course name (<c>CourseName</c>).</description></item>
     ///   <item><description>The teacher ID (<c>TeacherId</c>), corresponding to the current teacher.</description></item>
+    ///   <item><description>The student ID enrolled in the class (<c>StudentId</c>).</description></item>
     /// </list>
     /// </returns>
     public async Task<IEnumerable<ClassDTO>> GetUpcomingClassesForTeacherAsync(Guid teacherId)
@@ -134,6 +138,7 @@ public class ClassRepository : IClassRepository
         var untilUtc = nowUtc.AddDays(14);
 
         return await _context.Classes
+            .Include(c => c.Participation)
             .AsNoTracking()
             .Where(cls => cls.StartTime >= nowUtc && cls.StartTime < untilUtc)
             .Join(
@@ -148,7 +153,8 @@ public class ClassRepository : IClassRepository
                 StartTime = x.cls.StartTime,
                 CourseId  = x.cls.CourseId,
                 CourseName = x.crs.Name,
-                TeacherId = x.crs.TeacherId
+                TeacherId = x.crs.TeacherId,
+                StudentId = x.cls.Participation.UserId
             })
             .OrderBy(dto => dto.StartTime)
             .ToListAsync();

@@ -1,0 +1,13 @@
+namespace e_learning_backend.Infrastructure.Api.DTO;
+
+public class ExerciseDTO
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public bool Completed { get; set; }
+    public string CourseName { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public bool Graded { get; set; }
+    public double? Grade { get; set; }
+    public string? Comments { get; set; }
+}

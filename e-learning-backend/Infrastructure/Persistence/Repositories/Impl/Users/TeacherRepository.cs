@@ -227,6 +227,50 @@ public class TeacherRepository : ITeacherRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<ExerciseDTO>> GetExercisesByTeacherIdAndStudentIdAsync(
+        Guid teacherId, Guid studentId, Guid? courseId)
+    {
+        return await _context.Exercises
+            .Include(e => e.Class)
+                .ThenInclude(c => c.Participation)
+                    .ThenInclude(p => p.Course)
+            .Where(e => e.Class.Participation.Course.TeacherId == teacherId &&
+                        e.Class.Participation.UserId == studentId)
+            .Where(e => courseId == null || e.Class.Participation.CourseId == courseId)
+            .Select(e => new ExerciseDTO()
+            {
+                Id = e.Id,
+                Name = e.Class.Participation.Course.Name + " [" + e.Class.StartTime.ToString("yyyy-MM-dd") + "]",
+                Completed = e.Status == ExerciseStatus.Graded || e.Status == ExerciseStatus.Submitted,
+                CourseName = e.Class.Participation.Course.Name,
+                Status = e.Status.ToString(),
+                Graded = e.Grade != null,
+                Grade = e.Grade,
+                Comments = e.Comment ?? ""
+            })
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<QuizSummaryDTO>> GetQuizzesByTeacherIdAndStudentIdAsync(
+        Guid teacherId, Guid studentId, Guid? courseId)
+    {
+        return await _context.Quizzes
+            .Include(e => e.Class)
+                .ThenInclude(c => c.Participation)
+                    .ThenInclude(p => p.Course)
+            .Where(e => e.Class.Participation.Course.TeacherId == teacherId &&
+                        e.Class.Participation.UserId == studentId)
+            .Where(e => courseId == null || e.Class.Participation.CourseId == courseId)
+            .Select(e => new QuizSummaryDTO
+            {
+                Id = e.Id,
+                Name = e.Title,
+                Completed = e.Score != null,
+                CourseName = e.Class.Participation.Course.Name,
+                Type = "quiz"
+            })
+            .ToListAsync();
+    }
 
     public async Task<IEnumerable<ClassWithStudentsDTO>> GetClassesWithStudentsByTeacherIdAsync(Guid teacherId)
     {

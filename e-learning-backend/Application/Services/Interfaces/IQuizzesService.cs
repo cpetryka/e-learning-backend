@@ -7,6 +7,7 @@ public interface IQuizzesService
     Task<IEnumerable<QuizBriefDTO>> GetQuizzesAsync(
         Guid? studentId,
         Guid? courseId,
+        Guid? classId,
         string? searchQuery);
 
     Task<QuizDTO> GetQuizDetailsAsync(Guid quizId);

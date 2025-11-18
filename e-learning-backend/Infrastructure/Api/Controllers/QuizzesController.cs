@@ -23,9 +23,10 @@ public class QuizzesController : ControllerBase
     public async Task<ActionResult<IEnumerable<QuizBriefDTO>>> GetQuizzes(
         [FromQuery] Guid? studentId,
         [FromQuery] Guid? courseId,
+        [FromQuery] Guid? classId,
         [FromQuery] string? searchQuery)
     {
-        var quizzes = await _quizzesService.GetQuizzesAsync(studentId, courseId, searchQuery);
+        var quizzes = await _quizzesService.GetQuizzesAsync(studentId, courseId, classId, searchQuery);
 
         if (quizzes == null || !quizzes.Any())
             return NoContent();
