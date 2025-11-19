@@ -2,6 +2,7 @@ using e_learning_backend.Application.Services.Interfaces;
 using e_learning_backend.Domain.Quizzes;
 using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.Repositories;
+using e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
 
 namespace e_learning_backend.Application.Services;
 
@@ -11,14 +12,18 @@ public class QuizzesService : IQuizzesService
     private readonly IQuestionRepository _questionRepository;
     private readonly IQuestionCategoryRepository _questionCategoryRepository;
     private readonly IAnswerRepository _answerRepository;
+    private readonly IClassRepository _classRepository;
 
     public QuizzesService(IQuizRepository quizRepository, IQuestionRepository questionRepository,
-        IQuestionCategoryRepository questionCategoryRepository, IAnswerRepository answerRepository)
+        IQuestionCategoryRepository questionCategoryRepository, IAnswerRepository answerRepository,
+        IClassRepository classRepository)
     {
         _quizRepository = quizRepository;
         _questionRepository = questionRepository;
         _questionCategoryRepository = questionCategoryRepository;
         _answerRepository = answerRepository;
+        _classRepository = classRepository;
+        
     }
 
     public async Task<IEnumerable<QuizBriefDTO>> GetQuizzesAsync(
@@ -230,5 +235,41 @@ public class QuizzesService : IQuizzesService
         await _quizRepository.SaveChangesAsync();
 
         return score;
+    }
+    
+    public async Task<Guid> CreateQuizAsync(Guid userId, AddQuizDTO addQuizDto)
+    {
+        if (addQuizDto == null)
+            throw new ArgumentNullException(nameof(addQuizDto));
+
+        var singleClass = await _classRepository.GetByIdAsync(addQuizDto.ClassId);
+        if (singleClass == null)
+        {
+            throw new ArgumentException("Class not found.");
+        }
+
+        var quiz = new Quiz(
+            id: Guid.NewGuid(),
+            title: addQuizDto.Name,
+            multipleChoice: addQuizDto.IsMultipleChoice,
+            singleClass: singleClass
+        );
+
+        if (addQuizDto.QuestionIds != null && addQuizDto.QuestionIds.Any())
+        {
+            foreach (var qid in addQuizDto.QuestionIds)
+            {
+                var question = await _questionRepository.GetByIdAsync(qid);
+                if (question == null)
+                    throw new ArgumentException($"Question with id {qid} not found.");
+
+                quiz.AddQuestion(question);
+            }
+        }
+
+        await _quizRepository.AddAsync(quiz);
+        await _quizRepository.SaveChangesAsync();
+
+        return quiz.Id;
     }
 }

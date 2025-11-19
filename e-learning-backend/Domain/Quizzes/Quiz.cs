@@ -37,7 +37,11 @@ public class Quiz
         }
 
         _questions.Add(question);
-        question.AddQuiz(this);
+        
+        if (!question.Quizzes.Contains(this))
+        {
+            question.AddQuiz(this);
+        }
     }
     
     public void RemoveQuestion(Question question)

@@ -172,4 +172,19 @@ public class QuizzesController : ControllerBase
             return BadRequest(e.Message); // 400 for other errors
         }
     }
+    
+    [HttpPost]
+    public async Task<IActionResult> CreateQuiz([FromBody] AddQuizDTO addQuizDto)
+    {
+        var userId = User.GetUserId();
+        
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+
+        var quizId = await _quizzesService.CreateQuizAsync(userId.Value, addQuizDto);
+
+        return Created($"/api/quizzes/", quizId);
+    }
 }
