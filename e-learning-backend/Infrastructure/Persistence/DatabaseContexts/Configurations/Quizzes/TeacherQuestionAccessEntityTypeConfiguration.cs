@@ -19,12 +19,12 @@ public class TeacherQuestionAccessEntityTypeConfiguration : IEntityTypeConfigura
             .HasForeignKey(t => t.QuestionId);
 
         builder.HasData(
-            new
-            {
-                TeacherId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                QuestionId = Guid.Parse("10000000-0000-0000-0002-000000000001"),
-                Created = true
-            }
+            // new
+            // {
+            //     TeacherId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
+            //     QuestionId = Guid.Parse("10000000-0000-0000-0002-000000000001"),
+            //     Created = true
+            // }
         );
     }
 }
