@@ -172,9 +172,10 @@ builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 builder.Services.AddScoped<IQuestionCategoryRepository, QuestionCategoryRepository>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
-
-builder.Services.AddScoped<IUsersFilesService, UsersFilesService>();
 builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
+builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
+
+
 
 builder.Services.AddScoped<ISpectatorsService, SpectatorsService>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
@@ -185,6 +186,8 @@ builder.Services.AddScoped<IStudentsService, StudentsService>();
 builder.Services.AddScoped<IClassesService, ClassesService>();
 builder.Services.AddScoped<ITagsService, TagsService>();
 builder.Services.AddScoped<IQuizzesService, QuizzesService>();
+builder.Services.AddScoped<IExerciseService, ExerciseService>();
+builder.Services.AddScoped<IUsersFilesService, UsersFilesService>();
 
 builder.Services.AddSingleton<IEmailTemplateService, EmailTemplateService>();
 builder.Services.AddScoped<ISpectatorInviteRepository, SpectatorInviteRepository>();
@@ -196,6 +199,8 @@ builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 builder.Services.AddSingleton<IFileStorage, LocalDiskFileStorage>();
 builder.Services.AddSingleton<IFileExtensionValidator.IAssignmentExtensionValidator, AssignmentExtensionValidator>();
 builder.Services.AddSingleton<IFileExtensionValidator.IProfilePictureExtensionValidator, ProfilePictureValidator>();
+
+
 
 
 // EMAIL CONFIGURATION
