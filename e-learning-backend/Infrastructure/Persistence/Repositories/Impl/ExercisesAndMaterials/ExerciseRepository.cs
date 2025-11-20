@@ -16,6 +16,8 @@ public class ExerciseRepository : IExerciseRepository
     public async Task<Exercise?> GetByIdAsync(Guid id)
         => await _context.Exercises
             .Include(e => e.Class)
+            .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.Course)
             .Include(e => e.ExerciseResources)
             .SingleOrDefaultAsync(e => e.Id == id);
 

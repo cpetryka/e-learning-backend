@@ -6,10 +6,10 @@ namespace e_learning_backend.Domain.ExercisesAndMaterials;
 public class Exercise
 {
     public Guid Id { get; private set; }
-    public string? Instruction { get; private set; }
-    public double? Grade { get; private set; }
-    public string? Comment { get; private set; }
-    public ExerciseStatus Status { get; private set; }
+    public string? Instruction { get;  set; }
+    public double? Grade { get;  set; }
+    public string? Comment { get;  set; }
+    public ExerciseStatus Status { get;  set; }
     
     public Guid ClassId { get; set; }
     public Class Class { get; set; }
