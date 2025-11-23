@@ -278,4 +278,12 @@ public class SpectatorsController : ControllerBase
 
         return NoContent();
     }
+    
+    [HttpGet("{spectatorId:guid}/spectated")]
+    public async Task<IActionResult> GetSpectatedStudents(Guid spectatorId)
+    {
+        var spectatedStudents = await _spectatorsService.GetSpectatedStudentsAsync(spectatorId);
+
+        return Ok(spectatedStudents);
+    }
 }

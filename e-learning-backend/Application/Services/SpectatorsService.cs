@@ -22,4 +22,7 @@ public class SpectatorsService : ISpectatorsService
 
     public Task<bool> AddSpectatorAsync(Guid spectatorId, Guid spectatedId)
         => _spectatorsRepository.AddSpectatorAsync(spectatorId, spectatedId);
+    
+    public Task<IEnumerable<StudentBriefDTO>> GetSpectatedStudentsAsync(Guid spectatorId)
+        => _spectatorsRepository.GetSpectatedStudentsAsync(spectatorId);
 }

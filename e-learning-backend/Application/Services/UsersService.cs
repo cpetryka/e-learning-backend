@@ -17,7 +17,6 @@ public class UsersService : IUsersService
     public UsersService(IUsersRepository usersRepository)
     {
         _usersRepository = usersRepository;
-   
     }
 
     public async Task<AboutMeDTO?> GetAboutMeAsync(Guid userId)
@@ -34,9 +33,10 @@ public class UsersService : IUsersService
             Description = user.AboutMe,
         };
     }
-    
+
     public Task<bool> ExistsAsync(Guid userId)
         => _usersRepository.ExistsAsync(userId);
-    public Task<Guid?> GetIdByEmailAsync(string email) 
+
+    public Task<Guid?> GetIdByEmailAsync(string email)
         => _usersRepository.GetIdByEmailAsync(email);
 }

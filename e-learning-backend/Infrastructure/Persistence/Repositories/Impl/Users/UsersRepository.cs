@@ -1,4 +1,5 @@
 using e_learning_backend.Domain.Users;
+using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,10 +32,10 @@ public class UsersRepository : IUsersRepository
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
     }
-    
+
     public Task<bool> ExistsAsync(Guid userId)
         => _context.Users.AsNoTracking().AnyAsync(u => u.Id == userId);
-    
+
     public async Task<Guid?> GetIdByEmailAsync(string email)
     {
         if (string.IsNullOrWhiteSpace(email)) return null;

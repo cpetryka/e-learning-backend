@@ -74,17 +74,16 @@ public class SpectatorsRepository : ISpectatorsRepository
     /// </remarks>
     public async Task<bool> RemoveSpectatorAsync(Guid spectatorId, Guid spectatedId)
     {
-        
         if (spectatorId == Guid.Empty || spectatedId == Guid.Empty)
             return false;
-        
+
         var spectator = await _context.Users
             .Include(u => u.Spectates)
             .SingleOrDefaultAsync(u => u.Id == spectatorId);
 
         if (spectator is null)
             return false;
-        
+
         var spectated = await _context.Users
             .Include(u => u.SpectatedBy)
             .SingleOrDefaultAsync(u => u.Id == spectatedId);
@@ -104,8 +103,8 @@ public class SpectatorsRepository : ISpectatorsRepository
         await _context.SaveChangesAsync();
         return true;
     }
-    
-    
+
+
     /// <summary>
     /// Creates a new spectatorship relationship between two existing users,
     /// where the specified <paramref name="spectatorId"/> user becomes a spectator
@@ -143,10 +142,9 @@ public class SpectatorsRepository : ISpectatorsRepository
     /// </remarks>
     public async Task<bool> AddSpectatorAsync(Guid spectatorId, Guid spectatedId)
     {
-        
         if (spectatorId == Guid.Empty || spectatedId == Guid.Empty)
             return false;
-        
+
         var spectated = await _context.Users
             .Include(u => u.SpectatedBy)
             .Include(u => u.Roles)
@@ -173,4 +171,18 @@ public class SpectatorsRepository : ISpectatorsRepository
         return true;
     }
 
+    public async Task<IEnumerable<StudentBriefDTO>> GetSpectatedStudentsAsync(Guid spectatorId)
+    {
+        return await _context.Users
+            .AsNoTracking()
+            .Where(u => u.Id == spectatorId)
+            .SelectMany(u => u.Spectates)
+            .Select(s => new StudentBriefDTO
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Surname = s.Surname
+            })
+            .ToListAsync();
+    }
 }
