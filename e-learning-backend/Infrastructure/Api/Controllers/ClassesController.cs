@@ -46,7 +46,7 @@ public class ClassesController : ControllerBase
             return Forbid();
         }
 
-        if (result == null || !result.Any())
+        if (result == null)
             return NotFound("No upcoming classes found for the current user.");
 
         return Ok(result);
