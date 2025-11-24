@@ -187,4 +187,28 @@ public class QuizzesController : ControllerBase
 
         return Created($"/api/quizzes/", quizId);
     }
+    
+    [HttpPost("{sourceQuizId:guid}/copy")]
+    public async Task<IActionResult> CopyQuiz(Guid sourceQuizId, [FromBody] CopyQuizDTO copyQuizDto)
+    {
+        var userId = User.GetUserId();
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var newQuizId = await _quizzesService.CopyQuizAsync(userId.Value, sourceQuizId, copyQuizDto.ClassId);
+            return Created($"/api/quizzes/{newQuizId}/copy", newQuizId);
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }

@@ -272,4 +272,55 @@ public class QuizzesService : IQuizzesService
 
         return quiz.Id;
     }
+    
+    // public async Task<Guid> CopyQuizAsync(Guid userId, Guid quizId, Guid classId)
+    // {
+    //     // Ensure source quiz exists
+    //     var sourceQuiz = await _quizRepository.GetByIdAsync(quizId);
+    //     if (sourceQuiz == null)
+    //     {
+    //         throw new ArgumentException("Quiz not found.");
+    //     }
+    //
+    //     // Ensure target class exists
+    //     var targetClass = await _classRepository.GetByIdAsync(classId);
+    //     if (targetClass == null)
+    //     {
+    //         throw new ArgumentException("Class not found.");
+    //     }
+    //
+    //     // Delegate the actual copy to the repository which will create & persist the new quiz
+    //     var newQuizId = await _quizRepository.CopyQuizAsync(quizId, classId);
+    //     return newQuizId;
+    // }
+    
+    public async Task<Guid> CopyQuizAsync(Guid userId, Guid quizId, Guid classId)
+    {
+        // Ensure source quiz exists
+        var sourceQuiz = await _quizRepository.GetByIdAsync(quizId);
+        if (sourceQuiz == null)
+        {
+            throw new ArgumentException("Quiz not found.");
+        }
+
+        // Ensure target class exists
+        var targetClass = await _classRepository.GetByIdAsync(classId);
+        if (targetClass == null)
+        {
+            throw new ArgumentException("Class not found.");
+        }
+
+        // Construct new Quiz and associate existing questions
+        var newQuiz = new Quiz(Guid.NewGuid(), sourceQuiz.Title, sourceQuiz.MultipleChoice, targetClass);
+        foreach (var question in sourceQuiz.Questions)
+        {
+            newQuiz.AddQuestion(question);
+        }
+
+        // Persist
+        await _quizRepository.AddAsync(newQuiz);
+        await _quizRepository.SaveChangesAsync();
+
+        return newQuiz.Id;
+    }
 }

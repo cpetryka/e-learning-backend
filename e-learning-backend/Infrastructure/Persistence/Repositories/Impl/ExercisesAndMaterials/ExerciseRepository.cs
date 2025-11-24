@@ -19,6 +19,7 @@ public class ExerciseRepository : IExerciseRepository
             .ThenInclude(c => c.Participation)
             .ThenInclude(p => p.Course)
             .Include(e => e.ExerciseResources)
+            .ThenInclude(er => er.File)
             .SingleOrDefaultAsync(e => e.Id == id);
 
 

@@ -57,4 +57,27 @@ public class ExercisesController : ControllerBase
         return NoContent();
     }
     
+    [HttpPost("{exerciseId:guid}/copy")]
+    public async Task<IActionResult> CopyExercise(Guid exerciseId, [FromBody] CopyExerciseDTO dto)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userId, out var currentUserId))
+        {
+            return Unauthorized("Invalid or missing user identifier.");
+        }
+
+        try
+        {
+            var newExerciseId = await _exerciseService.CopyExerciseAsync(currentUserId, exerciseId, dto.ClassId);
+            return Created($"/api/exercises/{newExerciseId}/copy", newExerciseId);
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }
