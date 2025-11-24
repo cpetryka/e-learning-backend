@@ -11,4 +11,7 @@ public interface IExerciseService
         IEnumerable<Guid>? fileIds = null);
 
     Task<Guid> CopyExerciseAsync(Guid userId, Guid exerciseId, Guid classId);
+
+    Task<bool> EditExerciseAsync(Guid userId, Guid exerciseId, string? instructions,
+        IEnumerable<Guid>? fileIds = null);
 }

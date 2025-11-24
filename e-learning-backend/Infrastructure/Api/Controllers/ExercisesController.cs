@@ -104,4 +104,34 @@ public class ExercisesController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+    
+    [HttpPut("{exerciseId:guid}")]
+    public async Task<IActionResult> EditExercise(Guid exerciseId, [FromBody] EditExerciseDTO dto)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userId, out var currentUserId))
+        {
+            return Unauthorized("Invalid or missing user identifier.");
+        }
+
+        try
+        {
+            var success = await _exerciseService.EditExerciseAsync(currentUserId, exerciseId, dto.Instructions, dto.FileIds);
+            
+            if (!success)
+            {
+                return Forbid();
+            }
+
+            return NoContent();
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }

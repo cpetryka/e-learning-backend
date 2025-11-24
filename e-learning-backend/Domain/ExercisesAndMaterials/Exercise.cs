@@ -94,6 +94,8 @@ public class Exercise
             throw new ArgumentNullException(nameof(resource), "Resource cannot be null.");
         }
         
+        resource.File.RemoveExerciseResource(resource);
+        
         if (!_exerciseResources.Remove(resource))
         {
             throw new InvalidOperationException("Resource is not associated with this exercise.");

@@ -1,6 +1,4 @@
-﻿
-
-using e_learning_backend.Application.Services.Interfaces;
+﻿using e_learning_backend.Application.Services.Interfaces;
 using e_learning_backend.Domain.ExercisesAndMaterials;
 using e_learning_backend.Domain.ExercisesAndMaterials.ValueObjects;
 using e_learning_backend.Infrastructure.Api.DTO;
@@ -15,7 +13,8 @@ public class ExerciseService : IExerciseService
     private readonly IClassRepository _classRepository;
     private readonly IFileResourceRepository _fileResourceRepository;
 
-    public ExerciseService(IExerciseRepository exerciseRepository, IClassRepository classRepository, IFileResourceRepository fileResourceRepository)
+    public ExerciseService(IExerciseRepository exerciseRepository, IClassRepository classRepository,
+        IFileResourceRepository fileResourceRepository)
     {
         _exerciseRepository = exerciseRepository;
         _classRepository = classRepository;
@@ -38,7 +37,8 @@ public class ExerciseService : IExerciseService
         };
     }
 
-    public async Task<bool> GradeExerciseAsync(Guid assignmentId, double grade, string? comment, Guid teacherId)
+    public async Task<bool> GradeExerciseAsync(Guid assignmentId, double grade, string? comment,
+        Guid teacherId)
     {
         var exercise = await _exerciseRepository.GetByIdAsync(assignmentId);
 
@@ -52,12 +52,13 @@ public class ExerciseService : IExerciseService
         exercise.Grade = grade;
         exercise.Comment = comment;
 
-        await _exerciseRepository.UpdateAsync(exercise); 
+        await _exerciseRepository.UpdateAsync(exercise);
 
         return true;
     }
-    
-    public async Task<Guid> CreateExerciseAsync(Guid userId, Guid classId, string instructions, IEnumerable<Guid>? fileIds = null)
+
+    public async Task<Guid> CreateExerciseAsync(Guid userId, Guid classId, string instructions,
+        IEnumerable<Guid>? fileIds = null)
     {
         // Check if the target class exists
         var targetClass = await _classRepository.GetByIdAsync(classId);
@@ -88,7 +89,7 @@ public class ExerciseService : IExerciseService
 
         return newExercise.Id;
     }
-    
+
     public async Task<Guid> CopyExerciseAsync(Guid userId, Guid exerciseId, Guid classId)
     {
         // Validate source exercise
@@ -116,7 +117,8 @@ public class ExerciseService : IExerciseService
         {
             if (srcResource.Type == ExerciseResourceType.Content && srcResource.File != null)
             {
-                var reusedResource = new ExerciseResource(newExercise, srcResource.File, srcResource.Type);
+                var reusedResource =
+                    new ExerciseResource(newExercise, srcResource.File, srcResource.Type);
                 newExercise.AddResource(reusedResource);
             }
         }
@@ -124,5 +126,80 @@ public class ExerciseService : IExerciseService
         await _exerciseRepository.AddAsync(newExercise);
 
         return newExercise.Id;
+    }
+
+    public async Task<bool> EditExerciseAsync(Guid userId, Guid exerciseId, string? instructions,
+        IEnumerable<Guid>? fileIds = null)
+    {
+        var exercise = await _exerciseRepository.GetByIdAsync(exerciseId);
+        if (exercise == null)
+        {
+            throw new ArgumentException("Exercise not found.");
+        }
+
+        // Only allow editing when status is Unsolved
+        if (exercise.Status != ExerciseStatus.Unsolved)
+        {
+            throw new InvalidOperationException(
+                "Exercise can be edited only when its status is Unsolved.");
+        }
+
+        // Only course teacher can edit
+        var exerciseTeacherId = exercise.Class?.Participation?.Course?.TeacherId;
+        if (exerciseTeacherId is null || exerciseTeacherId != userId)
+        {
+            return false;
+        }
+
+        // Update instruction when provided (allow empty string)
+        if (instructions != null)
+        {
+            exercise.Instruction = instructions;
+        }
+
+        // Fetch current content resources snapshot
+        var existingContent = exercise.ExerciseResources
+            .Where(er => er.Type == ExerciseResourceType.Content)
+            .ToList();
+
+        // Remove all content files when fileIds is not sent
+        if (fileIds == null)
+        {
+            foreach (var res in existingContent)
+            {
+                exercise.RemoveResource(res);
+            }
+        }
+        else
+        {
+            var requestedIds = new HashSet<Guid>(fileIds);
+
+            // Remove resources that are not requested anymore
+            var toRemove = existingContent.Where(er => !requestedIds.Contains(er.FileId)).ToList();
+            foreach (var res in toRemove)
+            {
+                exercise.RemoveResource(res);
+            }
+
+            // Determine which file IDs still need to be added
+            var remainingIds = exercise.ExerciseResources
+                .Where(er => er.Type == ExerciseResourceType.Content)
+                .Select(er => er.FileId)
+                .ToHashSet();
+
+            var toAdd = requestedIds.Except(remainingIds);
+            foreach (var fileId in toAdd)
+            {
+                var file = await _fileResourceRepository.GetByIdAsync(fileId);
+                if (file == null)
+                    throw new ArgumentException($"File with id {fileId} not found.");
+
+                // Create a new ExerciseResource which links the exercise and file (adds to both sides)
+                _ = new ExerciseResource(exercise, file, ExerciseResourceType.Content);
+            }
+        }
+
+        await _exerciseRepository.UpdateAsync(exercise);
+        return true;
     }
 }
