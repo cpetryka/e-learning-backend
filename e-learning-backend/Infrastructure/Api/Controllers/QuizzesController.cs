@@ -211,4 +211,34 @@ public class QuizzesController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+    
+    [HttpPut("{quizId:guid}")]
+    public async Task<IActionResult> EditQuiz(Guid quizId, [FromBody] EditQuizDTO dto)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userId, out var currentUserId))
+        {
+            return Unauthorized("Invalid or missing user identifier.");
+        }
+
+        try
+        {
+            var success = await _quizzesService.EditQuizAsync(currentUserId, quizId, dto.Name, dto.QuestionIds);
+            
+            if (!success)
+            {
+                return Forbid();
+            }
+
+            return NoContent();
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }

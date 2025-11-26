@@ -15,6 +15,9 @@ public class QuizRepository : IQuizRepository
     public async Task<Quiz?> GetByIdAsync(Guid id)
         => await _context.Quizzes
             .Include(q => q.Class)
+            .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.Course)
+            .ThenInclude(c => c.Teacher)
             .Include(q => q.Questions)
             .ThenInclude(question => question.Answers)
             .SingleOrDefaultAsync(q => q.Id == id);

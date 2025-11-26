@@ -23,7 +23,6 @@ public class QuizzesService : IQuizzesService
         _questionCategoryRepository = questionCategoryRepository;
         _answerRepository = answerRepository;
         _classRepository = classRepository;
-        
     }
 
     public async Task<IEnumerable<QuizBriefDTO>> GetQuizzesAsync(
@@ -196,11 +195,11 @@ public class QuizzesService : IQuizzesService
                 }).ToList()
         };
     }
-    
+
     public async Task<double> SubmitQuizSolutionAsync(Guid quizId, QuizSolutionDTO solutionDto)
     {
         var quiz = await _quizRepository.GetByIdAsync(quizId);
-        
+
         if (quiz == null)
             throw new ArgumentException("Quiz not found");
 
@@ -210,18 +209,19 @@ public class QuizzesService : IQuizzesService
         {
             var question = quiz.Questions
                 .FirstOrDefault(q => q.Id == qSolution.QuestionId);
-            
+
             if (question == null) continue; // the question does not belong to the quiz
-            
-            var correctAnswers = question.Answers.Where(a => a.IsCorrect).Select(a => a.Id).ToHashSet();
+
+            var correctAnswers =
+                question.Answers.Where(a => a.IsCorrect).Select(a => a.Id).ToHashSet();
             var selectedAnswers = qSolution.SelectedAnswerIds.ToHashSet();
-            
+
             if (selectedAnswers.SetEquals(correctAnswers))
             {
                 score += 1;
             }
         }
-        
+
         if (quiz.Questions.Count == 0)
         {
             score = 0;
@@ -230,13 +230,13 @@ public class QuizzesService : IQuizzesService
         {
             score = (score / quiz.Questions.Count) * 100;
         }
-        
+
         quiz.Score = score;
         await _quizRepository.SaveChangesAsync();
 
         return score;
     }
-    
+
     public async Task<Guid> CreateQuizAsync(Guid userId, AddQuizDTO addQuizDto)
     {
         if (addQuizDto == null)
@@ -272,7 +272,7 @@ public class QuizzesService : IQuizzesService
 
         return quiz.Id;
     }
-    
+
     // public async Task<Guid> CopyQuizAsync(Guid userId, Guid quizId, Guid classId)
     // {
     //     // Ensure source quiz exists
@@ -293,7 +293,7 @@ public class QuizzesService : IQuizzesService
     //     var newQuizId = await _quizRepository.CopyQuizAsync(quizId, classId);
     //     return newQuizId;
     // }
-    
+
     public async Task<Guid> CopyQuizAsync(Guid userId, Guid quizId, Guid classId)
     {
         // Ensure source quiz exists
@@ -311,7 +311,8 @@ public class QuizzesService : IQuizzesService
         }
 
         // Construct new Quiz and associate existing questions
-        var newQuiz = new Quiz(Guid.NewGuid(), sourceQuiz.Title, sourceQuiz.MultipleChoice, targetClass);
+        var newQuiz = new Quiz(Guid.NewGuid(), sourceQuiz.Title, sourceQuiz.MultipleChoice,
+            targetClass);
         foreach (var question in sourceQuiz.Questions)
         {
             newQuiz.AddQuestion(question);
@@ -322,5 +323,69 @@ public class QuizzesService : IQuizzesService
         await _quizRepository.SaveChangesAsync();
 
         return newQuiz.Id;
+    }
+
+    public async Task<bool> EditQuizAsync(Guid userId, Guid quizId, string? name,
+        IEnumerable<Guid>? questionIds = null)
+    {
+        var quiz = await _quizRepository.GetByIdAsync(quizId);
+        if (quiz == null)
+        {
+            throw new ArgumentException("Quiz not found.");
+        }
+
+        // Only course teacher may edit
+        /*var teacherId = quiz.Class?.Participation?.Course?.TeacherId;
+        if (teacherId is null || teacherId != userId)
+        {
+            return false;
+        }*/
+
+        // Update name if provided (null means leave as is)
+        if (name != null)
+        {
+            quiz.SetTitle(name);
+        }
+
+        // Synchronize questions
+        var existingQuestions = quiz.Questions.ToList();
+
+        if (questionIds == null)
+        {
+            // Remove all questions
+            foreach (var q in existingQuestions)
+            {
+                quiz.RemoveQuestion(q);
+            }
+        }
+        else
+        {
+            var requestedIds = new HashSet<Guid>(questionIds);
+
+            // Remove questions that are not requested
+            var toRemove = existingQuestions.Where(q => !requestedIds.Contains(q.Id)).ToList();
+            foreach (var q in toRemove)
+            {
+                quiz.RemoveQuestion(q);
+            }
+
+            // Determine which ids need to be added
+            var remainingIds = quiz.Questions.Select(q => q.Id).ToHashSet();
+            var toAddIds = requestedIds.Except(remainingIds);
+
+            foreach (var qid in toAddIds)
+            {
+                var question = await _questionRepository.GetByIdAsync(qid);
+                if (question == null)
+                {
+                    throw new ArgumentException($"Question with id {qid} not found.");
+                }
+
+                quiz.AddQuestion(question);
+            }
+        }
+
+        await _quizRepository.UpdateAsync(quiz);
+        return true;
     }
 }

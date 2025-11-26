@@ -35,6 +35,10 @@ public class Quiz
         {
             throw new ArgumentNullException(nameof(question), "Question cannot be null.");
         }
+        
+        // Avoid duplicates based on Id
+        if (_questions.Any(q => q.Id == question.Id))
+            return;
 
         _questions.Add(question);
         
@@ -51,12 +55,22 @@ public class Quiz
             throw new ArgumentNullException(nameof(question), "Question cannot be null.");
         }
 
-        if (!_questions.Remove(question))
+        // Find the actual instance stored in this quiz by Id
+        var existing = _questions.FirstOrDefault(q => q.Id == question.Id);
+        if (existing == null)
         {
             throw new InvalidOperationException("Question is not associated with this quiz.");
         }
+
+        // Remove from this side
+        _questions.Remove(existing);
         
-        question.RemoveQuiz(this);
+        // Try to remove the back-reference on the question side but don't fail if it's already inconsistent
+        try
+        {
+            existing.RemoveQuiz(this);
+        }
+        catch { } // Ignore
     }
     
     public void SetScore(double score)
@@ -67,5 +81,15 @@ public class Quiz
         }
 
         Score = score;
+    }
+    
+    public void SetTitle(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            throw new ArgumentException("Title cannot be empty.", nameof(title));
+        }
+
+        Title = title;
     }
 }

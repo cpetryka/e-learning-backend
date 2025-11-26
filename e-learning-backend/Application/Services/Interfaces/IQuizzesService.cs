@@ -28,4 +28,5 @@ public interface IQuizzesService
     Task<double> SubmitQuizSolutionAsync(Guid quizId, QuizSolutionDTO solutionDto);
     Task<Guid> CreateQuizAsync(Guid userId, AddQuizDTO addQuizDto);
     Task<Guid> CopyQuizAsync(Guid userId, Guid quizId, Guid classId);
+    Task<bool> EditQuizAsync(Guid userId, Guid quizId, string? name, IEnumerable<Guid>? questionIds = null);
 }
