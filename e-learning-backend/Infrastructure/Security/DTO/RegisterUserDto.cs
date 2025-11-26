@@ -7,10 +7,10 @@ public class RegisterUserDto
     public string Name { get; init; } = null!;
     public string Surname { get; init; } = null!;
     public string Phone { get; init; } = null!;
-    public string AboutMe { get; init; } = null!;
+    public string AboutMe { get; init; } = string.Empty;
 
     /// <summary>
     ///   Optional. If "Teacher" (case‐insensitive), we register as Teacher, otherwise Student.
     /// </summary>
-    public string InitialRoleStr { get; init; }
+    public string AccountType { get; init; }
 }

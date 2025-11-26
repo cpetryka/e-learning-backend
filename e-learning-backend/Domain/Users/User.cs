@@ -74,7 +74,7 @@ public class User
         string hashedPassword,
         string phone,
         Role initialRole,
-        string? aboutMe = null)
+        string? aboutMe = "")
     {
         if (id == Guid.Empty)
         {

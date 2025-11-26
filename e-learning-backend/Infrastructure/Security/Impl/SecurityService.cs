@@ -27,9 +27,57 @@ public class SecurityService : ISecurityService
 
     public async Task<AuthorizationResultDto> RegisterAsync(RegisterUserDto dto)
     {
-        if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
+        // Try to load an existing user with roles
+        var existingUser = await _context.Users
+            .Include(u => u.Roles)
+            .SingleOrDefaultAsync(u => u.Email == dto.Email);
+
+        var requestedRoleName = dto.AccountType.Trim();
+        var requestedRoleNameNormalized = requestedRoleName.ToLowerInvariant();
+
+        if (existingUser != null)
+        {
+            // If user already has the role
+            if (existingUser.Roles.Any(r => r.RoleName.ToLowerInvariant() == requestedRoleNameNormalized))
+            {
+                return new AuthorizationResultDto
+                {
+                    Success = false,
+                    Errors = new[] { "User already exists" }
+                };
+            }
+            
+            // Check the provided password
+            if (!BCrypt.Net.BCrypt.Verify(dto.Password, existingUser.HashedPassword))
+            {
+                return new AuthorizationResultDto
+                {
+                    Success = false,
+                    Errors = new[] { "Invalid password for existing user" }
+                };
+            }
+
+            // Add the new role to the existing user
+            existingUser.AddRole(Role.FromString(requestedRoleName));
+
+            // Generate tokens for the existing user
+            var accessTokenForExisting = GenerateAccessToken(existingUser);
+            var refreshTokenForExisting = GenerateRefreshToken();
+
+            existingUser.RefreshToken = refreshTokenForExisting;
+            existingUser.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(24);
+
+            await _context.SaveChangesAsync();
+
             return new AuthorizationResultDto
-                { Success = false, Errors = new[] { "User already exists" } };
+            {
+                UserId = existingUser.Id.ToString(),
+                Success = true,
+                AccessToken = accessTokenForExisting,
+                RefreshToken = refreshTokenForExisting,
+                Roles = existingUser.Roles.Select(r => r.RoleName).ToList()
+            };
+        }
 
         // create domain user
         var domainUser = new User(
@@ -38,7 +86,7 @@ public class SecurityService : ISecurityService
             email: dto.Email,
             hashedPassword: BCrypt.Net.BCrypt.HashPassword(dto.Password),
             phone: dto.Phone,
-            Role.FromString(dto.InitialRoleStr.Trim()));
+            Role.FromString(dto.AccountType.Trim()));
 
         // generate tokens
         var accessToken = GenerateAccessToken(domainUser);
@@ -124,7 +172,7 @@ public class SecurityService : ISecurityService
             Roles = user.Roles.Select(r => r.RoleName).ToList()
         };
     }
-    
+
     public async Task LogoutByRefreshTokenAsync(string refreshToken)
     {
         var user = await _context.Users.SingleOrDefaultAsync(u => u.RefreshToken == refreshToken);
@@ -185,7 +233,7 @@ public class SecurityService : ISecurityService
 
     private string GenerateRefreshToken()
         => Guid.NewGuid().ToString("N");
-    
+
     // --------------------------------------------------------------------------------------------------------
     /// <summary>
     /// Generates a cryptographically secure, URL-safe token for spectator invitations.
@@ -203,5 +251,4 @@ public class SecurityService : ISecurityService
         RandomNumberGenerator.Fill(data);
         return WebEncoders.Base64UrlEncode(data);
     }
-
 }

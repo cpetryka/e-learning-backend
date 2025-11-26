@@ -47,7 +47,7 @@ public class SecurityServiceRegisterAsyncTest
             Surname = "Doe",
             Phone = "+48123456789",
             AboutMe = "About me",
-            InitialRoleStr = role
+            AccountType = role
         };
     }
 
