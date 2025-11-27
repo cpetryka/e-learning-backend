@@ -1714,7 +1714,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                         });
                 });
 
-        builder.HasMany(c => c.Links)
+        builder
+            .HasMany(c => c.Links)
             .WithOne(l => l.Class)
             .HasForeignKey(l => l.ClassId)
             .OnDelete(DeleteBehavior.Cascade);

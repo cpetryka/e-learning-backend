@@ -9,4 +9,6 @@ public interface IClassesService
     Task<IEnumerable<ClassDTO>> GetUpcomingClassesForStudentAsync(Guid userId);
     Task<IEnumerable<ClassDTO>> GetUpcomingClassesForTeacherAsync(Guid userId);
     Task<ClassBriefDto?> GetClassBriefAsync(Guid classId);
+    Task<bool> AddLinkAsync(Guid userId, Guid classId, string link, bool isMeeting);
+    Task<bool> RemoveLinkAsync(Guid userId, Guid linkId);
 }

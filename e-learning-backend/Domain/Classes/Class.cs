@@ -145,4 +145,14 @@ public class Class
             throw new InvalidOperationException("File does not exist in the class.");
         }
     }
+    
+    public void AddLink(LinkResource link)
+    {
+        if (link == null)
+        {
+            throw new ArgumentNullException(nameof(link), "Link cannot be null.");
+        }
+
+        _links.Add(link);
+    }
 }

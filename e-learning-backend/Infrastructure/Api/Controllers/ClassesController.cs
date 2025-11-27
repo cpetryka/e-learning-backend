@@ -94,4 +94,85 @@ public class ClassesController : ControllerBase
 
         return Ok(classDetails);
     }
+    
+    
+    [Authorize]
+    [HttpPost("{classId:guid}/links")]
+    public async Task<IActionResult> AddLink(Guid classId, [FromBody] AddClassLinkDTO dto)
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdStr, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        // Ensure the caller is a teacher
+        var roles = User.FindAll(ClaimTypes.Role)
+            .Select(c => c.Value)
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+
+        if (!roles.Any(r => r.Equals("teacher", StringComparison.OrdinalIgnoreCase)))
+        {
+            return Forbid();
+        }
+
+        try
+        {
+            var success = await _classesService.AddLinkAsync(userId, classId, dto.Link, dto.IsMeeting);
+            if (!success)
+            {
+                return Forbid();
+            }
+
+            return Created();
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    
+    [Authorize]
+    [HttpDelete("links/{linkId:guid}")]
+    public async Task<IActionResult> RemoveLink(Guid linkId)
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdStr, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        // Ensure caller is teacher
+        var roles = User.FindAll(ClaimTypes.Role)
+            .Select(c => c.Value)
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+
+        if (!roles.Any(r => r.Equals("teacher", StringComparison.OrdinalIgnoreCase)))
+        {
+            return Forbid();
+        }
+
+        try
+        {
+            var success = await _classesService.RemoveLinkAsync(userId, linkId);
+            if (!success)
+            {
+                return Forbid();
+            }
+
+            return NoContent();
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using e_learning_backend.API.DTOs;
+using e_learning_backend.Domain.ExercisesAndMaterials;
 using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
@@ -6,10 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 
 public class ClassesService : IClassesService
 {   private readonly IClassRepository _repository;
+    private readonly ILinkResourcesRepository _linkResourcesRepository;
     
-    public ClassesService(IClassRepository repository)
+    public ClassesService(IClassRepository repository, ILinkResourcesRepository linkResourcesRepository)
     {
         _repository = repository;
+        _linkResourcesRepository = linkResourcesRepository;
     }
     
     /// <summary>
@@ -70,5 +73,71 @@ public class ClassesService : IClassesService
         };
 
         return dto;
+    }
+    
+    public async Task<bool> AddLinkAsync(Guid userId, Guid classId, string link, bool isMeeting)
+    {
+        if (string.IsNullOrWhiteSpace(link))
+        {
+            throw new ArgumentException("Link cannot be empty.", nameof(link));
+        }
+
+        var cls = await _repository.GetByIdAsync(classId);
+        if (cls == null)
+        {
+            throw new ArgumentException("Class not found.");
+        }
+
+        // Only course teacher may add links
+        var teacherId = cls.Participation?.Course?.TeacherId;
+        if (teacherId is null || teacherId != userId)
+        {
+            return false;
+        }
+
+        if (isMeeting)
+        {
+            cls.SetLinkToMeeting(link);
+        }
+        else
+        {
+            var linkResource = new LinkResource(link, cls);
+            await _linkResourcesRepository.AddAsync(linkResource);
+        }
+
+        await _repository.UpdateAsync(cls);
+        return true;
+    }
+    
+    public async Task<bool> RemoveLinkAsync(Guid userId, Guid linkId)
+    {
+        if (linkId == Guid.Empty)
+        {
+            throw new ArgumentException("Invalid link id.", nameof(linkId));
+        }
+
+        var link = await _linkResourcesRepository.GetByIdAsync(linkId);
+        if (link == null)
+        {
+            throw new ArgumentException("Link not found.");
+        }
+
+        // Resolve the parent class
+        var cls = await _repository.GetByIdAsync(link.ClassId);
+
+        if (cls == null)
+        {
+            throw new ArgumentException("Parent class not found.");
+        }
+
+        // Only the course teacher may remove links
+        var teacherId = cls.Participation?.Course?.TeacherId;
+        if (teacherId is null || teacherId != userId)
+        {
+            return false;
+        }
+
+        await _linkResourcesRepository.DeleteAsync(linkId);
+        return true;
     }
 }

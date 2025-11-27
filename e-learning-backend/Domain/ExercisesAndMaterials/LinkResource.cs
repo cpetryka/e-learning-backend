@@ -13,12 +13,30 @@ public class LinkResource
 
     private LinkResource() { } // dla EF
 
-    public LinkResource(string link)
+    public LinkResource(string link, Class cls)
     {
         if (string.IsNullOrWhiteSpace(link))
+        {
             throw new ArgumentException("Link cannot be null or empty.", nameof(link));
+        }
 
+        if (cls == null)
+        {
+            throw new ArgumentNullException(nameof(cls));
+        }
+
+        Id = Guid.NewGuid();
         Link = link;
+        Class = cls;
+        ClassId = cls.Id;
         Date = DateTime.UtcNow;
+        
+        cls.AddLink(this);
+    }
+    
+    public void SetLink(string link)
+    {
+        if (string.IsNullOrWhiteSpace(link)) throw new ArgumentException("Link cannot be empty.", nameof(link));
+        Link = link;
     }
 }

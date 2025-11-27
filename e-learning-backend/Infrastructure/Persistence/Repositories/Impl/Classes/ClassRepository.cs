@@ -19,6 +19,7 @@ public class ClassRepository : IClassRepository
             .Include(c => c.Files)
             .Include(c => c.Participation)
                 .ThenInclude(p => p.Course)
+                    .ThenInclude(c => c.Teacher)
             .Include(c => c.Links)
             .Include(c => c.Status)
             .SingleOrDefaultAsync(c => c.Id == id);
