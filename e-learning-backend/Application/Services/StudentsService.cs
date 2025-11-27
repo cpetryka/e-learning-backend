@@ -11,6 +11,8 @@ public class StudentsService : IStudentsService
     private readonly IStudentsRepository _studentsRepository;
     private readonly IParticipationRepository _participationRepository;
     private readonly IClassRepository _classRepository;
+    
+    private static int DEFAULT_CLASS_DURATION_MINUTES = 60;
 
     public StudentsService(IStudentsRepository studentsRepository, IParticipationRepository participationRepository, IClassRepository classRepository)
     {
@@ -111,7 +113,7 @@ public class StudentsService : IStudentsService
         return classes.Select(c =>
         {
             var start = c.StartTime;
-            var end = c.StartTime.AddMinutes(60); // bo Duration = 60
+            var end = c.StartTime.AddMinutes(DEFAULT_CLASS_DURATION_MINUTES);
 
             string state =
                 now < start ? "upcoming" :
@@ -124,7 +126,7 @@ public class StudentsService : IStudentsService
                 State = state,
                 Date = c.StartTime,
                 Title = c.Participation.Course.Name ?? "",
-                Duration = 60
+                Duration = DEFAULT_CLASS_DURATION_MINUTES
             };
         });
     }

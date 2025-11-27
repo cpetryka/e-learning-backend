@@ -84,7 +84,7 @@ public class StudentsController : ControllerBase
     }
 
     [HttpGet("{studentId:guid}/classes")]
-    public async Task<IActionResult> GetAllExercisesByStudentIdAsync(Guid studentId,
+    public async Task<IActionResult> GetAllClassesByStudentIdAsync(Guid studentId,
         [FromQuery] DateTime? from = null,
         [FromQuery] DateTime? to = null,
         [FromQuery] List<Guid>? participationIds = null)
