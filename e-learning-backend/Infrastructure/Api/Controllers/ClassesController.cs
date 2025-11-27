@@ -3,6 +3,7 @@ using System.Text.Json;
 using e_learning_backend.API.DTOs;
 using e_learning_backend.Domain.Classes;
 using e_learning_backend.Infrastructure.Api.DTO;
+using e_learning_backend.Infrastructure.Extensions;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -169,6 +170,66 @@ public class ClassesController : ControllerBase
         catch (ArgumentException e)
         {
             return NotFound(e.Message);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    
+    [HttpGet("{classId:guid}/links")]
+    public async Task<IActionResult> GetClassLinks(Guid classId)
+    {
+        var userId = User.GetUserId();
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
+        try
+        {
+            var classDetails = await _classesService.GetClassLinksAsync(classId);
+            return Ok(classDetails);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    
+    [HttpGet("{classId:guid}/files")]
+    public async Task<IActionResult> GetClassFiles(Guid classId)
+    {
+        var userId = User.GetUserId();
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
+        try
+        {
+            var classFiles = await _classesService.GetClassFilesAsync(classId);
+            return Ok(classFiles);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    
+    [HttpGet("{classId:guid}/exercises")]
+    public async Task<IActionResult> GetClassExercises(Guid classId)
+    {
+        var userId = User.GetUserId();
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
+        try
+        {
+            var classExercises = await _classesService.GetClassExercisesAsync(classId);
+            return Ok(classExercises);
         }
         catch (Exception e)
         {

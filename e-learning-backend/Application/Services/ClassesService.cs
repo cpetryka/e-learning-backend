@@ -6,15 +6,17 @@ using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 public class ClassesService : IClassesService
-{   private readonly IClassRepository _repository;
+{
+    private readonly IClassRepository _repository;
     private readonly ILinkResourcesRepository _linkResourcesRepository;
-    
-    public ClassesService(IClassRepository repository, ILinkResourcesRepository linkResourcesRepository)
+
+    public ClassesService(IClassRepository repository,
+        ILinkResourcesRepository linkResourcesRepository)
     {
         _repository = repository;
         _linkResourcesRepository = linkResourcesRepository;
     }
-    
+
     /// <summary>
     /// Retrieves all upcoming classes for a specific student within the next 14 days (UTC).
     /// </summary>
@@ -22,21 +24,21 @@ public class ClassesService : IClassesService
     public Task<IEnumerable<ClassDTO>> GetUpcomingClassesForStudentAsync(Guid studentId)
         => _repository.GetUpcomingClassesForStudentAsync(studentId);
 
-    
+
     /// <summary>
     /// Retrieves all upcoming classes for a specific teacher within the next 14 days (UTC).
     /// </summary>
     /// <param name="teacherId">The unique identifier of the teacher.</param>
-    public Task<IEnumerable<ClassDTO>> GetUpcomingClassesForTeacherAsync(Guid teacherId) 
+    public Task<IEnumerable<ClassDTO>> GetUpcomingClassesForTeacherAsync(Guid teacherId)
         => _repository.GetUpcomingClassesForTeacherAsync(teacherId);
-    
+
     public async Task<ClassBriefDto?> GetClassBriefAsync(Guid classId)
     {
         var cls = await _repository.GetByIdAsync(classId);
-        
+
         if (cls == null)
             return null;
-        
+
         var dto = new ClassBriefDto
         {
             Id = cls.Id,
@@ -74,7 +76,7 @@ public class ClassesService : IClassesService
 
         return dto;
     }
-    
+
     public async Task<bool> AddLinkAsync(Guid userId, Guid classId, string link, bool isMeeting)
     {
         if (string.IsNullOrWhiteSpace(link))
@@ -108,7 +110,7 @@ public class ClassesService : IClassesService
         await _repository.UpdateAsync(cls);
         return true;
     }
-    
+
     public async Task<bool> RemoveLinkAsync(Guid userId, Guid linkId)
     {
         if (linkId == Guid.Empty)
@@ -139,5 +141,97 @@ public class ClassesService : IClassesService
 
         await _linkResourcesRepository.DeleteAsync(linkId);
         return true;
+    }
+
+    public async Task<IEnumerable<GetClassLinkDTO>> GetClassLinksAsync(Guid classId)
+    {
+        return await _repository
+            .GetByIdAsync(classId)
+            .ContinueWith(task =>
+            {
+                var cls = task.Result;
+                if (cls == null)
+                {
+                    throw new ArgumentException("Class not found.");
+                }
+
+                var links = cls.Links.Select(link => new GetClassLinkDTO
+                {
+                    Id = link.Id,
+                    Path = link.Link,
+                    IsMeeting = false,
+                    CourseName = link.Class.Participation.Course.Name ?? ""
+                });
+
+                links = cls.LinkToMeeting != null ? new[]
+                        {
+                            new GetClassLinkDTO
+                            {
+                                Id = Guid.Empty, 
+                                Path = cls.LinkToMeeting, 
+                                IsMeeting = true,
+                                CourseName = cls.Participation.Course.Name ?? ""
+                            }
+                        }
+                        .Concat(links)
+                    : links;
+
+                return links;
+            });
+    }
+
+    public async Task<IEnumerable<GetClassFileDTO>> GetClassFilesAsync(Guid classId)
+    {
+        return await _repository
+            .GetByIdAsync(classId)
+            .ContinueWith(task =>
+            {
+                var cls = task.Result;
+                if (cls == null)
+                {
+                    throw new ArgumentException("Class not found.");
+                }
+
+                var files = cls.Files.Select(file => new GetClassFileDTO
+                {
+                    Id = file.Id,
+                    Name = file.Name,
+                    FilePath = file.Path,
+                    AssociatedCourseName = cls.Participation.Course.Name ?? "",
+                    AssociatedClassDate = cls.StartTime
+                });
+
+                return files;
+            });
+    }
+
+    public async Task<IEnumerable<GetExerciseDTO>> GetClassExercisesAsync(Guid classId)
+    {
+        return await _repository
+            .GetByIdAsync(classId)
+            .ContinueWith(task =>
+            {
+                var cls = task.Result;
+                if (cls == null)
+                {
+                    throw new ArgumentException("Class not found.");
+                }
+
+                var exercises = cls.Exercises.Select(exercise => new GetExerciseDTO
+                {
+                    Id = exercise.Id,
+                    Name = "Exercise " +
+                           (cls.Participation.Course.Name ?? "Unknown") +
+                           " [" + cls.StartTime.ToString("yyyy-MM-dd") + "]",
+                    CourseName = cls.Participation.Course.Name ?? "",
+                    Status = exercise.Status.ToString().ToLowerInvariant(),
+                    Graded = exercise.Grade.HasValue,
+                    Grade = exercise.Grade,
+                    Comments = exercise.Comment ?? "",
+                    Instruction = exercise.Instruction ?? ""
+                });
+
+                return exercises;
+            });
     }
 }
