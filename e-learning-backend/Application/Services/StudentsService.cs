@@ -11,6 +11,8 @@ public class StudentsService : IStudentsService
     private readonly IStudentsRepository _studentsRepository;
     private readonly IParticipationRepository _participationRepository;
     private readonly IClassRepository _classRepository;
+    
+    private static int DEFAULT_CLASS_DURATION_MINUTES = 60;
 
     public StudentsService(IStudentsRepository studentsRepository, IParticipationRepository participationRepository, IClassRepository classRepository)
     {
@@ -90,5 +92,42 @@ public class StudentsService : IStudentsService
     public async Task<IEnumerable<CourseBriefDTO>> GetStudentCoursesAsync(Guid studentId)
     {
         return await _studentsRepository.GetStudentCourses(studentId);
+    }
+
+    public async Task<IEnumerable<GetClassTilePropsDTO>> GetAllClassesByStudentIdAsync(Guid studentId, IEnumerable<Guid>? participationIds, DateTime from,
+        DateTime to)
+    {
+        var participations = participationIds?.Any() == true
+            ? await _participationRepository.GetByIdsAsync(studentId, participationIds)
+            : await _participationRepository.GetByUserIdAsync(studentId);
+
+        if (!participations.Any()) {
+            return Enumerable.Empty<GetClassTilePropsDTO>();
+        }
+        
+    
+        var selectedCourseIds = participations.Select(p => p.CourseId).ToList();
+        var classes = await _classRepository.GetByUserAndCoursesInDateRangeAsync(studentId, selectedCourseIds, from, to);
+        var now = DateTime.UtcNow;
+        
+        return classes.Select(c =>
+        {
+            var start = c.StartTime;
+            var end = c.StartTime.AddMinutes(DEFAULT_CLASS_DURATION_MINUTES);
+
+            string state =
+                now < start ? "upcoming" :
+                now >= start && now < end ? "ongoing" :
+                "completed";
+            
+            return new GetClassTilePropsDTO
+            {
+                Id = c.Id,
+                State = state,
+                Date = c.StartTime,
+                Title = c.Participation.Course.Name ?? "",
+                Duration = DEFAULT_CLASS_DURATION_MINUTES
+            };
+        });
     }
 }

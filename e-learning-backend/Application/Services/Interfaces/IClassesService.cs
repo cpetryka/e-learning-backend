@@ -11,4 +11,7 @@ public interface IClassesService
     Task<ClassBriefDto?> GetClassBriefAsync(Guid classId);
     Task<bool> AddLinkAsync(Guid userId, Guid classId, string link, bool isMeeting);
     Task<bool> RemoveLinkAsync(Guid userId, Guid linkId);
+    Task<IEnumerable<GetClassLinkDTO>> GetClassLinksAsync(Guid classId);
+    Task<IEnumerable<GetClassFileDTO>> GetClassFilesAsync(Guid classId);
+    Task<IEnumerable<GetExerciseDTO>> GetClassExercisesAsync(Guid classId);
 }
