@@ -91,4 +91,41 @@ public class StudentsService : IStudentsService
     {
         return await _studentsRepository.GetStudentCourses(studentId);
     }
+
+    public async Task<IEnumerable<GetClassTilePropsDTO>> GetAllClassesByStudentIdAsync(Guid studentId, IEnumerable<Guid>? participationIds, DateTime from,
+        DateTime to)
+    {
+        var participations = participationIds?.Any() == true
+            ? await _participationRepository.GetByIdsAsync(studentId, participationIds)
+            : await _participationRepository.GetByUserIdAsync(studentId);
+
+        if (!participations.Any()) {
+            return Enumerable.Empty<GetClassTilePropsDTO>();
+        }
+        
+    
+        var selectedCourseIds = participations.Select(p => p.CourseId).ToList();
+        var classes = await _classRepository.GetByUserAndCoursesInDateRangeAsync(studentId, selectedCourseIds, from, to);
+        var now = DateTime.UtcNow;
+        
+        return classes.Select(c =>
+        {
+            var start = c.StartTime;
+            var end = c.StartTime.AddMinutes(60); // bo Duration = 60
+
+            string state =
+                now < start ? "upcoming" :
+                now >= start && now < end ? "ongoing" :
+                "completed";
+            
+            return new GetClassTilePropsDTO
+            {
+                Id = c.Id,
+                State = state,
+                Date = c.StartTime,
+                Title = c.Participation.Course.Name ?? "",
+                Duration = 60
+            };
+        });
+    }
 }

@@ -3,15 +3,20 @@ using e_learning_backend.Infrastructure.Api.DTO;
 
 namespace e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 
-public interface IStudentsService 
+public interface IStudentsService
 {
     Task<StudentDTO?> GetStudentWithCoursesAsync(Guid studentId);
-    
+
     Task<IEnumerable<ClassBriefDto>> GetTimelineAsync(
         Guid studentId,
         IEnumerable<Guid>? participationIds,
         DateTime from,
         DateTime to);
-    
+
     Task<IEnumerable<CourseBriefDTO>> GetStudentCoursesAsync(Guid studentId);
+
+    Task<IEnumerable<GetClassTilePropsDTO>> GetAllClassesByStudentIdAsync(Guid studentId,
+        IEnumerable<Guid>? participationIds,
+        DateTime from,
+        DateTime to);
 }
