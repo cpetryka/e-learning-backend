@@ -116,9 +116,17 @@ public class TeacherController : ControllerBase
         return Ok(upcomingClasses);
     }
     
-    [HttpGet("{teacherId}/exercises-to-grade")]
-    public async Task<IActionResult> GetExercisesToGrade(Guid teacherId)
+    [HttpGet("exercises-to-grade")]
+    public async Task<IActionResult> GetExercisesToGrade()
     {
+        
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (userIdClaim == null)
+            return Unauthorized("Missing NameIdentifier claim in token.");
+
+        if (!Guid.TryParse(userIdClaim, out var teacherId))
+            return Unauthorized("Invalid user ID in token.");
         var exercises = await _teacherService.GetExercisesToGradeAsync(teacherId);
         return Ok(exercises);
     }
