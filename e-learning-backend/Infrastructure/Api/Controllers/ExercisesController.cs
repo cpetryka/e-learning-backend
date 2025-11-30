@@ -134,4 +134,70 @@ public class ExercisesController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+    
+    [HttpPost("{exerciseId:guid}/submit")]
+    public async Task<IActionResult> SubmitExercise(Guid exerciseId)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userId, out var currentUserId))
+        {
+            return Unauthorized("Invalid or missing user identifier.");
+        }
+
+        try
+        {
+            var success = await _exerciseService.SubmitExercise(exerciseId, currentUserId);
+
+            if (!success)
+            {
+                return Forbid();
+            }
+
+            return NoContent();
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpPost("{exerciseId:guid}/solution")]
+    [RequestSizeLimit(50 * 1024 * 1024)]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> AddSolutionFile(Guid exerciseId, [FromForm] Guid classId, IFormFile file, CancellationToken ct = default)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userId, out var currentUserId))
+        {
+            return Unauthorized("Invalid or missing user identifier.");
+        }
+
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("No file uploaded or file is empty.");
+        }
+
+        try
+        {
+            var fileId = await _exerciseService.AddSolutionFileAsync(currentUserId, exerciseId, classId, file, ct);
+            return Created($"/api/exercises/{exerciseId}/solution", new { fileId });
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            return Forbid(e.Message);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
 }

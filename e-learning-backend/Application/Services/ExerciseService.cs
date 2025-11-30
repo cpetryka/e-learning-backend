@@ -4,6 +4,7 @@ using e_learning_backend.Domain.ExercisesAndMaterials.ValueObjects;
 using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
+using Microsoft.AspNetCore.Http;
 
 namespace e_learning_backend.Application.Services;
 
@@ -12,13 +13,15 @@ public class ExerciseService : IExerciseService
     private readonly IExerciseRepository _exerciseRepository;
     private readonly IClassRepository _classRepository;
     private readonly IFileResourceRepository _fileResourceRepository;
+    private readonly IUsersFilesService _usersFilesService;
 
     public ExerciseService(IExerciseRepository exerciseRepository, IClassRepository classRepository,
-        IFileResourceRepository fileResourceRepository)
+        IFileResourceRepository fileResourceRepository, IUsersFilesService usersFilesService)
     {
         _exerciseRepository = exerciseRepository;
         _classRepository = classRepository;
         _fileResourceRepository = fileResourceRepository;
+        _usersFilesService = usersFilesService;
     }
 
     public async Task<GetExerciseDetailsDTO?> GetByIdAsync(Guid id)
@@ -51,6 +54,24 @@ public class ExerciseService : IExerciseService
 
         exercise.Grade = grade;
         exercise.Comment = comment;
+
+        await _exerciseRepository.UpdateAsync(exercise);
+
+        return true;
+    }
+    
+    public async Task<bool> SubmitExercise(Guid exerciseId, Guid studentId)
+    {
+        var exercise = await _exerciseRepository.GetByIdAsync(exerciseId);
+
+        if (exercise is null)
+            return false;
+        var exerciseStudentId = exercise.Class?.Participation?.User.Id;
+
+        if (exerciseStudentId is null || exerciseStudentId != studentId)
+            return false;
+
+        exercise.Status = ExerciseStatus.Submitted;
 
         await _exerciseRepository.UpdateAsync(exercise);
 
@@ -201,5 +222,51 @@ public class ExerciseService : IExerciseService
 
         await _exerciseRepository.UpdateAsync(exercise);
         return true;
+    }     
+
+    public async Task<Guid> AddSolutionFileAsync(Guid userId, Guid exerciseId, Guid classId, IFormFile file, CancellationToken ct = default)
+    {
+        
+        var exercise = await _exerciseRepository.GetByIdAsync(exerciseId);
+        if (exercise == null)
+        {
+            throw new ArgumentException("Exercise not found.");
+        }
+        
+        var targetClass = await _classRepository.GetByIdAsync(classId);
+        if (targetClass == null)
+        {
+            throw new ArgumentException("Class not found.");
+        }
+        
+        if (exercise.ClassId != classId)
+        {
+            throw new ArgumentException("Exercise does not belong to the specified class.");
+        }
+        
+        var exerciseStudentId = exercise.Class?.Participation?.User.Id;
+        var exerciseTeacherId = exercise.Class?.Participation?.Course?.TeacherId;
+        
+        if (exerciseStudentId != userId && exerciseTeacherId != userId)
+        {
+            throw new UnauthorizedAccessException("User does not have permission to add solution to this exercise.");
+        }
+        
+        var uploadResult = await _usersFilesService.UploadAsync(userId, file, ct);
+        
+        var fileResource = await _fileResourceRepository.GetByIdAsync(uploadResult.Id);
+        if (fileResource == null)
+        {
+            throw new InvalidOperationException("File was uploaded but could not be retrieved.");
+        }
+        
+        targetClass.AddFile(fileResource);
+        
+        exercise.addSolutionFile(fileResource);
+        
+        await _exerciseRepository.UpdateAsync(exercise);
+        await _classRepository.UpdateAsync(targetClass);
+
+        return uploadResult.Id;
     }
 }

@@ -51,6 +51,7 @@ public class StudnetsRepository : IStudentsRepository
             .Select(e => new GetExerciseDTO()
             {
                 Id = e.Id,
+                ClassId = e.Class.Id,
                 Name = e.Class.Participation.Course.Name + " [" + e.Class.StartTime.ToString("yyyy-MM-dd") + "]",
                 CourseName = e.Class.Participation.Course.Name,
                 Status = e.Status.ToString(),

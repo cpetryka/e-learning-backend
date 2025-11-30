@@ -173,7 +173,7 @@ public class SpectatorsController : ControllerBase
 
         try
         {
-            // 1) persist pending invite
+            
             var token = SecurityService.CreateSpectatorInviteSecureToken(32);
             var expiresHours = _config.GetValue<int?>("Invitations:ExpiresInHours") ?? 48;
             var expiresAtUtc = DateTime.UtcNow.AddHours(expiresHours);
@@ -185,8 +185,7 @@ public class SpectatorsController : ControllerBase
                 token: token,
                 expiresAtUtc: expiresAtUtc
             );
-
-            // 2) send e-mail
+            
             var appName = _config["App:Name"] ?? "E-Learning";
             var confirmBase = _config["Invitations:ConfirmBaseUrl"] ?? "https://example.com/accept";
             var confirmUrl = $"{confirmBase}?token={Uri.EscapeDataString(token)}";
@@ -253,10 +252,10 @@ public class SpectatorsController : ControllerBase
         if (!Guid.TryParse(userIdStr, out var currentUserId))
             return Unauthorized("Invalid or missing user identifier.");
 
-        // 1) Retrieve invitation by token
+        
         var invite = await _inviteService.GetByTokenAsync(request.Token);
         if (invite is null)
-            return NotFound(); //"Invitation not found."
+            return NotFound(); 
 
         if (invite.Accepted)
             return Conflict("Invitation already accepted.");
@@ -264,14 +263,14 @@ public class SpectatorsController : ControllerBase
         if (invite.ExpiresAtUtc <= DateTime.UtcNow)
             return Conflict("Invitation time expired."); 
 
-        // 2) Verify the current user is the invited spectator
+        
         var isSpectator =
             await _usersService.ExistsAsync(currentUserId) &&
             await _inviteService.IsCurrentUserTheSpectatorAsync(invite, currentUserId);
         if (!isSpectator)
             return Forbid();
 
-        // 3) Accept the invitation and create spectatorship
+        
         var ok = await _inviteService.AcceptAsync(invite, currentUserId);
         if (!ok)
             return Problem("Could not accept invitation.", statusCode: 500);
