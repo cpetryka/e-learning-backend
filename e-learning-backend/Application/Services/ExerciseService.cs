@@ -233,16 +233,16 @@ public class ExerciseService : IExerciseService
             throw new ArgumentException("Exercise not found.");
         }
         
-        var targetClass = await _classRepository.GetByIdAsync(classId);
+        /*var targetClass = await _classRepository.GetByIdAsync(exercise.ClassId);
         if (targetClass == null)
         {
             throw new ArgumentException("Class not found.");
-        }
+        }*/
         
-        if (exercise.ClassId != classId)
+        /*if (exercise.ClassId != classId)
         {
             throw new ArgumentException("Exercise does not belong to the specified class.");
-        }
+        }*/
         
         var exerciseStudentId = exercise.Class?.Participation?.User.Id;
         var exerciseTeacherId = exercise.Class?.Participation?.Course?.TeacherId;
@@ -260,12 +260,12 @@ public class ExerciseService : IExerciseService
             throw new InvalidOperationException("File was uploaded but could not be retrieved.");
         }
         
-        targetClass.AddFile(fileResource);
+        // targetClass.AddFile(fileResource);
         
         exercise.addSolutionFile(fileResource);
         
         await _exerciseRepository.UpdateAsync(exercise);
-        await _classRepository.UpdateAsync(targetClass);
+        // await _classRepository.UpdateAsync(targetClass);
 
         return uploadResult.Id;
     }
