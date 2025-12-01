@@ -22,16 +22,19 @@ public class ExercisesController : ControllerBase
     }
 
     [HttpGet("unsolved-by-user/{userId}")]
-    public async Task<IActionResult> GetAllUnsolvedExercisesByUserId(Guid userId)
+    public async Task<IActionResult> GetAllUnsolvedExercisesByUserId(
+        Guid userId, [FromQuery] List<Guid>? courseIds = null)
     {
-        var exercises = await _exerciseRepository.GetAllUnsolvedExercisesByUserId(userId);
+        var exercises = 
+            await _exerciseRepository.GetAllUnsolvedExercisesByUserId(userId, courseIds);
         return Ok(exercises);
     }
 
     [HttpGet("by-teacher/{teacherId:guid}")]
     public async Task<IActionResult> GetAllExercisesByTeacherId(Guid teacherId)
     {
-        var exercises = await _exerciseRepository.GetAllExercisesByTeacherId(teacherId);
+        var exercises = 
+            await _exerciseRepository.GetAllExercisesByTeacherId(teacherId);
         return Ok(exercises);
     }
 

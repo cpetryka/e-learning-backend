@@ -54,7 +54,8 @@ public class ExerciseRepository : IExerciseRepository
         }
     }
 
-    public async Task<IEnumerable<ExerciseBriefDTO>> GetAllUnsolvedExercisesByUserId(Guid userId)
+    public async Task<IEnumerable<ExerciseBriefDTO>> GetAllUnsolvedExercisesByUserId(
+        Guid userId, List<Guid>? courseIds = null)
     {
         return await _context.Exercises
             .Include(e => e.Class)
@@ -63,6 +64,8 @@ public class ExerciseRepository : IExerciseRepository
             .Where(e =>
                 (e.Status == ExerciseStatus.Unsolved || e.Status == ExerciseStatus.SolutionAdded)
                 && e.Class.Participation.UserId == userId)
+            .Where(e => courseIds == null || courseIds.Count == 0 || 
+                        courseIds.Contains(e.Class.Participation.CourseId))
             .Select(e => new ExerciseBriefDTO
             {
                 Id = e.Id,

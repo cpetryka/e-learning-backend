@@ -351,7 +351,8 @@ public class TeacherRepository : ITeacherRepository
         
     }
     
-    public async Task<IEnumerable<ExerciseBriefDTO>> GetExercisesToGradeAsync(Guid teacherId)
+    public async Task<IEnumerable<ExerciseBriefDTO>> GetExercisesToGradeAsync(
+        Guid teacherId, List<Guid>? courseIds = null, List<Guid>? studentIds = null)
     {
         return await _context.Exercises
             .Include(e => e.Class)
@@ -359,6 +360,10 @@ public class TeacherRepository : ITeacherRepository
             .ThenInclude(p => p.Course)
             .Where(e => e.Class.Participation.Course.TeacherId == teacherId &&
                         e.Status == ExerciseStatus.Submitted)
+            .Where(e => courseIds == null || courseIds.Count == 0 || 
+                        courseIds.Contains(e.Class.Participation.CourseId))
+            .Where(e => studentIds == null || studentIds.Count == 0 || 
+                        studentIds.Contains(e.Class.Participation.UserId))
             .Select(e => new ExerciseBriefDTO
             {
                 Id = e.Id,

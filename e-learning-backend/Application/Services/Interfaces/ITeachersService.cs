@@ -17,9 +17,11 @@ public interface ITeacherService
 
     Task<IEnumerable<QuizSummaryDTO>> GetQuizzesByTeacherIdAndStudentIdAsync(
         Guid teacherId, Guid studentId, Guid? courseId);
-    Task<IReadOnlyList<ClassWithStudentsDTO>> GetTeacherClassesWithStudentsAsync(Guid teacherId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ClassWithStudentsDTO>> GetTeacherClassesWithStudentsAsync(
+        Guid teacherId, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<TeacherUpcomingClass>> GetUpcomingClassesAsync(Guid teacherId,
         DateOnly start, DateOnly end);
-    Task<IEnumerable<ExerciseBriefDTO>> GetExercisesToGradeAsync(Guid teacherId);
+    Task<IEnumerable<ExerciseBriefDTO>> GetExercisesToGradeAsync(Guid teacherId, 
+        List<Guid>? courseIds = null, List<Guid>? studentIds = null);
 }

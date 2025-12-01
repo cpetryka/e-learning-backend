@@ -117,7 +117,7 @@ public class TeacherController : ControllerBase
     }
     
     [HttpGet("exercises-to-grade")]
-    public async Task<IActionResult> GetExercisesToGrade()
+    public async Task<IActionResult> GetExercisesToGrade([FromQuery] List<Guid>? courseIds = null, [FromQuery] List<Guid>? studentIds = null)
     {
         
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -127,7 +127,7 @@ public class TeacherController : ControllerBase
 
         if (!Guid.TryParse(userIdClaim, out var teacherId))
             return Unauthorized("Invalid user ID in token.");
-        var exercises = await _teacherService.GetExercisesToGradeAsync(teacherId);
+        var exercises = await _teacherService.GetExercisesToGradeAsync(teacherId, courseIds, studentIds);
         return Ok(exercises);
     }
     
