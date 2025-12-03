@@ -13,8 +13,8 @@ public class CourseVariant
     public CourseRate Rate { get; set; }
     public CourseLanguage Language { get; private set; }
     
-    public Guid CourseId { get;set; }
-    public Course Course { get; set; }
+    public Guid CourseId { get; private set; }
+    public Course Course { get; private set; }
     
     private readonly HashSet<Participation> _participations = new();
     public IReadOnlyCollection<Participation> Participations => _participations;
@@ -59,7 +59,7 @@ public class CourseVariant
 
         if (!_participations.Contains(participation))
         {
-            throw new InvalidOperationException("Participation does not exist for this course.");
+            throw new InvalidOperationException("Participation does not exist for this course variant.");
         }
 
         _participations.Remove(participation);

@@ -70,8 +70,11 @@ public class ClassRepository : IClassRepository
             .ThenInclude(p => p.CourseVariant)
             .ThenInclude(p => p.Course)
             .AsSplitQuery()
+            .Include(c => c.Participation)
+            .ThenInclude(p => p.CourseVariant)
             .Where(c => courseIds.Contains(c.Participation.CourseVariant.CourseId) &&
-                        _context.Participations.Any(p => p.UserId == studentId && p.CourseVariant.CourseId == c.Participation.CourseVariant.CourseId) &&
+                        _context.Participations.Any(p => p.UserId == studentId && 
+                        p.CourseVariant.CourseId == c.Participation.CourseVariant.CourseId) &&
                         c.StartTime >= from &&
                         c.StartTime <= to)
             .ToListAsync();
@@ -101,6 +104,8 @@ public class ClassRepository : IClassRepository
 
         return await _context.Classes
             .Include(c => c.Participation)
+            .ThenInclude(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
             .AsNoTracking()
             .Where(c => c.UserId == userId && c.StartTime >= nowUtc && c.StartTime < untilUtc)
             .Join(
@@ -142,6 +147,8 @@ public class ClassRepository : IClassRepository
 
         return await _context.Classes
             .Include(c => c.Participation)
+            .ThenInclude(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
             .AsNoTracking()
             .Where(cls => cls.StartTime >= nowUtc && cls.StartTime < untilUtc)
             .Join(
