@@ -9,8 +9,8 @@ public class Participation
     public Guid UserId { get; set; }
     public User User { get; set; }
     
-    public Guid CourseId { get;set; }
-    public Course Course { get; set; }
+    public Guid CourseVariantId { get; set; }
+    public CourseVariant CourseVariant { get; set; }
     
     public Guid? ReviewId { get;set; }
     public Review? Review { get; set; }
@@ -22,17 +22,17 @@ public class Participation
     
     protected Participation() { }
     
-    public Participation(User user, Course course, bool notifications = false)
+    public Participation(User user, CourseVariant courseVariant, bool notifications = false)
     {
         User = user ?? throw new ArgumentNullException(nameof(user));
-        Course = course ?? throw new ArgumentNullException(nameof(course));
+        CourseVariant = courseVariant ?? throw new ArgumentNullException(nameof(courseVariant));
         UserId = user.Id;
-        CourseId = course.Id;
+        CourseVariantId = courseVariant.Id;
         Notifications = notifications;
 
         // Add this participation to both collections
         user.AddParticipation(this);
-        course.AddParticipation(this);
+        courseVariant.AddParticipation(this);
     }
     
     public void TurnOnNotifications()

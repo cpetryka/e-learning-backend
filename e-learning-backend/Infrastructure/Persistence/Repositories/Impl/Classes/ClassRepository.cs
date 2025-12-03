@@ -18,8 +18,9 @@ public class ClassRepository : IClassRepository
             .Include(c => c.Quizzes)
             .Include(c => c.Files)
             .Include(c => c.Participation)
-                .ThenInclude(p => p.Course)
-                    .ThenInclude(c => c.Teacher)
+                .ThenInclude(p => p.CourseVariant)
+                    .ThenInclude(p => p.Course)
+                        .ThenInclude(c => c.Teacher)
             .Include(c => c.Links)
             .Include(c => c.Status)
             .SingleOrDefaultAsync(c => c.Id == id);
@@ -66,10 +67,14 @@ public class ClassRepository : IClassRepository
             .Include(c => c.Files)
             .Include(c => c.Links)
             .Include(c => c.Participation)
+            .ThenInclude(p => p.CourseVariant)
             .ThenInclude(p => p.Course)
             .AsSplitQuery()
-            .Where(c => courseIds.Contains(c.CourseId) &&
-                        _context.Participations.Any(p => p.UserId == studentId && p.CourseId == c.CourseId) &&
+            .Include(c => c.Participation)
+            .ThenInclude(p => p.CourseVariant)
+            .Where(c => courseIds.Contains(c.Participation.CourseVariant.CourseId) &&
+                        _context.Participations.Any(p => p.UserId == studentId && 
+                        p.CourseVariant.CourseId == c.Participation.CourseVariant.CourseId) &&
                         c.StartTime >= from &&
                         c.StartTime <= to)
             .ToListAsync();
@@ -99,16 +104,18 @@ public class ClassRepository : IClassRepository
 
         return await _context.Classes
             .Include(c => c.Participation)
+            .ThenInclude(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
             .AsNoTracking()
             .Where(c => c.UserId == userId && c.StartTime >= nowUtc && c.StartTime < untilUtc)
             .Join(
                 _context.Courses.AsNoTracking(),
-                cls => cls.CourseId,
+                cls => cls.Participation.CourseVariant.CourseId,
                 crs => crs.Id,
                 (cls, crs) => new ClassDTO
                 {
                     StartTime = cls.StartTime,
-                    CourseId = cls.CourseId,
+                    CourseId = cls.Participation.CourseVariant.CourseId,
                     CourseName = crs.Name,
                     TeacherId = crs.TeacherId,
                     StudentId = cls.UserId
@@ -140,11 +147,13 @@ public class ClassRepository : IClassRepository
 
         return await _context.Classes
             .Include(c => c.Participation)
+            .ThenInclude(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
             .AsNoTracking()
             .Where(cls => cls.StartTime >= nowUtc && cls.StartTime < untilUtc)
             .Join(
                 _context.Courses.AsNoTracking(),
-                cls => cls.CourseId,
+                cls => cls.Participation.CourseVariant.CourseId,
                 crs => crs.Id,
                 (cls, crs) => new { cls, crs }
             )
@@ -152,7 +161,7 @@ public class ClassRepository : IClassRepository
             .Select(x => new ClassDTO
             {
                 StartTime = x.cls.StartTime,
-                CourseId  = x.cls.CourseId,
+                CourseId  = x.cls.Participation.CourseVariant.CourseId,
                 CourseName = x.crs.Name,
                 TeacherId = x.crs.TeacherId,
                 StudentId = x.cls.Participation.UserId

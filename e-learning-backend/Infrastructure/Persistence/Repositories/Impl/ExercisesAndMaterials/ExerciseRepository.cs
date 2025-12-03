@@ -17,7 +17,8 @@ public class ExerciseRepository : IExerciseRepository
         => await _context.Exercises
             .Include(e => e.Class)
             .ThenInclude(c => c.Participation)
-            .ThenInclude(p => p.Course)
+            .ThenInclude(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
             .Include(e => e.ExerciseResources)
             .ThenInclude(er => er.File)
             .SingleOrDefaultAsync(e => e.Id == id);
@@ -60,17 +61,19 @@ public class ExerciseRepository : IExerciseRepository
         return await _context.Exercises
             .Include(e => e.Class)
                 .ThenInclude(c => c.Participation)
+                    .ThenInclude(p => p.CourseVariant)
+                        .ThenInclude(cv => cv.Course)
             .Include(e => e.ExerciseResources)
             .Where(e =>
                 (e.Status == ExerciseStatus.Unsolved || e.Status == ExerciseStatus.SolutionAdded)
                 && e.Class.Participation.UserId == userId)
             .Where(e => courseIds == null || courseIds.Count == 0 || 
-                        courseIds.Contains(e.Class.Participation.CourseId))
+                        courseIds.Contains(e.Class.Participation.CourseVariant.CourseId))
             .Select(e => new ExerciseBriefDTO
             {
                 Id = e.Id,
-                CourseId = e.Class.CourseId,
-                CourseName = e.Class.Participation.Course.Name,
+                CourseId = e.Class.Participation.CourseVariant.CourseId,
+                CourseName = e.Class.Participation.CourseVariant.Course.Name,
                 ClassStartTime = e.Class.StartTime,
                 ExerciseStatus = e.Status.ToString()
             })
@@ -82,15 +85,16 @@ public class ExerciseRepository : IExerciseRepository
         return await _context.Exercises
             .Include(e => e.Class)
                 .ThenInclude(c => c.Participation)
-                    .ThenInclude(p => p.Course)
+                    .ThenInclude(p => p.CourseVariant)
+                        .ThenInclude(cv => cv.Course)
             .Include(e => e.ExerciseResources)
                 .ThenInclude(e => e.File)
-            .Where(e => e.Class.Participation.Course.TeacherId == teacherId)
+            .Where(e => e.Class.Participation.CourseVariant.Course.TeacherId == teacherId)
             .Select(e => new GetExerciseDTO()
             {
                 Id = e.Id,
                 Name = "",
-                CourseName = e.Class.Participation.Course.Name,
+                CourseName = e.Class.Participation.CourseVariant.Course.Name,
                 Status = e.Status.ToString(),
                 Graded = e.Grade != null,
                 Grade = e.Grade,

@@ -19,7 +19,8 @@ public class CourseRepository : ICourseRepository
             .Include(c => c.Variants)
             .ThenInclude(v => v.Level)
             .Include(c => c.Teacher)
-            .Include(c => c.Participations)
+            .Include(c => c.Variants)
+            .ThenInclude(v => v.Participations)
             .ThenInclude(p => p.Review)
             .Include(c => c.Category)
             .FirstOrDefaultAsync(c => c.Id == courseId);
@@ -36,7 +37,8 @@ public class CourseRepository : ICourseRepository
             .ThenInclude(v => v.Language)
             .Include(c => c.Variants)
             .ThenInclude(v => v.Rate)
-            .Include(c => c.Participations)
+            .Include(c => c.Variants)
+            .ThenInclude(v => v.Participations)
             .ThenInclude(p => p.Review)
             .ToListAsync();
     }
@@ -52,7 +54,8 @@ public class CourseRepository : ICourseRepository
             .ThenInclude(v => v.Language)
             .Include(c => c.Variants)
             .ThenInclude(v => v.Rate)
-            .Include(c => c.Participations)
+            .Include(c => c.Variants)
+            .ThenInclude(v => v.Participations)
             .ThenInclude(p => p.Review)
             .AsQueryable();
     }

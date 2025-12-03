@@ -33,8 +33,8 @@ public class StudentsService : IStudentsService
             CoursesBrief = student.Participations
                 .Select(p => new CourseBriefDTO
                 {
-                    Id = p.Course.Id,
-                    Name = p.Course.Name
+                    Id = p.CourseVariant.Course.Id,
+                    Name = p.CourseVariant.Course.Name
                 })
                 .ToList()
         };
@@ -54,7 +54,7 @@ public class StudentsService : IStudentsService
         if (!participations.Any())
             return Enumerable.Empty<ClassBriefDto>();
 
-        var selectedCourseIds = participations.Select(p => p.CourseId).ToList();
+        var selectedCourseIds = participations.Select(p => p.CourseVariant.CourseId).ToList();
 
         var classes = await _classRepository.GetByUserAndCoursesInDateRangeAsync(studentId, selectedCourseIds, from, to);
         
@@ -66,8 +66,8 @@ public class StudentsService : IStudentsService
             LinkToMeeting = c.LinkToMeeting,
             Links = c.Links?.Select(l => l.Link).ToHashSet() ?? new HashSet<string>(),
             UserId = studentId,
-            CourseId = c.CourseId,
-            CourseName = c.Participation.Course.Name,
+            CourseId = c.Participation.CourseVariant.Course.Id,
+            CourseName = c.Participation.CourseVariant.Course.Name,
             Exercises = c.Exercises.Select(e => new ExercisePreviewDto
             {
                 Id = e.Id,
@@ -106,7 +106,7 @@ public class StudentsService : IStudentsService
         }
         
     
-        var selectedCourseIds = participations.Select(p => p.CourseId).ToList();
+        var selectedCourseIds = participations.Select(p => p.CourseVariant.CourseId).ToList();
         var classes = await _classRepository.GetByUserAndCoursesInDateRangeAsync(studentId, selectedCourseIds, from, to);
         var now = DateTime.UtcNow;
         
@@ -125,7 +125,7 @@ public class StudentsService : IStudentsService
                 Id = c.Id,
                 State = state,
                 Date = c.StartTime,
-                Title = c.Participation.Course.Name ?? "",
+                Title = c.Participation.CourseVariant.Course.Name ?? "",
                 Duration = DEFAULT_CLASS_DURATION_MINUTES
             };
         });

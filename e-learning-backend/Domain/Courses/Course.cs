@@ -23,8 +23,7 @@ public class Course
     private readonly List<CourseVariant> _variants = new();
     public IReadOnlyCollection<CourseVariant> Variants => _variants;
     
-    private readonly HashSet<Participation> _participations = new();
-    public IReadOnlyCollection<Participation> Participations => _participations;
+    
 
     public Course() { }
 
@@ -77,30 +76,6 @@ public class Course
         }
     }
     
-    public void AddParticipation(Participation participation)
-    {
-        if (participation == null)
-        {
-            throw new ArgumentNullException(nameof(participation));
-        }
-        
-        _participations.Add(participation);
-    }
-    
-    public void RemoveParticipation(Participation participation)
-    {
-        if (participation == null)
-        {
-            throw new ArgumentNullException(nameof(participation));
-        }
-
-        if (!_participations.Contains(participation))
-        {
-            throw new InvalidOperationException("Participation does not exist for this course.");
-        }
-
-        _participations.Remove(participation);
-    }
     public void SetProfilePicture(ProfilePicture picture) => ProfilePicture = picture;
 
     private string ToPlainText()

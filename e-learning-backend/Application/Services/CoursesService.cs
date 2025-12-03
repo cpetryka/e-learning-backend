@@ -1,4 +1,5 @@
 ﻿using e_learning_backend.Domain.Courses;
+using e_learning_backend.Domain.Participations;
 using e_learning_backend.Domain.Users.ValueObjects;
 using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.Repositories;
@@ -99,14 +100,17 @@ public class CoursesService : ICoursesService
     public async Task<double> GetCourseAverageRatingAsync(Guid courseId)
     {
         var course = await _courseRepository.GetByIdAsync(courseId);
+        if (course == null) return 0;
 
-        return course?.Participations
+        var ratings = course.Variants?
+            .SelectMany(v => v.Participations)
             .Where(p => p.Review != null)
-            .Select(p => p.Review!.StarsNumber)
-            .DefaultIfEmpty(0)
-            .Average() ?? 0;
+            .Select(p => (double)p.Review!.StarsNumber)
+            .DefaultIfEmpty(0);
+
+        return ratings == null ? 0 : ratings.Average();
     }
-    
+
     public async Task<List<TeacherAvailabilityDTO>> GetTeacherAvailabilityByCourseId(Guid courseId)
     {
         var course = await _courseRepository.GetByIdAsync(courseId);
@@ -128,10 +132,10 @@ public async Task<PagedResult<CourseWidgetDTO>> GetCoursesAsync(
     int pageNumber,
     int pageSize)
 {
-    // Pobieramy IQueryable zamiast całej listy
-    var coursesQuery = _courseRepository.GetAllQueryable();
+    // 1. Inicjalizacja zapytania
+    IQueryable<Course> coursesQuery = _courseRepository.GetAllQueryable();
 
-    // Filtry
+    // 2. Aplikacja filtrów (SQL WHERE)
     if (categories != null && categories.Length > 0)
         coursesQuery = coursesQuery.Where(c => categories.Contains(c.Category.Name));
 
@@ -153,54 +157,83 @@ public async Task<PagedResult<CourseWidgetDTO>> GetCoursesAsync(
     if (!string.IsNullOrWhiteSpace(query))
         coursesQuery = coursesQuery.Where(c => c.Name.Contains(query) || c.Description.Contains(query));
 
-    // Liczymy całkowitą liczbę wyników
+    // 3. Liczenie wyników (wykonuje zapytanie SELECT COUNT)
     var totalCount = await coursesQuery.CountAsync();
 
-    // Paginacja i mapowanie na DTO
-    var pagedCourses = await coursesQuery
-        .OrderBy(c => c.Name) // domyślne sortowanie
+    // 4. Pobieranie danych (Dopiero tutaj dodajemy Include, bo są potrzebne do mapowania)
+    // WAŻNE: Musisz dodać .Include(), aby EF pobrał powiązane dane,
+    // ponieważ rezygnujemy z .Select() na poziomie bazy.
+    var courses = await coursesQuery
+        .Include(c => c.Category)
+        .Include(c => c.Teacher)
+        .Include(c => c.ProfilePicture)
+        .Include(c => c.Variants)
+            .ThenInclude(v => v.Level)
+        .Include(c => c.Variants)
+            .ThenInclude(v => v.Language)
+        .Include(c => c.Variants)
+            .ThenInclude(v => v.Rate) // Potrzebne do cen
+        .Include(c => c.Variants)
+            .ThenInclude(v => v.Participations) // Potrzebne do gwiazdek (ocen)
+            .ThenInclude(p => p.Review)
+        .OrderBy(c => c.Name)
         .Skip((pageNumber - 1) * pageSize)
         .Take(pageSize)
-        .Select(c => new CourseWidgetDTO
-        {
-            Id = c.Id,
-            Name = c.Name,
-            Description = c.Description,
-            TeacherName = c.Teacher != null ? c.Teacher.Name : "Unknown",
-            TeacherSurname = c.Teacher != null ? c.Teacher.Surname : "Unknown",
-            TeacherId = c.Teacher != null ? c.Teacher.Id : Guid.Empty,
-            Rating = c.Participations != null && c.Participations.Any(p => p.Review != null)
-                ? c.Participations.Where(p => p.Review != null).Average(p => p.Review!.StarsNumber)
-                : 0,
-            MinimumCoursePrice = c.Variants.Any(v => v.Rate != null) ? c.Variants.Min(v => v.Rate!.Amount) : 0,
-            MaximumCoursePrice = c.Variants.Any(v => v.Rate != null) ? c.Variants.Max(v => v.Rate!.Amount) : 0,
-            LevelVariants = c.Variants
-                .Where(v => v.Level != null)
-                .Select(v => v.Level!.Name)
-                .Distinct()
-                .ToArray(),
-            LanguageVariants = c.Variants
-                .Where(v => v.Language != null)
-                .Select(v => v.Language!.Name)
-                .Distinct()
-                .ToArray(),
-            ProfilePictureUrl = c.ProfilePicture != null
-                ? "http://localhost:5249/" + c.ProfilePicture.FilePath.Replace("\\", "/")
-                : null
-        })
-        .ToListAsync();
+        .ToListAsync(); // <--- TU WYKONUJE SIĘ SQL (Materializacja danych)
+
+    // 5. Mapowanie w pamięci (C#)
+    // Teraz operujemy na liście w pamięci RAM, więc ToArray(), Replace() itp. są bezpieczne.
+    var courseDtos = courses.Select(c => new CourseWidgetDTO
+    {
+        Id = c.Id,
+        Name = c.Name,
+        Description = c.Description,
+        TeacherName = c.Teacher != null ? c.Teacher.Name : "Unknown",
+        TeacherSurname = c.Teacher != null ? c.Teacher.Surname : "Unknown",
+        TeacherId = c.TeacherId,
+        
+        // Obliczanie średniej oceny w pamięci (bezpieczniejsze dla nulli)
+        Rating = c.Variants
+            .SelectMany(v => v.Participations)
+            .Where(p => p.Review != null)
+            .Select(p => (double)p.Review!.StarsNumber)
+            .DefaultIfEmpty(0)
+            .Any() ? c.Variants.SelectMany(v => v.Participations).Where(p => p.Review != null).Average(p => p.Review!.StarsNumber) : 0,
+
+        // Ceny
+        MinimumCoursePrice = c.Variants.Any(v => v.Rate != null)
+            ? c.Variants.Min(v => v.Rate!.Amount)
+            : 0,
+        MaximumCoursePrice = c.Variants.Any(v => v.Rate != null)
+            ? c.Variants.Max(v => v.Rate!.Amount)
+            : 0,
+
+        // Warianty (tablice stringów - to powodowało błąd wcześniej w SQL)
+        LevelVariants = c.Variants
+            .Where(v => v.Level != null)
+            .Select(v => v.Level!.Name)
+            .Distinct()
+            .ToArray(),
+
+        LanguageVariants = c.Variants
+            .Where(v => v.Language != null)
+            .Select(v => v.Language!.Name)
+            .Distinct()
+            .ToArray(),
+
+        ProfilePictureUrl = c.ProfilePicture != null
+            ? "http://localhost:5249/" + c.ProfilePicture.FilePath.Replace("\\", "/")
+            : null
+    }).ToList();
 
     return new PagedResult<CourseWidgetDTO>
     {
-        Items = pagedCourses,
+        Items = courseDtos,
         TotalCount = totalCount,
         Page = pageNumber,
         PageSize = pageSize
     };
 }
-
-
-
 
     public async Task<IEnumerable<CourseWidgetDTO>> GetCoursesBasedOnQuery(string query)
     {
@@ -214,18 +247,31 @@ public async Task<PagedResult<CourseWidgetDTO>> GetCoursesAsync(
                 Name = c.Name,
                 Description = c.Description,
                 ProfilePictureUrl = c.ProfilePicture?.FilePath,
-                Rating = c.Participations
-                    .Where(p => p.Review != null)
-                    .Select(p => (double)p.Review!.StarsNumber)
-                    .DefaultIfEmpty(0)
-                    .Average(),
-                MinimumCoursePrice = c.Variants.Any() ? c.Variants.Min(v => v.Rate.Amount) : 0,
-                MaximumCoursePrice = c.Variants.Any() ? c.Variants.Max(v => v.Rate.Amount) : 0,
-                LevelVariants = c.Variants.Select(v => v.Level.Name).Distinct().ToArray(),
-                LanguageVariants = c.Variants.Select(v => v.Language.Name).Distinct().ToArray(),
-                TeacherId = c.Teacher.Id,
-                TeacherName = c.Teacher.Name,
-                TeacherSurname = c.Teacher.Surname
+                Rating = (c.Variants != null && c.Variants.Any())
+                    ? c.Variants
+                        .SelectMany(v => v.Participations ?? Enumerable.Empty<Participation>())
+                        .Where(p => p.Review != null)
+                        .Select(p => (double)p.Review!.StarsNumber)
+                        .DefaultIfEmpty(0)
+                        .Average()
+                    : 0,
+                MinimumCoursePrice = (c.Variants != null && c.Variants.Any())
+                    ? c.Variants.Min(v => v.Rate!.Amount)
+                    : 0,
+                MaximumCoursePrice = (c.Variants != null && c.Variants.Any())
+                    ? c.Variants.Max(v => v.Rate!.Amount)
+                    : 0,
+                LevelVariants = c.Variants != null
+                    ? c.Variants.Where(v => v.Level != null).Select(v => v.Level!.Name).Distinct()
+                        .ToArray()
+                    : Array.Empty<string>(),
+                LanguageVariants = c.Variants != null
+                    ? c.Variants.Where(v => v.Language != null).Select(v => v.Language!.Name)
+                        .Distinct().ToArray()
+                    : Array.Empty<string>(),
+                TeacherId = c.TeacherId,
+                TeacherName = c.Teacher?.Name ?? "Unknown",
+                TeacherSurname = c.Teacher?.Surname ?? "Unknown"
             });
     }
 
@@ -234,13 +280,8 @@ public async Task<PagedResult<CourseWidgetDTO>> GetCoursesAsync(
         var course = await _courseRepository.GetByIdAsync(courseId);
         if (course == null) return null;
 
-
         var teacher = await _teacherService.GetTeacherAsync(course.TeacherId);
         if (teacher == null) return null;
-
-        // var availability = await _teacherService.GetTeacherAvailabilityAsync(course.TeacherId);
-
-        // var reviews = await _teacherService.GetTeacherReviewsAsync(course.TeacherId);
 
         var teacherDto = new TeacherDTO
         {
@@ -252,16 +293,25 @@ public async Task<PagedResult<CourseWidgetDTO>> GetCoursesAsync(
             TeacherProfilePictureUrl = teacher.TeacherProfilePictureUrl
         };
 
-
         double rating = 0;
-        var courseReviews = course.Participations
+
+        var participations = new List<Participation>();
+        if (course.Variants != null)
+        {
+            foreach (var v in course.Variants)
+            {
+                if (v.Participations != null)
+                    participations.AddRange(v.Participations);
+            }
+        }
+
+        var courseReviews = participations
             .Where(p => p.Review != null)
             .Select(p => p.Review!)
             .ToList();
 
         if (courseReviews.Any())
             rating = courseReviews.Average(r => r.StarsNumber);
-
 
         return new CourseDetailsDTO
         {
@@ -270,14 +320,14 @@ public async Task<PagedResult<CourseWidgetDTO>> GetCoursesAsync(
             Category = course.Category?.Name,
             Description = course.Description,
             Rating = rating,
-            Variants = course.Variants
+            Variants = course.Variants?
                 .Where(v => v != null)
                 .Select(v => new CourseVariantDTO
                 {
                     LanguageName = v.Language?.Name ?? "Unknown",
                     LevelName = v.Level?.Name ?? "Unknown",
                     Price = v.Rate?.Amount ?? 0
-                }).ToList(),
+                }).ToList() ?? new List<CourseVariantDTO>(),
             Teacher = teacherDto,
             ProfilePictureUrl = course.ProfilePicture != null
                 ? "http://localhost:5249/" + course.ProfilePicture.FilePath.Replace("\\", "/")

@@ -16,7 +16,8 @@ public class QuizRepository : IQuizRepository
         => await _context.Quizzes
             .Include(q => q.Class)
             .ThenInclude(c => c.Participation)
-            .ThenInclude(p => p.Course)
+            .ThenInclude(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
             .ThenInclude(c => c.Teacher)
             .Include(q => q.Questions)
             .ThenInclude(question => question.Answers)
@@ -65,17 +66,18 @@ public class QuizRepository : IQuizRepository
         return await _context.Quizzes
             .Include(q => q.Class)
             .ThenInclude(c => c.Participation)
-            .ThenInclude(p => p.Course)
+            .ThenInclude(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
             .Where(q => !studentId.HasValue || q.Class.Participation.UserId == studentId.Value)
-            .Where(q => !courseId.HasValue || q.Class.Participation.CourseId == courseId.Value)
+            .Where(q => !courseId.HasValue || q.Class.Participation.CourseVariant.CourseId == courseId.Value)
             .Where(q => !classId.HasValue || q.Class.Id == classId.Value)
             .Where(q => string.IsNullOrEmpty(searchQuery) || q.Title.ToLower().Contains(searchQuery.ToLower()))
             .Select(q => new QuizBriefDTO
             {
                 Id = q.Id,
                 Name = q.Title,
-                CourseId = q.Class.Participation.CourseId,
-                CourseName = q.Class.Participation.Course.Name,
+                CourseId = q.Class.Participation.CourseVariant.CourseId,
+                CourseName = q.Class.Participation.CourseVariant.Course.Name,
                 QuestionNumber = q.Questions.Count,
                 Completed = q.Score.HasValue
             })
@@ -88,14 +90,16 @@ public class QuizRepository : IQuizRepository
             .Include(q => q.Questions)
             .Include(q => q.Class)
             .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
             .Select(q => new QuizDTO
             {
                 Id = q.Id,
                 Name = q.Title,
                 ClassId = q.ClassId,
-                CourseId = q.Class.Participation.CourseId,
-                CourseName = q.Class.Participation.Course.Name,
-                TeacherId = q.Class.Participation.Course.TeacherId,
+                CourseId = q.Class.Participation.CourseVariant.CourseId,
+                CourseName = q.Class.Participation.CourseVariant.Course.Name,
+                TeacherId = q.Class.Participation.CourseVariant.Course.TeacherId,
                 StudentId = q.Class.UserId,
                 IsMultipleChoice = q.MultipleChoice,
                 Score = q.Score,
