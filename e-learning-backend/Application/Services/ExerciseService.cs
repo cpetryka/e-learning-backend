@@ -36,7 +36,7 @@ public class ExerciseService : IExerciseService
             ExerciseId = exercise.Id,
             Grade = exercise.Grade,
             Comment = exercise.Comment,
-            TeacherId = exercise.Class.Participation.Course.TeacherId
+            TeacherId = exercise.Class.Participation.CourseVariant.Course.TeacherId
         };
     }
 
@@ -47,7 +47,7 @@ public class ExerciseService : IExerciseService
 
         if (exercise is null)
             return false;
-        var exerciseTeacherId = exercise.Class?.Participation?.Course?.TeacherId;
+        var exerciseTeacherId = exercise.Class?.Participation?.CourseVariant?.Course?.TeacherId;
 
         if (exerciseTeacherId is null || exerciseTeacherId != teacherId)
             return false;
@@ -166,7 +166,7 @@ public class ExerciseService : IExerciseService
         }
 
         // Only course teacher can edit
-        var exerciseTeacherId = exercise.Class?.Participation?.Course?.TeacherId;
+        var exerciseTeacherId = exercise.Class?.Participation?.CourseVariant?.Course?.TeacherId;
         if (exerciseTeacherId is null || exerciseTeacherId != userId)
         {
             return false;
@@ -245,7 +245,7 @@ public class ExerciseService : IExerciseService
         }*/
         
         var exerciseStudentId = exercise.Class?.Participation?.User.Id;
-        var exerciseTeacherId = exercise.Class?.Participation?.Course?.TeacherId;
+        var exerciseTeacherId = exercise.Class?.Participation?.CourseVariant?.Course?.TeacherId;
         
         if (exerciseStudentId != userId && exerciseTeacherId != userId)
         {

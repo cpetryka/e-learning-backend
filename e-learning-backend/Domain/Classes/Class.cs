@@ -15,7 +15,7 @@ public class Class
     public ClassStatus Status { get; private set; }
     
     public Guid UserId { get; set; }
-    public Guid CourseId { get; set; }
+    public Guid CourseVariantId { get; set; }
     public Participation Participation { get; set; } 
     
     private readonly HashSet<Exercise> _exercises = new();

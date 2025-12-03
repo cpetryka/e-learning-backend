@@ -19,7 +19,8 @@ public class StudnetsRepository : IStudentsRepository
     {
         return await _context.Users
             .Include(u => u.Participations)
-            .ThenInclude(p => p.Course)
+                .ThenInclude(p => p.CourseVariant)
+                    .ThenInclude(p => p.Course)
             .Where(u => u.Id == studentId)
             .Where(u => u.Roles.Any(r => r.RoleName == Role.Student.RoleName))
             .FirstOrDefaultAsync();
@@ -28,12 +29,14 @@ public class StudnetsRepository : IStudentsRepository
     public async Task<IEnumerable<CourseBriefDTO>> GetStudentCourses(Guid studentId)
     {
         return await _context.Participations
+            .Include(p => p.CourseVariant)
+                .ThenInclude(cv => cv.Course)
             .Where(p => p.UserId == studentId)
             .Distinct()
             .Select(p => new CourseBriefDTO
             {
-                Id = p.Course.Id,
-                Name = p.Course.Name
+                Id = p.CourseVariant.Course.Id,
+                Name = p.CourseVariant.Course.Name
             })
             .ToListAsync();
     }
@@ -43,17 +46,18 @@ public class StudnetsRepository : IStudentsRepository
         return await _context.Exercises
             .Include(e => e.Class)
             .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.CourseVariant)
             .ThenInclude(p => p.Course)
             .Include(e => e.ExerciseResources)
             .ThenInclude(e => e.File)
             .Where(e => e.Class.Participation.UserId == studentId)
-            .Where(e => courseId == null || e.Class.Participation.CourseId == courseId)
+            .Where(e => courseId == null || e.Class.Participation.CourseVariant.CourseId == courseId)
             .Select(e => new GetExerciseDTO()
             {
                 Id = e.Id,
                 ClassId = e.Class.Id,
-                Name = e.Class.Participation.Course.Name + " [" + e.Class.StartTime.ToString("yyyy-MM-dd") + "]",
-                CourseName = e.Class.Participation.Course.Name,
+                Name = e.Class.Participation.CourseVariant.Course.Name + " [" + e.Class.StartTime.ToString("yyyy-MM-dd") + "]",
+                CourseName = e.Class.Participation.CourseVariant.Course.Name,
                 Status = e.Status.ToString(),
                 Graded = e.Grade != null,
                 Grade = e.Grade,

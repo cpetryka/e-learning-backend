@@ -17,7 +17,7 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
 
         builder.HasOne(c => c.Participation)
             .WithMany(p => p.Classes)
-            .HasForeignKey(c => new { c.UserId, c.CourseId });
+            .HasForeignKey(c => new { c.UserId, c.CourseVariantId });
 
         builder.HasMany(c => c.Exercises)
             .WithOne(e => e.Class)
@@ -1735,7 +1735,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/a9666cb3",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("f5f9237d-5ff5-439a-86c5-10c66cb2d9e6")
+                CourseVariantId =
+                    Guid.Parse("2bb9df2c-c27b-424c-8814-7c38b00045e8") // Mapped from f5f9237d...
             },
             new
             {
@@ -1745,7 +1746,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/cbfa65d0",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("78f0e23b-1b9a-4b07-9191-7f2f332e3ee8")
+                CourseVariantId =
+                    Guid.Parse("ce899111-a22d-4cca-bd65-fcfa633754b9") // Mapped from 78f0e23b...
             },
             new
             {
@@ -1755,7 +1757,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/a054d37f",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("6e3a3c34-f40c-4d90-a986-588b17867b71")
+                CourseVariantId =
+                    Guid.Parse("c89fe8aa-1778-4a06-bc5f-74b646e229db") // Mapped from 6e3a3c34...
             },
             new
             {
@@ -1765,7 +1768,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/00c7a653",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("e4c2a925-fc12-4827-a9e2-df87cc7c12e0")
+                CourseVariantId =
+                    Guid.Parse("ea675454-f59a-4c5e-978b-a674f7d7fbaf") // Mapped from e4c2a925...
             },
             new
             {
@@ -1775,7 +1779,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/ff9a47e5",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("a0e86a5c-82b0-4ef8-9492-7d9a8e1e0d15")
+                CourseVariantId =
+                    Guid.Parse("52540491-ae28-4d37-b551-9ab7883c2dd2") // Mapped from a0e86a5c...
             },
             new
             {
@@ -1785,7 +1790,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/98ac26d0",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("fb003b55-b775-45b1-8f3c-568c4e7e8d40")
+                CourseVariantId =
+                    Guid.Parse("9b77a2fb-6522-45dd-ae91-e5b84d0a3951") // Mapped from fb003b55...
             },
             new
             {
@@ -1795,7 +1801,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/a14bf451",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -1805,7 +1812,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/1670ac1e",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("99d1436e-0028-4b8e-b949-fcf33fc43e2d")
+                CourseVariantId =
+                    Guid.Parse("72e7ead9-5ed8-4eac-bbef-ff39303c1d6f") // Mapped from 99d1436e...
             },
             new
             {
@@ -1815,7 +1823,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/2e7bca49",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("99d1436e-0028-4b8e-b949-fcf33fc43e2d")
+                CourseVariantId =
+                    Guid.Parse("72e7ead9-5ed8-4eac-bbef-ff39303c1d6f") // Mapped from 99d1436e...
             },
             new
             {
@@ -1825,7 +1834,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/5c6e203f",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("a0e86a5c-82b0-4ef8-9492-7d9a8e1e0d15")
+                CourseVariantId =
+                    Guid.Parse("52540491-ae28-4d37-b551-9ab7883c2dd2") // Mapped from a0e86a5c...
             },
             new
             {
@@ -1835,7 +1845,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/9e8247cb",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("f5f9237d-5ff5-439a-86c5-10c66cb2d9e6")
+                CourseVariantId =
+                    Guid.Parse("2bb9df2c-c27b-424c-8814-7c38b00045e8") // Mapped from f5f9237d...
             },
             new
             {
@@ -1845,7 +1856,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/105b8671",
                 ClassStatusId = Guid.Parse("42222222-2222-2222-2222-222222222222"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("78f0e23b-1b9a-4b07-9191-7f2f332e3ee8")
+                CourseVariantId =
+                    Guid.Parse("ce899111-a22d-4cca-bd65-fcfa633754b9") // Mapped from 78f0e23b...
             },
             new
             {
@@ -1855,7 +1867,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/bd976747",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("0042b980-d8cc-4969-af0f-62d8c1632871")
+                CourseVariantId =
+                    Guid.Parse("82502dbb-dd0d-436c-8973-439f54f30307") // Mapped from 0042b980...
             },
             new
             {
@@ -1865,7 +1878,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/1ac62717",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -1875,7 +1889,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/85c8d54f",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("f31eb3f2-643d-4b31-9f8f-d7aaf6e0e6cd")
+                CourseVariantId =
+                    Guid.Parse("fe7615e2-cd45-4307-9e74-a837f2b4d606") // Mapped from f31eb3f2...
             },
             new
             {
@@ -1885,7 +1900,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/95bd18d9",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("fb003b55-b775-45b1-8f3c-568c4e7e8d40")
+                CourseVariantId =
+                    Guid.Parse("9b77a2fb-6522-45dd-ae91-e5b84d0a3951") // Mapped from fb003b55...
             },
             new
             {
@@ -1895,7 +1911,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/18281db6",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("99d1436e-0028-4b8e-b949-fcf33fc43e2d")
+                CourseVariantId =
+                    Guid.Parse("72e7ead9-5ed8-4eac-bbef-ff39303c1d6f") // Mapped from 99d1436e...
             },
             new
             {
@@ -1905,7 +1922,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/9c1bf982",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("d1b85095-dcb3-4ec6-b0c6-1a0c5b47d8a3")
+                CourseVariantId =
+                    Guid.Parse("9f219956-15d4-459f-89ef-c6b833ae8adb") // Mapped from d1b85095...
             },
             new
             {
@@ -1915,7 +1933,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/cf149cc0",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("c29ad7cb-dede-4ff6-b119-70dbad602f90")
+                CourseVariantId =
+                    Guid.Parse("97904238-f028-4e42-8676-5067dd3b2f48") // Mapped from c29ad7cb...
             },
             new
             {
@@ -1925,7 +1944,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/c636a25b",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("c29ad7cb-dede-4ff6-b119-70dbad602f90")
+                CourseVariantId =
+                    Guid.Parse("97904238-f028-4e42-8676-5067dd3b2f48") // Mapped from c29ad7cb...
             },
             new
             {
@@ -1935,7 +1955,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/242c7bfa",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("d1b85095-dcb3-4ec6-b0c6-1a0c5b47d8a3")
+                CourseVariantId =
+                    Guid.Parse("9f219956-15d4-459f-89ef-c6b833ae8adb") // Mapped from d1b85095...
             },
             new
             {
@@ -1945,7 +1966,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/8d78c1a9",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -1955,7 +1977,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/f39e0e2c",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("fb003b55-b775-45b1-8f3c-568c4e7e8d40")
+                CourseVariantId =
+                    Guid.Parse("9b77a2fb-6522-45dd-ae91-e5b84d0a3951") // Mapped from fb003b55...
             },
             new
             {
@@ -1965,7 +1988,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/8118269e",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("d1b85095-dcb3-4ec6-b0c6-1a0c5b47d8a3")
+                CourseVariantId =
+                    Guid.Parse("9f219956-15d4-459f-89ef-c6b833ae8adb") // Mapped from d1b85095...
             },
             new
             {
@@ -1975,7 +1999,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/87fc2a93",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("d1b85095-dcb3-4ec6-b0c6-1a0c5b47d8a3")
+                CourseVariantId =
+                    Guid.Parse("9f219956-15d4-459f-89ef-c6b833ae8adb") // Mapped from d1b85095...
             },
             new
             {
@@ -1985,7 +2010,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/fa104442",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("e4c2a925-fc12-4827-a9e2-df87cc7c12e0")
+                CourseVariantId =
+                    Guid.Parse("ea675454-f59a-4c5e-978b-a674f7d7fbaf") // Mapped from e4c2a925...
             },
             new
             {
@@ -1995,7 +2021,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/2d7e07fd",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -2005,7 +2032,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/0f1a6fe0",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("78f0e23b-1b9a-4b07-9191-7f2f332e3ee8")
+                CourseVariantId =
+                    Guid.Parse("ce899111-a22d-4cca-bd65-fcfa633754b9") // Mapped from 78f0e23b...
             },
             new
             {
@@ -2015,7 +2043,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/ef2895f7",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("a0e86a5c-82b0-4ef8-9492-7d9a8e1e0d15")
+                CourseVariantId =
+                    Guid.Parse("52540491-ae28-4d37-b551-9ab7883c2dd2") // Mapped from a0e86a5c...
             },
             new
             {
@@ -2025,7 +2054,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/2b180b96",
                 ClassStatusId = Guid.Parse("42222222-2222-2222-2222-222222222222"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("78f0e23b-1b9a-4b07-9191-7f2f332e3ee8")
+                CourseVariantId =
+                    Guid.Parse("ce899111-a22d-4cca-bd65-fcfa633754b9") // Mapped from 78f0e23b...
             },
             new
             {
@@ -2035,7 +2065,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/78968696",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("7f3d823c-b6ab-497f-8cc9-30b0f80d68f2")
+                CourseVariantId =
+                    Guid.Parse("e1fc1975-94ce-4181-b485-0d6c05a5a1b8") // Mapped from 7f3d823c...
             },
             new
             {
@@ -2045,7 +2076,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/0d9aefb4",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("f31eb3f2-643d-4b31-9f8f-d7aaf6e0e6cd")
+                CourseVariantId =
+                    Guid.Parse("fe7615e2-cd45-4307-9e74-a837f2b4d606") // Mapped from f31eb3f2...
             },
             new
             {
@@ -2055,7 +2087,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/bcf0c5ef",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("99d1436e-0028-4b8e-b949-fcf33fc43e2d")
+                CourseVariantId =
+                    Guid.Parse("72e7ead9-5ed8-4eac-bbef-ff39303c1d6f") // Mapped from 99d1436e...
             },
             new
             {
@@ -2065,7 +2098,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/f856448e",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("99d1436e-0028-4b8e-b949-fcf33fc43e2d")
+                CourseVariantId =
+                    Guid.Parse("72e7ead9-5ed8-4eac-bbef-ff39303c1d6f") // Mapped from 99d1436e...
             },
             new
             {
@@ -2075,7 +2109,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/3707f5ae",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("e4c2a925-fc12-4827-a9e2-df87cc7c12e0")
+                CourseVariantId =
+                    Guid.Parse("ea675454-f59a-4c5e-978b-a674f7d7fbaf") // Mapped from e4c2a925...
             },
             new
             {
@@ -2085,7 +2120,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/7f35fe50",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("f5f9237d-5ff5-439a-86c5-10c66cb2d9e6")
+                CourseVariantId =
+                    Guid.Parse("2bb9df2c-c27b-424c-8814-7c38b00045e8") // Mapped from f5f9237d...
             },
             new
             {
@@ -2095,7 +2131,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/3f7d2aa5",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("f31eb3f2-643d-4b31-9f8f-d7aaf6e0e6cd")
+                CourseVariantId =
+                    Guid.Parse("fe7615e2-cd45-4307-9e74-a837f2b4d606") // Mapped from f31eb3f2...
             },
             new
             {
@@ -2105,7 +2142,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/678b7248",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("f5f9237d-5ff5-439a-86c5-10c66cb2d9e6")
+                CourseVariantId =
+                    Guid.Parse("2bb9df2c-c27b-424c-8814-7c38b00045e8") // Mapped from f5f9237d...
             },
             new
             {
@@ -2115,7 +2153,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/8a606b9c",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("b13306f3-05fd-4f45-bdeb-8b3f9e90a4bb")
+                CourseVariantId =
+                    Guid.Parse("adf06fe9-868c-454a-ab23-0a646d3590e2") // Mapped from b13306f3...
             },
             new
             {
@@ -2125,7 +2164,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/1ea87f39",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("f31eb3f2-643d-4b31-9f8f-d7aaf6e0e6cd")
+                CourseVariantId =
+                    Guid.Parse("fe7615e2-cd45-4307-9e74-a837f2b4d606") // Mapped from f31eb3f2...
             },
             new
             {
@@ -2135,7 +2175,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/fb2f5dbb",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("e4c2a925-fc12-4827-a9e2-df87cc7c12e0")
+                CourseVariantId =
+                    Guid.Parse("ea675454-f59a-4c5e-978b-a674f7d7fbaf") // Mapped from e4c2a925...
             },
             new
             {
@@ -2145,7 +2186,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/c0bc42e4",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("b13306f3-05fd-4f45-bdeb-8b3f9e90a4bb")
+                CourseVariantId =
+                    Guid.Parse("adf06fe9-868c-454a-ab23-0a646d3590e2") // Mapped from b13306f3...
             },
             new
             {
@@ -2155,7 +2197,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/c8a3cac8",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("78f0e23b-1b9a-4b07-9191-7f2f332e3ee8")
+                CourseVariantId =
+                    Guid.Parse("ce899111-a22d-4cca-bd65-fcfa633754b9") // Mapped from 78f0e23b...
             },
             new
             {
@@ -2165,7 +2208,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/29ca5b42",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("f31eb3f2-643d-4b31-9f8f-d7aaf6e0e6cd")
+                CourseVariantId =
+                    Guid.Parse("fe7615e2-cd45-4307-9e74-a837f2b4d606") // Mapped from f31eb3f2...
             },
             new
             {
@@ -2175,7 +2219,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/3ba7c22d",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("99d1436e-0028-4b8e-b949-fcf33fc43e2d")
+                CourseVariantId =
+                    Guid.Parse("72e7ead9-5ed8-4eac-bbef-ff39303c1d6f") // Mapped from 99d1436e...
             },
             new
             {
@@ -2185,7 +2230,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/7b436c63",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -2195,7 +2241,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/bebeea43",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("6e3a3c34-f40c-4d90-a986-588b17867b71")
+                CourseVariantId =
+                    Guid.Parse("c89fe8aa-1778-4a06-bc5f-74b646e229db") // Mapped from 6e3a3c34...
             },
             new
             {
@@ -2205,7 +2252,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/162a96c2",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("78f0e23b-1b9a-4b07-9191-7f2f332e3ee8")
+                CourseVariantId =
+                    Guid.Parse("ce899111-a22d-4cca-bd65-fcfa633754b9") // Mapped from 78f0e23b...
             },
             new
             {
@@ -2215,7 +2263,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/2cb6822d",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("6e3a3c34-f40c-4d90-a986-588b17867b71")
+                CourseVariantId =
+                    Guid.Parse("c89fe8aa-1778-4a06-bc5f-74b646e229db") // Mapped from 6e3a3c34...
             },
             new
             {
@@ -2225,7 +2274,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/b39950b1",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("99d1436e-0028-4b8e-b949-fcf33fc43e2d")
+                CourseVariantId =
+                    Guid.Parse("72e7ead9-5ed8-4eac-bbef-ff39303c1d6f") // Mapped from 99d1436e...
             },
             new
             {
@@ -2235,7 +2285,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/f6c3e123",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("e4c2a925-fc12-4827-a9e2-df87cc7c12e0")
+                CourseVariantId =
+                    Guid.Parse("ea675454-f59a-4c5e-978b-a674f7d7fbaf") // Mapped from e4c2a925...
             },
             new
             {
@@ -2245,7 +2296,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/63e1faea",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("6e3a3c34-f40c-4d90-a986-588b17867b71")
+                CourseVariantId =
+                    Guid.Parse("c89fe8aa-1778-4a06-bc5f-74b646e229db") // Mapped from 6e3a3c34...
             },
             new
             {
@@ -2255,7 +2307,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/5db93847",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("99d1436e-0028-4b8e-b949-fcf33fc43e2d")
+                CourseVariantId =
+                    Guid.Parse("72e7ead9-5ed8-4eac-bbef-ff39303c1d6f") // Mapped from 99d1436e...
             },
             new
             {
@@ -2265,7 +2318,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/730d49b1",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("0042b980-d8cc-4969-af0f-62d8c1632871")
+                CourseVariantId =
+                    Guid.Parse("82502dbb-dd0d-436c-8973-439f54f30307") // Mapped from 0042b980...
             },
             new
             {
@@ -2275,7 +2329,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/b70659d6",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("fb003b55-b775-45b1-8f3c-568c4e7e8d40")
+                CourseVariantId =
+                    Guid.Parse("9b77a2fb-6522-45dd-ae91-e5b84d0a3951") // Mapped from fb003b55...
             },
             new
             {
@@ -2285,7 +2340,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/236eb9c0",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("6e3a3c34-f40c-4d90-a986-588b17867b71")
+                CourseVariantId =
+                    Guid.Parse("c89fe8aa-1778-4a06-bc5f-74b646e229db") // Mapped from 6e3a3c34...
             },
             new
             {
@@ -2295,7 +2351,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/50910c9b",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("b13306f3-05fd-4f45-bdeb-8b3f9e90a4bb")
+                CourseVariantId =
+                    Guid.Parse("adf06fe9-868c-454a-ab23-0a646d3590e2") // Mapped from b13306f3...
             },
             new
             {
@@ -2305,7 +2362,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/c85ed656",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("c29ad7cb-dede-4ff6-b119-70dbad602f90")
+                CourseVariantId =
+                    Guid.Parse("97904238-f028-4e42-8676-5067dd3b2f48") // Mapped from c29ad7cb...
             },
             new
             {
@@ -2315,7 +2373,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/07b372f5",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("6e3a3c34-f40c-4d90-a986-588b17867b71")
+                CourseVariantId =
+                    Guid.Parse("c89fe8aa-1778-4a06-bc5f-74b646e229db") // Mapped from 6e3a3c34...
             },
             new
             {
@@ -2325,7 +2384,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/4076a3d7",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("fb003b55-b775-45b1-8f3c-568c4e7e8d40")
+                CourseVariantId =
+                    Guid.Parse("9b77a2fb-6522-45dd-ae91-e5b84d0a3951") // Mapped from fb003b55...
             },
             new
             {
@@ -2335,7 +2395,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/670f9787",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -2345,7 +2406,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/e1cb7dd7",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("e4c2a925-fc12-4827-a9e2-df87cc7c12e0")
+                CourseVariantId =
+                    Guid.Parse("ea675454-f59a-4c5e-978b-a674f7d7fbaf") // Mapped from e4c2a925...
             },
             new
             {
@@ -2355,7 +2417,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/2162dcc9",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("f31eb3f2-643d-4b31-9f8f-d7aaf6e0e6cd")
+                CourseVariantId =
+                    Guid.Parse("fe7615e2-cd45-4307-9e74-a837f2b4d606") // Mapped from f31eb3f2...
             },
             new
             {
@@ -2365,7 +2428,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/630e3cbb",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -2375,7 +2439,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/905cac16",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("c29ad7cb-dede-4ff6-b119-70dbad602f90")
+                CourseVariantId =
+                    Guid.Parse("97904238-f028-4e42-8676-5067dd3b2f48") // Mapped from c29ad7cb...
             },
             new
             {
@@ -2385,7 +2450,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/7b2b8c33",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("f5f9237d-5ff5-439a-86c5-10c66cb2d9e6")
+                CourseVariantId =
+                    Guid.Parse("2bb9df2c-c27b-424c-8814-7c38b00045e8") // Mapped from f5f9237d...
             },
             new
             {
@@ -2395,7 +2461,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/59ef06f9",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("44d62488-947d-41e1-a1dd-7de74ff7aa8f")
+                CourseVariantId =
+                    Guid.Parse("a415a739-5557-4d0e-8980-68bb3ba2aa7e") // Mapped from 44d62488...
             },
             new
             {
@@ -2405,7 +2472,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/24791226",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("b9427e4d-34e6-48c5-943f-94e3f2f6891c")
+                CourseVariantId =
+                    Guid.Parse("32637827-fe2d-4a40-9641-8b18a9df1cfb") // Mapped from b9427e4d...
             },
             new
             {
@@ -2415,7 +2483,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/0d62be16",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("99d1436e-0028-4b8e-b949-fcf33fc43e2d")
+                CourseVariantId =
+                    Guid.Parse("72e7ead9-5ed8-4eac-bbef-ff39303c1d6f") // Mapped from 99d1436e...
             },
             new
             {
@@ -2425,7 +2494,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/fb8032de",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("99d1436e-0028-4b8e-b949-fcf33fc43e2d")
+                CourseVariantId =
+                    Guid.Parse("72e7ead9-5ed8-4eac-bbef-ff39303c1d6f") // Mapped from 99d1436e...
             },
             new
             {
@@ -2435,7 +2505,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/77b1c858",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("fb003b55-b775-45b1-8f3c-568c4e7e8d40")
+                CourseVariantId =
+                    Guid.Parse("9b77a2fb-6522-45dd-ae91-e5b84d0a3951") // Mapped from fb003b55...
             },
             new
             {
@@ -2445,7 +2516,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/bf7cf7af",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("b9427e4d-34e6-48c5-943f-94e3f2f6891c")
+                CourseVariantId =
+                    Guid.Parse("32637827-fe2d-4a40-9641-8b18a9df1cfb") // Mapped from b9427e4d...
             },
             new
             {
@@ -2455,7 +2527,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/6a861127",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("f5f9237d-5ff5-439a-86c5-10c66cb2d9e6")
+                CourseVariantId =
+                    Guid.Parse("2bb9df2c-c27b-424c-8814-7c38b00045e8") // Mapped from f5f9237d...
             },
             new
             {
@@ -2465,7 +2538,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/66c1cefd",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("d1b85095-dcb3-4ec6-b0c6-1a0c5b47d8a3")
+                CourseVariantId =
+                    Guid.Parse("9f219956-15d4-459f-89ef-c6b833ae8adb") // Mapped from d1b85095...
             },
             new
             {
@@ -2475,7 +2549,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/b04e01e7",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("a0e86a5c-82b0-4ef8-9492-7d9a8e1e0d15")
+                CourseVariantId =
+                    Guid.Parse("52540491-ae28-4d37-b551-9ab7883c2dd2") // Mapped from a0e86a5c...
             },
             new
             {
@@ -2485,7 +2560,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/9721f6ca",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("f31eb3f2-643d-4b31-9f8f-d7aaf6e0e6cd")
+                CourseVariantId =
+                    Guid.Parse("fe7615e2-cd45-4307-9e74-a837f2b4d606") // Mapped from f31eb3f2...
             },
             new
             {
@@ -2495,7 +2571,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/fa0ebeca",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("fb003b55-b775-45b1-8f3c-568c4e7e8d40")
+                CourseVariantId =
+                    Guid.Parse("9b77a2fb-6522-45dd-ae91-e5b84d0a3951") // Mapped from fb003b55...
             },
             new
             {
@@ -2505,7 +2582,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/c864fa15",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("d1b85095-dcb3-4ec6-b0c6-1a0c5b47d8a3")
+                CourseVariantId =
+                    Guid.Parse("9f219956-15d4-459f-89ef-c6b833ae8adb") // Mapped from d1b85095...
             },
             new
             {
@@ -2515,7 +2593,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/47db2e8d",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("c29ad7cb-dede-4ff6-b119-70dbad602f90")
+                CourseVariantId =
+                    Guid.Parse("97904238-f028-4e42-8676-5067dd3b2f48") // Mapped from c29ad7cb...
             },
             new
             {
@@ -2525,7 +2604,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/2cfa0081",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("e4c2a925-fc12-4827-a9e2-df87cc7c12e0")
+                CourseVariantId =
+                    Guid.Parse("ea675454-f59a-4c5e-978b-a674f7d7fbaf") // Mapped from e4c2a925...
             },
             new
             {
@@ -2535,7 +2615,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/b00e0b15",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("a0e86a5c-82b0-4ef8-9492-7d9a8e1e0d15")
+                CourseVariantId =
+                    Guid.Parse("52540491-ae28-4d37-b551-9ab7883c2dd2") // Mapped from a0e86a5c...
             },
             new
             {
@@ -2545,7 +2626,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/db2a3731",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("7f3d823c-b6ab-497f-8cc9-30b0f80d68f2")
+                CourseVariantId =
+                    Guid.Parse("e1fc1975-94ce-4181-b485-0d6c05a5a1b8") // Mapped from 7f3d823c...
             },
             new
             {
@@ -2555,7 +2637,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/2f623547",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("d1b85095-dcb3-4ec6-b0c6-1a0c5b47d8a3")
+                CourseVariantId =
+                    Guid.Parse("9f219956-15d4-459f-89ef-c6b833ae8adb") // Mapped from d1b85095...
             },
             new
             {
@@ -2565,7 +2648,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/5533ead9",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("fb003b55-b775-45b1-8f3c-568c4e7e8d40")
+                CourseVariantId =
+                    Guid.Parse("9b77a2fb-6522-45dd-ae91-e5b84d0a3951") // Mapped from fb003b55...
             },
             new
             {
@@ -2575,7 +2659,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/0fc8b57e",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("a0e86a5c-82b0-4ef8-9492-7d9a8e1e0d15")
+                CourseVariantId =
+                    Guid.Parse("52540491-ae28-4d37-b551-9ab7883c2dd2") // Mapped from a0e86a5c...
             },
             new
             {
@@ -2585,7 +2670,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/a9f12556",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("c29ad7cb-dede-4ff6-b119-70dbad602f90")
+                CourseVariantId =
+                    Guid.Parse("97904238-f028-4e42-8676-5067dd3b2f48") // Mapped from c29ad7cb...
             },
             new
             {
@@ -2595,7 +2681,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/a4c0902a",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("a0e86a5c-82b0-4ef8-9492-7d9a8e1e0d15")
+                CourseVariantId =
+                    Guid.Parse("52540491-ae28-4d37-b551-9ab7883c2dd2") // Mapped from a0e86a5c...
             },
             new
             {
@@ -2605,7 +2692,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/42d1a1df",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("c29ad7cb-dede-4ff6-b119-70dbad602f90")
+                CourseVariantId =
+                    Guid.Parse("97904238-f028-4e42-8676-5067dd3b2f48") // Mapped from c29ad7cb...
             },
             new
             {
@@ -2615,7 +2703,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/ded06c9f",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("6e3a3c34-f40c-4d90-a986-588b17867b71")
+                CourseVariantId =
+                    Guid.Parse("c89fe8aa-1778-4a06-bc5f-74b646e229db") // Mapped from 6e3a3c34...
             },
             new
             {
@@ -2625,7 +2714,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/b6655450",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("6e3a3c34-f40c-4d90-a986-588b17867b71")
+                CourseVariantId =
+                    Guid.Parse("c89fe8aa-1778-4a06-bc5f-74b646e229db") // Mapped from 6e3a3c34...
             },
             new
             {
@@ -2635,7 +2725,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/b3441c04",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("d1b85095-dcb3-4ec6-b0c6-1a0c5b47d8a3")
+                CourseVariantId =
+                    Guid.Parse("9f219956-15d4-459f-89ef-c6b833ae8adb") // Mapped from d1b85095...
             },
             new
             {
@@ -2645,7 +2736,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/71859e9d",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("78f0e23b-1b9a-4b07-9191-7f2f332e3ee8")
+                CourseVariantId =
+                    Guid.Parse("ce899111-a22d-4cca-bd65-fcfa633754b9") // Mapped from 78f0e23b...
             },
             new
             {
@@ -2655,7 +2747,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/755651d7",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("b9427e4d-34e6-48c5-943f-94e3f2f6891c")
+                CourseVariantId =
+                    Guid.Parse("32637827-fe2d-4a40-9641-8b18a9df1cfb") // Mapped from b9427e4d...
             },
             new
             {
@@ -2665,7 +2758,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/0c30af04",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("44d62488-947d-41e1-a1dd-7de74ff7aa8f")
+                CourseVariantId =
+                    Guid.Parse("a415a739-5557-4d0e-8980-68bb3ba2aa7e") // Mapped from 44d62488...
             },
             new
             {
@@ -2675,7 +2769,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/cd36a53d",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("b9427e4d-34e6-48c5-943f-94e3f2f6891c")
+                CourseVariantId =
+                    Guid.Parse("32637827-fe2d-4a40-9641-8b18a9df1cfb") // Mapped from b9427e4d...
             },
             new
             {
@@ -2685,7 +2780,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/b3c7ab84",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("c29ad7cb-dede-4ff6-b119-70dbad602f90")
+                CourseVariantId =
+                    Guid.Parse("97904238-f028-4e42-8676-5067dd3b2f48") // Mapped from c29ad7cb...
             },
             new
             {
@@ -2695,7 +2791,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/2fb751fa",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("6e3a3c34-f40c-4d90-a986-588b17867b71")
+                CourseVariantId =
+                    Guid.Parse("c89fe8aa-1778-4a06-bc5f-74b646e229db") // Mapped from 6e3a3c34...
             },
             new
             {
@@ -2705,7 +2802,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/b05e6bb3",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("f31eb3f2-643d-4b31-9f8f-d7aaf6e0e6cd")
+                CourseVariantId =
+                    Guid.Parse("fe7615e2-cd45-4307-9e74-a837f2b4d606") // Mapped from f31eb3f2...
             },
             new
             {
@@ -2715,7 +2813,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/27b87acd",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("f5f9237d-5ff5-439a-86c5-10c66cb2d9e6")
+                CourseVariantId =
+                    Guid.Parse("2bb9df2c-c27b-424c-8814-7c38b00045e8") // Mapped from f5f9237d...
             },
             new
             {
@@ -2725,7 +2824,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/f53e2570",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("b13306f3-05fd-4f45-bdeb-8b3f9e90a4bb")
+                CourseVariantId =
+                    Guid.Parse("adf06fe9-868c-454a-ab23-0a646d3590e2") // Mapped from b13306f3...
             },
             new
             {
@@ -2735,7 +2835,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/c92c60d4",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("e4c2a925-fc12-4827-a9e2-df87cc7c12e0")
+                CourseVariantId =
+                    Guid.Parse("ea675454-f59a-4c5e-978b-a674f7d7fbaf") // Mapped from e4c2a925...
             },
             new
             {
@@ -2745,7 +2846,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/d71a7b73",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("a0e86a5c-82b0-4ef8-9492-7d9a8e1e0d15")
+                CourseVariantId =
+                    Guid.Parse("52540491-ae28-4d37-b551-9ab7883c2dd2") // Mapped from a0e86a5c...
             },
             new
             {
@@ -2755,7 +2857,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/75ca8c99",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("f5f9237d-5ff5-439a-86c5-10c66cb2d9e6")
+                CourseVariantId =
+                    Guid.Parse("2bb9df2c-c27b-424c-8814-7c38b00045e8") // Mapped from f5f9237d...
             },
             new
             {
@@ -2765,7 +2868,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/f264fbd9",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("b13306f3-05fd-4f45-bdeb-8b3f9e90a4bb")
+                CourseVariantId =
+                    Guid.Parse("adf06fe9-868c-454a-ab23-0a646d3590e2") // Mapped from b13306f3...
             },
             new
             {
@@ -2775,7 +2879,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/5ae86199",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("78f0e23b-1b9a-4b07-9191-7f2f332e3ee8")
+                CourseVariantId =
+                    Guid.Parse("ce899111-a22d-4cca-bd65-fcfa633754b9") // Mapped from 78f0e23b...
             },
             new
             {
@@ -2785,7 +2890,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/515753f9",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("d1b85095-dcb3-4ec6-b0c6-1a0c5b47d8a3")
+                CourseVariantId =
+                    Guid.Parse("9f219956-15d4-459f-89ef-c6b833ae8adb") // Mapped from d1b85095...
             },
             new
             {
@@ -2795,7 +2901,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/befe5d53",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("f31eb3f2-643d-4b31-9f8f-d7aaf6e0e6cd")
+                CourseVariantId =
+                    Guid.Parse("fe7615e2-cd45-4307-9e74-a837f2b4d606") // Mapped from f31eb3f2...
             },
             new
             {
@@ -2805,7 +2912,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/ecd10ec7",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("b9427e4d-34e6-48c5-943f-94e3f2f6891c")
+                CourseVariantId =
+                    Guid.Parse("32637827-fe2d-4a40-9641-8b18a9df1cfb") // Mapped from b9427e4d...
             },
             new
             {
@@ -2815,7 +2923,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/22fe52f6",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("f5f9237d-5ff5-439a-86c5-10c66cb2d9e6")
+                CourseVariantId =
+                    Guid.Parse("2bb9df2c-c27b-424c-8814-7c38b00045e8") // Mapped from f5f9237d...
             },
             new
             {
@@ -2825,7 +2934,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/33528b3c",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("b9427e4d-34e6-48c5-943f-94e3f2f6891c")
+                CourseVariantId =
+                    Guid.Parse("32637827-fe2d-4a40-9641-8b18a9df1cfb") // Mapped from b9427e4d...
             },
             new
             {
@@ -2835,7 +2945,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/73f6e31e",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("c29ad7cb-dede-4ff6-b119-70dbad602f90")
+                CourseVariantId =
+                    Guid.Parse("97904238-f028-4e42-8676-5067dd3b2f48") // Mapped from c29ad7cb...
             },
             new
             {
@@ -2845,7 +2956,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/1bd81078",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("e4c2a925-fc12-4827-a9e2-df87cc7c12e0")
+                CourseVariantId =
+                    Guid.Parse("ea675454-f59a-4c5e-978b-a674f7d7fbaf") // Mapped from e4c2a925...
             },
             new
             {
@@ -2855,7 +2967,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/92f8e808",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("f5f9237d-5ff5-439a-86c5-10c66cb2d9e6")
+                CourseVariantId =
+                    Guid.Parse("2bb9df2c-c27b-424c-8814-7c38b00045e8") // Mapped from f5f9237d...
             },
             new
             {
@@ -2865,7 +2978,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/65a3bf23",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("0042b980-d8cc-4969-af0f-62d8c1632871")
+                CourseVariantId =
+                    Guid.Parse("82502dbb-dd0d-436c-8973-439f54f30307") // Mapped from 0042b980...
             },
             new
             {
@@ -2875,7 +2989,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/dac9f27b",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("44d62488-947d-41e1-a1dd-7de74ff7aa8f")
+                CourseVariantId =
+                    Guid.Parse("a415a739-5557-4d0e-8980-68bb3ba2aa7e") // Mapped from 44d62488...
             },
             new
             {
@@ -2885,7 +3000,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/e2079979",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("44d62488-947d-41e1-a1dd-7de74ff7aa8f")
+                CourseVariantId =
+                    Guid.Parse("a415a739-5557-4d0e-8980-68bb3ba2aa7e") // Mapped from 44d62488...
             },
             new
             {
@@ -2895,7 +3011,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/bf95142c",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -2905,7 +3022,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/a1a36e9c",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("b9427e4d-34e6-48c5-943f-94e3f2f6891c")
+                CourseVariantId =
+                    Guid.Parse("32637827-fe2d-4a40-9641-8b18a9df1cfb") // Mapped from b9427e4d...
             },
             new
             {
@@ -2915,7 +3033,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/5c7da5e7",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("44d62488-947d-41e1-a1dd-7de74ff7aa8f")
+                CourseVariantId =
+                    Guid.Parse("a415a739-5557-4d0e-8980-68bb3ba2aa7e") // Mapped from 44d62488...
             },
             new
             {
@@ -2925,7 +3044,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/f56a386d",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("99d1436e-0028-4b8e-b949-fcf33fc43e2d")
+                CourseVariantId =
+                    Guid.Parse("72e7ead9-5ed8-4eac-bbef-ff39303c1d6f") // Mapped from 99d1436e...
             },
             new
             {
@@ -2935,7 +3055,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/384d5e55",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -2945,7 +3066,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/4271b32e",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("d1b85095-dcb3-4ec6-b0c6-1a0c5b47d8a3")
+                CourseVariantId =
+                    Guid.Parse("9f219956-15d4-459f-89ef-c6b833ae8adb") // Mapped from d1b85095...
             },
             new
             {
@@ -2955,7 +3077,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/381eb402",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("0042b980-d8cc-4969-af0f-62d8c1632871")
+                CourseVariantId =
+                    Guid.Parse("82502dbb-dd0d-436c-8973-439f54f30307") // Mapped from 0042b980...
             },
             new
             {
@@ -2965,7 +3088,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/a60636a9",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("6e3a3c34-f40c-4d90-a986-588b17867b71")
+                CourseVariantId =
+                    Guid.Parse("c89fe8aa-1778-4a06-bc5f-74b646e229db") // Mapped from 6e3a3c34...
             },
             new
             {
@@ -2975,7 +3099,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/fd79bae8",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -2985,7 +3110,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/3c08b968",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("6e3a3c34-f40c-4d90-a986-588b17867b71")
+                CourseVariantId =
+                    Guid.Parse("c89fe8aa-1778-4a06-bc5f-74b646e229db") // Mapped from 6e3a3c34...
             },
             new
             {
@@ -2995,7 +3121,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/1c2242ce",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("44d62488-947d-41e1-a1dd-7de74ff7aa8f")
+                CourseVariantId =
+                    Guid.Parse("a415a739-5557-4d0e-8980-68bb3ba2aa7e") // Mapped from 44d62488...
             },
             new
             {
@@ -3005,7 +3132,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/c70ba7f4",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("0042b980-d8cc-4969-af0f-62d8c1632871")
+                CourseVariantId =
+                    Guid.Parse("82502dbb-dd0d-436c-8973-439f54f30307") // Mapped from 0042b980...
             },
             new
             {
@@ -3015,7 +3143,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/f2c48858",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -3025,7 +3154,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/8668096a",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("c29ad7cb-dede-4ff6-b119-70dbad602f90")
+                CourseVariantId =
+                    Guid.Parse("97904238-f028-4e42-8676-5067dd3b2f48") // Mapped from c29ad7cb...
             },
             new
             {
@@ -3035,7 +3165,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/67e9ccc3",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("d1b85095-dcb3-4ec6-b0c6-1a0c5b47d8a3")
+                CourseVariantId =
+                    Guid.Parse("9f219956-15d4-459f-89ef-c6b833ae8adb") // Mapped from d1b85095...
             },
             new
             {
@@ -3045,7 +3176,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/264bc52c",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("d1b85095-dcb3-4ec6-b0c6-1a0c5b47d8a3")
+                CourseVariantId =
+                    Guid.Parse("9f219956-15d4-459f-89ef-c6b833ae8adb") // Mapped from d1b85095...
             },
             new
             {
@@ -3055,7 +3187,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/e5c3f780",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("f31eb3f2-643d-4b31-9f8f-d7aaf6e0e6cd")
+                CourseVariantId =
+                    Guid.Parse("fe7615e2-cd45-4307-9e74-a837f2b4d606") // Mapped from f31eb3f2...
             },
             new
             {
@@ -3065,7 +3198,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/aad383f5",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("f5f9237d-5ff5-439a-86c5-10c66cb2d9e6")
+                CourseVariantId =
+                    Guid.Parse("2bb9df2c-c27b-424c-8814-7c38b00045e8") // Mapped from f5f9237d...
             },
             new
             {
@@ -3075,7 +3209,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/604bc72e",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("6e3a3c34-f40c-4d90-a986-588b17867b71")
+                CourseVariantId =
+                    Guid.Parse("c89fe8aa-1778-4a06-bc5f-74b646e229db") // Mapped from 6e3a3c34...
             },
             new
             {
@@ -3085,7 +3220,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/a719b848",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("d1b85095-dcb3-4ec6-b0c6-1a0c5b47d8a3")
+                CourseVariantId =
+                    Guid.Parse("9f219956-15d4-459f-89ef-c6b833ae8adb") // Mapped from d1b85095...
             },
             new
             {
@@ -3095,7 +3231,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/64d9eb32",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("0042b980-d8cc-4969-af0f-62d8c1632871")
+                CourseVariantId =
+                    Guid.Parse("82502dbb-dd0d-436c-8973-439f54f30307") // Mapped from 0042b980...
             },
             new
             {
@@ -3105,7 +3242,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/b52c95fe",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("c29ad7cb-dede-4ff6-b119-70dbad602f90")
+                CourseVariantId =
+                    Guid.Parse("97904238-f028-4e42-8676-5067dd3b2f48") // Mapped from c29ad7cb...
             },
             new
             {
@@ -3115,7 +3253,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/772e8415",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -3125,7 +3264,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/edee693f",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("78f0e23b-1b9a-4b07-9191-7f2f332e3ee8")
+                CourseVariantId =
+                    Guid.Parse("ce899111-a22d-4cca-bd65-fcfa633754b9") // Mapped from 78f0e23b...
             },
             new
             {
@@ -3135,7 +3275,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/3981b1aa",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("6e3a3c34-f40c-4d90-a986-588b17867b71")
+                CourseVariantId =
+                    Guid.Parse("c89fe8aa-1778-4a06-bc5f-74b646e229db") // Mapped from 6e3a3c34...
             },
             new
             {
@@ -3145,7 +3286,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/1fc8aad1",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -3155,7 +3297,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/4429e33c",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("f5f9237d-5ff5-439a-86c5-10c66cb2d9e6")
+                CourseVariantId =
+                    Guid.Parse("2bb9df2c-c27b-424c-8814-7c38b00045e8") // Mapped from f5f9237d...
             },
             new
             {
@@ -3165,7 +3308,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/5d2b72fd",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("c29ad7cb-dede-4ff6-b119-70dbad602f90")
+                CourseVariantId =
+                    Guid.Parse("97904238-f028-4e42-8676-5067dd3b2f48") // Mapped from c29ad7cb...
             },
             new
             {
@@ -3175,7 +3319,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/b2141971",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("99d1436e-0028-4b8e-b949-fcf33fc43e2d")
+                CourseVariantId =
+                    Guid.Parse("72e7ead9-5ed8-4eac-bbef-ff39303c1d6f") // Mapped from 99d1436e...
             },
             new
             {
@@ -3185,7 +3330,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/8be82956",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("b13306f3-05fd-4f45-bdeb-8b3f9e90a4bb")
+                CourseVariantId =
+                    Guid.Parse("adf06fe9-868c-454a-ab23-0a646d3590e2") // Mapped from b13306f3...
             },
             new
             {
@@ -3195,7 +3341,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/bbf96d99",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("f31eb3f2-643d-4b31-9f8f-d7aaf6e0e6cd")
+                CourseVariantId =
+                    Guid.Parse("fe7615e2-cd45-4307-9e74-a837f2b4d606") // Mapped from f31eb3f2...
             },
             new
             {
@@ -3205,7 +3352,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/e9f6b81a",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                CourseId = Guid.Parse("0042b980-d8cc-4969-af0f-62d8c1632871")
+                CourseVariantId =
+                    Guid.Parse("82502dbb-dd0d-436c-8973-439f54f30307") // Mapped from 0042b980...
             },
             new
             {
@@ -3215,7 +3363,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/f4540c46",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("0042b980-d8cc-4969-af0f-62d8c1632871")
+                CourseVariantId =
+                    Guid.Parse("82502dbb-dd0d-436c-8973-439f54f30307") // Mapped from 0042b980...
             },
             new
             {
@@ -3225,7 +3374,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/9238a4f8",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                CourseId = Guid.Parse("78f0e23b-1b9a-4b07-9191-7f2f332e3ee8")
+                CourseVariantId =
+                    Guid.Parse("ce899111-a22d-4cca-bd65-fcfa633754b9") // Mapped from 78f0e23b...
             },
             new
             {
@@ -3235,7 +3385,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/e9f6b8ab",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -3245,7 +3396,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/f4540cab",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                CourseId = Guid.Parse("b39f4f06-84e4-45c0-a3a0-b59334c8f8d0")
+                CourseVariantId =
+                    Guid.Parse("6b5b4010-c79b-4913-a488-21c3a83b3178") // Mapped from b39f4f06...
             },
             new
             {
@@ -3255,7 +3407,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/9238a4ab",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                CourseId = Guid.Parse("b13306f3-05fd-4f45-bdeb-8b3f9e90a4bb")
+                CourseVariantId =
+                    Guid.Parse("adf06fe9-868c-454a-ab23-0a646d3590e2") // Mapped from b13306f3...
             },
             new
             {
@@ -3265,7 +3418,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/9238a4ab",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                CourseId = Guid.Parse("b13306f3-05fd-4f45-bdeb-8b3f9e90a4bb")
+                CourseVariantId =
+                    Guid.Parse("adf06fe9-868c-454a-ab23-0a646d3590e2") // Mapped from b13306f3...
             },
             new
             {
@@ -3275,7 +3429,8 @@ public class ClassEntityTypeConfiguration : IEntityTypeConfiguration<Class>
                 LinkToMeeting = "https://example.com/meeting/9238a4ab",
                 ClassStatusId = Guid.Parse("41111111-1111-1111-1111-111111111111"),
                 UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                CourseId = Guid.Parse("b13306f3-05fd-4f45-bdeb-8b3f9e90a4bb")
+                CourseVariantId =
+                    Guid.Parse("adf06fe9-868c-454a-ab23-0a646d3590e2") // Mapped from b13306f3...
             }
         );
     }

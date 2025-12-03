@@ -49,8 +49,8 @@ public class ClassesService : IClassesService
                 ? new[] { cls.LinkToMeeting }.Concat(cls.Links.Select(link => link.Link))
                 : cls.Links.Select(link => link.Link)),
             UserId = cls.UserId,
-            CourseId = cls.CourseId,
-            CourseName = cls.Participation.Course.Name ?? "Unknown",
+            CourseId = cls.Participation.CourseVariant.Course.Id,
+            CourseName = cls.Participation.CourseVariant.Course.Name ?? "Unknown",
 
             Exercises = cls.Exercises.Select(ex => new ExercisePreviewDto
             {
@@ -91,7 +91,7 @@ public class ClassesService : IClassesService
         }
 
         // Only course teacher may add links
-        var teacherId = cls.Participation?.Course?.TeacherId;
+        var teacherId = cls.Participation?.CourseVariant?.Course?.TeacherId;
         if (teacherId is null || teacherId != userId)
         {
             return false;
@@ -133,7 +133,7 @@ public class ClassesService : IClassesService
         }
 
         // Only the course teacher may remove links
-        var teacherId = cls.Participation?.Course?.TeacherId;
+        var teacherId = cls.Participation?.CourseVariant?.Course?.TeacherId;
         if (teacherId is null || teacherId != userId)
         {
             return false;
@@ -160,7 +160,7 @@ public class ClassesService : IClassesService
                     Id = link.Id,
                     Path = link.Link,
                     IsMeeting = false,
-                    CourseName = link.Class.Participation.Course.Name ?? ""
+                    CourseName = link.Class.Participation.CourseVariant.Course.Name ?? ""
                 });
 
                 links = cls.LinkToMeeting != null ? new[]
@@ -170,7 +170,7 @@ public class ClassesService : IClassesService
                                 Id = Guid.Empty, 
                                 Path = cls.LinkToMeeting, 
                                 IsMeeting = true,
-                                CourseName = cls.Participation.Course.Name ?? ""
+                                CourseName = cls.Participation.CourseVariant.Course.Name ?? ""
                             }
                         }
                         .Concat(links)
@@ -197,7 +197,7 @@ public class ClassesService : IClassesService
                     Id = file.Id,
                     Name = file.Name,
                     FilePath = file.Path,
-                    AssociatedCourseName = cls.Participation.Course.Name ?? "",
+                    AssociatedCourseName = cls.Participation.CourseVariant.Course.Name ?? "",
                     AssociatedClassDate = cls.StartTime
                 });
 
@@ -221,9 +221,9 @@ public class ClassesService : IClassesService
                 {
                     Id = exercise.Id,
                     Name = "Exercise " +
-                           (cls.Participation.Course.Name ?? "Unknown") +
+                           (cls.Participation.CourseVariant.Course.Name ?? "Unknown") +
                            " [" + cls.StartTime.ToString("yyyy-MM-dd") + "]",
-                    CourseName = cls.Participation.Course.Name ?? "",
+                    CourseName = cls.Participation.CourseVariant.Course.Name ?? "",
                     Status = exercise.Status.ToString().ToLowerInvariant(),
                     Graded = exercise.Grade.HasValue,
                     Grade = exercise.Grade,

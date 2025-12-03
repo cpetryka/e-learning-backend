@@ -39,7 +39,9 @@ public class TeacherRepository : ITeacherRepository
     public async Task<IEnumerable<TeacherReviewDTO>> GetTeacherReviews(Guid teacherId)
     {
         return await _context.Participations
-            .Where(p => p.Course.TeacherId == teacherId && p.Review != null)
+            .Include(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
+            .Where(p => p.CourseVariant.Course.TeacherId == teacherId && p.Review != null)
             .Select(p => new TeacherReviewDTO
             {
                 ReviewId = p.Review.Id,
@@ -171,7 +173,9 @@ public class TeacherRepository : ITeacherRepository
     public async Task<IEnumerable<StudentBriefDTO>> GetStudentsByTeacherIdAsync(Guid teacherId)
     {
         return await _context.Participations
-            .Where(p => p.Course.TeacherId == teacherId)
+            .Include(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
+            .Where(p => p.CourseVariant.Course.TeacherId == teacherId)
             .Select(p => p.User)
             .Distinct()
             .Select(s => new StudentBriefDTO
@@ -200,7 +204,9 @@ public class TeacherRepository : ITeacherRepository
         Guid courseId)
     {
         return await _context.Participations
-            .Where(p => p.Course.TeacherId == teacherId && p.CourseId == courseId)
+            .Include(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
+            .Where(p => p.CourseVariant.Course.TeacherId == teacherId && p.CourseVariant.CourseId == courseId)
             .Select(p => p.User)
             .Distinct()
             .Select(s => new StudentBriefDTO
@@ -216,8 +222,10 @@ public class TeacherRepository : ITeacherRepository
         Guid studentId)
     {
         return await _context.Participations
-            .Where(p => p.Course.TeacherId == teacherId && p.UserId == studentId)
-            .Select(p => p.Course)
+            .Include(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
+            .Where(p => p.CourseVariant.Course.TeacherId == teacherId && p.UserId == studentId)
+            .Select(p => p.CourseVariant.Course)
             .Distinct()
             .Select(c => new CourseBriefDTO
             {
@@ -233,16 +241,17 @@ public class TeacherRepository : ITeacherRepository
         return await _context.Exercises
             .Include(e => e.Class)
                 .ThenInclude(c => c.Participation)
-                    .ThenInclude(p => p.Course)
-            .Where(e => e.Class.Participation.Course.TeacherId == teacherId &&
+                    .ThenInclude(p => p.CourseVariant)
+                        .ThenInclude(cv => cv.Course)
+            .Where(e => e.Class.Participation.CourseVariant.Course.TeacherId == teacherId &&
                         e.Class.Participation.UserId == studentId)
-            .Where(e => courseId == null || e.Class.Participation.CourseId == courseId)
+            .Where(e => courseId == null || e.Class.Participation.CourseVariant.CourseId == courseId)
             .Select(e => new ExerciseDTO()
             {
                 Id = e.Id,
-                Name = e.Class.Participation.Course.Name + " [" + e.Class.StartTime.ToString("yyyy-MM-dd") + "]",
+                Name = e.Class.Participation.CourseVariant.Course.Name + " [" + e.Class.StartTime.ToString("yyyy-MM-dd") + "]",
                 Completed = e.Status == ExerciseStatus.Graded || e.Status == ExerciseStatus.Submitted,
-                CourseName = e.Class.Participation.Course.Name,
+                CourseName = e.Class.Participation.CourseVariant.Course.Name,
                 Status = e.Status.ToString(),
                 Graded = e.Grade != null,
                 Grade = e.Grade,
@@ -257,16 +266,17 @@ public class TeacherRepository : ITeacherRepository
         return await _context.Quizzes
             .Include(e => e.Class)
                 .ThenInclude(c => c.Participation)
-                    .ThenInclude(p => p.Course)
-            .Where(e => e.Class.Participation.Course.TeacherId == teacherId &&
+                    .ThenInclude(p => p.CourseVariant)
+                        .ThenInclude(p => p.Course)
+            .Where(e => e.Class.Participation.CourseVariant.Course.TeacherId == teacherId &&
                         e.Class.Participation.UserId == studentId)
-            .Where(e => courseId == null || e.Class.Participation.CourseId == courseId)
+            .Where(e => courseId == null || e.Class.Participation.CourseVariant.CourseId == courseId)
             .Select(e => new QuizSummaryDTO
             {
                 Id = e.Id,
                 Name = e.Title,
                 Completed = e.Score != null,
-                CourseName = e.Class.Participation.Course.Name,
+                CourseName = e.Class.Participation.CourseVariant.Course.Name,
                 Type = "quiz"
             })
             .ToListAsync();
@@ -285,11 +295,13 @@ public class TeacherRepository : ITeacherRepository
 
         
         var studentsFlat = await _context.Participations
+            .Include(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
             .AsNoTracking()
-            .Where(p => courseIds.Contains(p.CourseId))
+            .Where(p => courseIds.Contains(p.CourseVariant.CourseId))
             .Select(p => new
             {
-                p.CourseId,
+                p.CourseVariant.CourseId,
                 UserId = p.User.Id,
                 p.User.Name,
                 p.User.Surname
@@ -330,10 +342,11 @@ public class TeacherRepository : ITeacherRepository
     {
         return await _context.Classes
             .Include(c => c.Participation)
+            .ThenInclude(p => p.CourseVariant)
             .ThenInclude(c => c.Course)
             .Include(c => c.Participation)
             .ThenInclude(c => c.User)
-            .Where(c => c.Participation.Course.TeacherId == teacherId &&
+            .Where(c => c.Participation.CourseVariant.Course.TeacherId == teacherId &&
                         DateOnly.FromDateTime(c.StartTime) >= start &&
                         DateOnly.FromDateTime(c.StartTime.AddHours(1)) <= end)
             .Select(c => new TeacherUpcomingClass
@@ -341,8 +354,8 @@ public class TeacherRepository : ITeacherRepository
                 ClassId = c.Id,
                 StudentId = c.UserId,
                 StudentName = c.Participation.User.Name + " " + c.Participation.User.Surname,
-                CourseId = c.Participation.Course.Id,
-                CourseName = c.Participation.Course.Name,
+                CourseId = c.Participation.CourseVariant.Course.Id,
+                CourseName = c.Participation.CourseVariant.Course.Name,
                 ClassDate = DateOnly.FromDateTime(c.StartTime),
                 ClassStartTime = TimeOnly.FromDateTime(c.StartTime),
                 ClassEndTime = TimeOnly.FromDateTime(c.StartTime.AddHours(1))
@@ -357,18 +370,19 @@ public class TeacherRepository : ITeacherRepository
         return await _context.Exercises
             .Include(e => e.Class)
             .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.CourseVariant)
             .ThenInclude(p => p.Course)
-            .Where(e => e.Class.Participation.Course.TeacherId == teacherId &&
+            .Where(e => e.Class.Participation.CourseVariant.Course.TeacherId == teacherId &&
                         e.Status == ExerciseStatus.Submitted)
             .Where(e => courseIds == null || courseIds.Count == 0 || 
-                        courseIds.Contains(e.Class.Participation.CourseId))
+                        courseIds.Contains(e.Class.Participation.CourseVariant.CourseId))
             .Where(e => studentIds == null || studentIds.Count == 0 || 
                         studentIds.Contains(e.Class.Participation.UserId))
             .Select(e => new ExerciseBriefDTO
             {
                 Id = e.Id,
-                CourseId = e.Class.Participation.Course.Id,
-                CourseName = e.Class.Participation.Course.Name,
+                CourseId = e.Class.Participation.CourseVariant.Course.Id,
+                CourseName = e.Class.Participation.CourseVariant.Course.Name,
                 ClassStartTime = e.Class.StartTime,
                 ExerciseStatus = e.Status.ToString()
             })
@@ -380,20 +394,21 @@ public class TeacherRepository : ITeacherRepository
         return await _context.Exercises
             .Include(e => e.Class)
             .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.CourseVariant)
             .ThenInclude(p => p.Course)
             .Include(e => e.Class)
             .ThenInclude(c => c.Participation)
             .ThenInclude(p => p.User)
             .Include(e => e.ExerciseResources)
             .ThenInclude(e => e.File)
-            .Where(e => e.Class.Participation.Course.TeacherId == teacherId)
-            .Where(e => courseId == null || e.Class.Participation.CourseId == courseId)
+            .Where(e => e.Class.Participation.CourseVariant.Course.TeacherId == teacherId)
+            .Where(e => courseId == null || e.Class.Participation.CourseVariant.CourseId == courseId)
             .Where(e => studentId == null || e.Class.Participation.UserId == studentId)
             .Select(e => new GetExerciseDTO()
             {
                 Id = e.Id,
-                Name = e.Class.Participation.Course.Name + " [" + e.Class.StartTime.ToString("yyyy-MM-dd") + "] - " + e.Class.Participation.User.Name + " " + e.Class.Participation.User.Surname,
-                CourseName = e.Class.Participation.Course.Name,
+                Name = e.Class.Participation.CourseVariant.Course.Name + " [" + e.Class.StartTime.ToString("yyyy-MM-dd") + "] - " + e.Class.Participation.User.Name + " " + e.Class.Participation.User.Surname,
+                CourseName = e.Class.Participation.CourseVariant.Course.Name,
                 Status = e.Status.ToString(),
                 Graded = e.Grade != null,
                 Grade = e.Grade,

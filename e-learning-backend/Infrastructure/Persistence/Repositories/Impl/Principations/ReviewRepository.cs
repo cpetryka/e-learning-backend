@@ -46,6 +46,8 @@ public class ReviewRepository : IReviewRepository
     public async Task<Review?> GetByParticipationIdAsync(Guid userId, Guid courseId)
         => await _context.Reviews
             .Include(r => r.Participation)
-            .Where(r => r.Participation.UserId == userId && r.Participation.CourseId == courseId)
+            .ThenInclude(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
+            .Where(r => r.Participation.UserId == userId && r.Participation.CourseVariant.CourseId == courseId)
             .SingleOrDefaultAsync();
 }
