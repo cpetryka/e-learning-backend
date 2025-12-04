@@ -247,14 +247,14 @@ public class ClassesController : ControllerBase
             return Unauthorized();
         }
 
-        if (dto == null || dto.CourseVariantId == Guid.Empty)
+        if (dto == null || dto.CourseId == Guid.Empty)
         {
             return BadRequest("Invalid request payload.");
         }
 
         try
         {
-            var success = await _classesService.AddClassForExistingParticipation(userId.Value, dto.CourseVariantId, dto.StartTime);
+            var success = await _classesService.AddClassForExistingParticipation(userId.Value, dto.CourseId, dto.StartTime);
             if (!success)
                 return Forbid();
 

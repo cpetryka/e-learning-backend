@@ -243,23 +243,23 @@ public class ClassesService : IClassesService
             });
     }
 
-    public async Task<bool> AddClassForExistingParticipation(Guid studentId, Guid courseVariantId, DateTime startTime)
+    public async Task<bool> AddClassForExistingParticipation(Guid studentId, Guid courseId, DateTime startTime)
     {
         if (studentId == Guid.Empty)
         {
             throw new ArgumentException("Invalid student id.", nameof(studentId));
         }
 
-        if (courseVariantId == Guid.Empty)
+        if (courseId == Guid.Empty)
         {
-            throw new ArgumentException("Invalid course variant id.", nameof(courseVariantId));
+            throw new ArgumentException("Invalid course id.", nameof(courseId));
         }
 
         // Resolve participation by composite key
-        var participation = await _participationRepository.GetByIdAsync(studentId, courseVariantId);
+        var participation = await _participationRepository.GetByIdAsync(studentId, courseId);
         if (participation == null)
         {
-            Console.WriteLine("Participation not found for studentId: " + studentId + ", courseVariantId: " + courseVariantId);
+            Console.WriteLine("Participation not found for studentId: " + studentId + ", courseId: " + courseId);
             return false;
         }
 

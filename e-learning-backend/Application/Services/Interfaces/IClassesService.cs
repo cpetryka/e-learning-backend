@@ -14,5 +14,5 @@ public interface IClassesService
     Task<IEnumerable<GetClassLinkDTO>> GetClassLinksAsync(Guid classId);
     Task<IEnumerable<GetClassFileDTO>> GetClassFilesAsync(Guid classId);
     Task<IEnumerable<GetExerciseDTO>> GetClassExercisesAsync(Guid classId);
-    Task<bool> AddClassForExistingParticipation(Guid studentId, Guid courseVariantId, DateTime startTime);
+    Task<bool> AddClassForExistingParticipation(Guid studentId, Guid courseId, DateTime startTime);
 }
