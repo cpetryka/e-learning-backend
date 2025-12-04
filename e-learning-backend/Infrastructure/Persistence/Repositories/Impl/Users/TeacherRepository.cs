@@ -140,7 +140,8 @@ public class TeacherRepository : ITeacherRepository
 
         var jsonOptions = new JsonSerializerOptions
         {
-            PropertyNameCaseInsensitive = true
+           
+            PropertyNameCaseInsensitive = true 
         };
 
         var result = rows.Select(r =>
@@ -148,13 +149,14 @@ public class TeacherRepository : ITeacherRepository
            
             var raw = JsonSerializer.Deserialize<List<RawTimeslot>>(r.Timeslots ?? "[]", jsonOptions) ?? new();
 
+
             var slots = raw
                 .Select(ts => new TeacherAvailabilityDTO.TimeslotDTO
                 {
-                    TimeFrom = TimeOnly.Parse(ts.TimeFrom),
+                    TimeFrom = TimeOnly.Parse(ts.TimeFrom), 
                     TimeUntil = TimeOnly.Parse(ts.TimeUntil)
                 })
-                // na wszelki wypadek   deduplikacja i sort jak w poprzednich przykładach
+               
                 .DistinctBy(s => (s.TimeFrom, s.TimeUntil))
                 .OrderBy(s => s.TimeFrom)
                 .ToList();
