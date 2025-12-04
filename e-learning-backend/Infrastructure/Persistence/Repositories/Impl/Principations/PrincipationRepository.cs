@@ -17,6 +17,9 @@ public class ParticipationRepository : IParticipationRepository
             .Include(p => p.User)
             .Include(p => p.CourseVariant)
                 .ThenInclude(cv => cv.Course)
+            .Include(p => p.CourseVariant)
+                .ThenInclude(cv => cv.Course)
+                    .ThenInclude(co => co.Teacher)
             .Include(p => p.Review)
             .Include(p => p.Classes)
             .SingleOrDefaultAsync(p => p.UserId == userId && p.CourseVariant.CourseId == courseId);

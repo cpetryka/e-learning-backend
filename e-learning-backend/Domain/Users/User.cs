@@ -456,5 +456,6 @@ public class User
 
         _files.Remove(file);
     }
+    
     public void SetProfilePicture(ProfilePicture picture) => ProfilePicture = picture;
 }

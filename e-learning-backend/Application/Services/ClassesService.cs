@@ -1,6 +1,8 @@
 ﻿using e_learning_backend.API.DTOs;
+using e_learning_backend.Domain.Classes;
 using e_learning_backend.Domain.ExercisesAndMaterials;
 using e_learning_backend.Infrastructure.Api.DTO;
+using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -9,12 +11,18 @@ public class ClassesService : IClassesService
 {
     private readonly IClassRepository _repository;
     private readonly ILinkResourcesRepository _linkResourcesRepository;
+    private readonly IParticipationRepository _participationRepository;
+    private readonly ITeacherRepository _teacherRepository;
 
     public ClassesService(IClassRepository repository,
-        ILinkResourcesRepository linkResourcesRepository)
+        ILinkResourcesRepository linkResourcesRepository, 
+        IParticipationRepository participationRepository,
+        ITeacherRepository teacherRepository)
     {
         _repository = repository;
         _linkResourcesRepository = linkResourcesRepository;
+        _participationRepository = participationRepository;
+        _teacherRepository = teacherRepository;
     }
 
     /// <summary>
@@ -233,5 +241,76 @@ public class ClassesService : IClassesService
 
                 return exercises;
             });
+    }
+
+    public async Task<bool> AddClassForExistingParticipation(Guid studentId, Guid courseVariantId, DateTime startTime)
+    {
+        if (studentId == Guid.Empty)
+        {
+            throw new ArgumentException("Invalid student id.", nameof(studentId));
+        }
+
+        if (courseVariantId == Guid.Empty)
+        {
+            throw new ArgumentException("Invalid course variant id.", nameof(courseVariantId));
+        }
+
+        // Resolve participation by composite key
+        var participation = await _participationRepository.GetByIdAsync(studentId, courseVariantId);
+        if (participation == null)
+        {
+            Console.WriteLine("Participation not found for studentId: " + studentId + ", courseVariantId: " + courseVariantId);
+            return false;
+        }
+
+        // Ensure the participation belongs to the student (redundant check but kept for safety)
+        if (participation.UserId != studentId)
+        {
+            Console.WriteLine("Participation userId does not match studentId.");
+            return false;
+        }
+        
+        // Ensure teacher availability
+        var teacher = participation.CourseVariant?.Course?.Teacher;
+        if (teacher == null || teacher.Id == Guid.Empty)
+        {
+            Console.WriteLine("Teacher not found for the course.");
+            return false;
+        }
+
+        var teacherAvailability = await _teacherRepository.GetTeacherAvailabilityAsync(teacher.Id);
+        if (teacherAvailability == null || !teacherAvailability.Any())
+        {
+            Console.WriteLine("Teacher not found for the course.");
+            return false;
+        }
+
+        var requestedDate = DateOnly.FromDateTime(startTime);
+        var dayAvailability = teacherAvailability.FirstOrDefault(d => d.Day == requestedDate);
+        if (dayAvailability == null || dayAvailability.Timeslots == null || !dayAvailability.Timeslots.Any())
+        {
+            Console.WriteLine("Teacher is not available on the requested date: " + requestedDate);
+            return false;
+        }
+
+        var startTimeOnly = TimeOnly.FromDateTime(startTime);
+        var isAvailable = dayAvailability.Timeslots.Any(ts =>
+            startTimeOnly >= ts.TimeFrom && startTimeOnly < ts.TimeUntil);
+
+        if (!isAvailable)
+        {
+            Console.WriteLine("Teacher is not available at the requested time: " + startTimeOnly);
+            return false;
+        }
+
+        var cls = new Class(startTime)
+        {
+            UserId = studentId,
+            Participation = participation,
+            CourseVariantId = participation.CourseVariant?.Id ?? Guid.Empty
+        };
+
+        await _repository.AddAsync(cls);
+        return true;
     }
 }

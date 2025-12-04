@@ -236,4 +236,37 @@ public class ClassesController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+    
+    [Authorize]
+    [HttpPost("/existing-participation")]
+    public async Task<IActionResult> AddClassForExistingParticipation([FromBody] AddClassForExistingParticipationDTO dto)
+    {
+        var userId = User.GetUserId();
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+
+        if (dto == null || dto.CourseVariantId == Guid.Empty)
+        {
+            return BadRequest("Invalid request payload.");
+        }
+
+        try
+        {
+            var success = await _classesService.AddClassForExistingParticipation(userId.Value, dto.CourseVariantId, dto.StartTime);
+            if (!success)
+                return Forbid();
+
+            return Created();
+        }
+        catch (ArgumentException e)
+        {
+            return BadRequest(e.Message);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }
