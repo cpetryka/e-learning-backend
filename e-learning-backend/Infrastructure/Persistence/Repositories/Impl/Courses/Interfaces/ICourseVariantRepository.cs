@@ -9,4 +9,5 @@ public interface ICourseVariantRepository
     Task AddAsync(CourseVariant variant);
     Task UpdateAsync(CourseVariant variant);
     Task DeleteAsync(Guid id);
+    Task<CourseVariant?> GetByAttributesAsync(Guid courseId, Guid levelId, Guid languageId);
 }

@@ -82,7 +82,7 @@ public class ClassesController : ControllerBase
 
         return Ok(result);
     }
-    
+
     [HttpGet("{classId:guid}")]
     public async Task<ActionResult<ClassBriefDto>> GetClassDetails(Guid classId)
     {
@@ -95,8 +95,8 @@ public class ClassesController : ControllerBase
 
         return Ok(classDetails);
     }
-    
-    
+
+
     [Authorize]
     [HttpPost("{classId:guid}/links")]
     public async Task<IActionResult> AddLink(Guid classId, [FromBody] AddClassLinkDTO dto)
@@ -119,7 +119,8 @@ public class ClassesController : ControllerBase
 
         try
         {
-            var success = await _classesService.AddLinkAsync(userId, classId, dto.Link, dto.IsMeeting);
+            var success =
+                await _classesService.AddLinkAsync(userId, classId, dto.Link, dto.IsMeeting);
             if (!success)
             {
                 return Forbid();
@@ -136,7 +137,7 @@ public class ClassesController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
+
     [Authorize]
     [HttpDelete("links/{linkId:guid}")]
     public async Task<IActionResult> RemoveLink(Guid linkId)
@@ -176,7 +177,7 @@ public class ClassesController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
+
     [HttpGet("{classId:guid}/links")]
     public async Task<IActionResult> GetClassLinks(Guid classId)
     {
@@ -185,7 +186,7 @@ public class ClassesController : ControllerBase
         {
             return Unauthorized();
         }
-        
+
         try
         {
             var classDetails = await _classesService.GetClassLinksAsync(classId);
@@ -196,7 +197,7 @@ public class ClassesController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
+
     [HttpGet("{classId:guid}/files")]
     public async Task<IActionResult> GetClassFiles(Guid classId)
     {
@@ -205,7 +206,7 @@ public class ClassesController : ControllerBase
         {
             return Unauthorized();
         }
-        
+
         try
         {
             var classFiles = await _classesService.GetClassFilesAsync(classId);
@@ -216,7 +217,7 @@ public class ClassesController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
+
     [HttpGet("{classId:guid}/exercises")]
     public async Task<IActionResult> GetClassExercises(Guid classId)
     {
@@ -225,7 +226,7 @@ public class ClassesController : ControllerBase
         {
             return Unauthorized();
         }
-        
+
         try
         {
             var classExercises = await _classesService.GetClassExercisesAsync(classId);
@@ -236,10 +237,11 @@ public class ClassesController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
+
     [Authorize]
-    [HttpPost("/existing-participation")]
-    public async Task<IActionResult> AddClassForExistingParticipation([FromBody] AddClassForExistingParticipationDTO dto)
+    [HttpPost]
+    public async Task<IActionResult> AddClassWithNewParticipation(
+        [FromBody] AddClassWithParticipationDTO dto)
     {
         var userId = User.GetUserId();
         if (userId == null)
@@ -247,18 +249,24 @@ public class ClassesController : ControllerBase
             return Unauthorized();
         }
 
-        if (dto == null || dto.CourseId == Guid.Empty)
+        if (dto == null || dto.CourseId == Guid.Empty || dto.LanguageId == Guid.Empty ||
+            dto.LevelId == Guid.Empty)
         {
             return BadRequest("Invalid request payload.");
         }
 
         try
         {
-            var success = await _classesService.AddClassForExistingParticipation(userId.Value, dto.CourseId, dto.StartTime);
+            var success = await _classesService.AddClassWithParticipationAsync(
+                userId.GetValueOrDefault(), dto.CourseId, dto.StartTime, dto.LevelId,
+                dto.LanguageId);
+            
             if (!success)
+            {
                 return Forbid();
+            }
 
-            return Created();
+            return Created(string.Empty, null);
         }
         catch (ArgumentException e)
         {

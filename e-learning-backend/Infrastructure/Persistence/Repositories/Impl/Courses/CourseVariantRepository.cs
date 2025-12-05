@@ -48,4 +48,15 @@ public class CourseVariantRepository : ICourseVariantRepository
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task<CourseVariant?> GetByAttributesAsync(Guid courseId, Guid levelId, Guid languageId)
+    {
+        return await _context.CourseVariants
+            .Include(v => v.Level)
+            .Include(v => v.Language)
+            .SingleOrDefaultAsync(v =>
+                v.CourseId == courseId &&
+                v.Level.Id == levelId &&
+                v.Language.Id == languageId);
+    }
 }

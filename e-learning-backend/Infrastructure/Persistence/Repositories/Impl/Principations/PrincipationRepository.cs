@@ -1,4 +1,6 @@
-﻿using e_learning_backend.Domain.Participations;
+﻿using e_learning_backend.Domain.Courses;
+using e_learning_backend.Domain.Participations;
+using e_learning_backend.Domain.Users;
 using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using Microsoft.EntityFrameworkCore;
@@ -104,4 +106,13 @@ public class ParticipationRepository : IParticipationRepository
             .Include(p => p.Review)
             .Include(p => p.Classes)
             .ToListAsync();
+    
+    public async Task<Participation> AddAsync(User user, CourseVariant courseVariant)
+    {
+        var participation = new Participation(user, courseVariant);
+        await _context.Participations.AddAsync(participation);
+        await _context.SaveChangesAsync();
+
+        return participation;
+    }
 }

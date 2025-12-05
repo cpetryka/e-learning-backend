@@ -6,6 +6,7 @@ using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
 using e_learning_backend.Infrastructure.Security.Impl.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 
 public class ClassesService : IClassesService
 {
@@ -13,16 +14,22 @@ public class ClassesService : IClassesService
     private readonly ILinkResourcesRepository _linkResourcesRepository;
     private readonly IParticipationRepository _participationRepository;
     private readonly ITeacherRepository _teacherRepository;
+    private readonly ICourseVariantRepository _courseVariantRepository;
+    private readonly IUsersRepository _usersRepository;
 
     public ClassesService(IClassRepository repository,
-        ILinkResourcesRepository linkResourcesRepository, 
+        ILinkResourcesRepository linkResourcesRepository,
         IParticipationRepository participationRepository,
-        ITeacherRepository teacherRepository)
+        ITeacherRepository teacherRepository,
+        ICourseVariantRepository courseVariantRepository,
+        IUsersRepository usersRepository)
     {
         _repository = repository;
         _linkResourcesRepository = linkResourcesRepository;
         _participationRepository = participationRepository;
         _teacherRepository = teacherRepository;
+        _courseVariantRepository = courseVariantRepository;
+        _usersRepository = usersRepository;
     }
 
     /// <summary>
@@ -171,12 +178,13 @@ public class ClassesService : IClassesService
                     CourseName = link.Class.Participation.CourseVariant.Course.Name ?? ""
                 });
 
-                links = cls.LinkToMeeting != null ? new[]
+                links = cls.LinkToMeeting != null
+                    ? new[]
                         {
                             new GetClassLinkDTO
                             {
-                                Id = Guid.Empty, 
-                                Path = cls.LinkToMeeting, 
+                                Id = Guid.Empty,
+                                Path = cls.LinkToMeeting,
                                 IsMeeting = true,
                                 CourseName = cls.Participation.CourseVariant.Course.Name ?? ""
                             }
@@ -242,8 +250,9 @@ public class ClassesService : IClassesService
                 return exercises;
             });
     }
-
-    public async Task<bool> AddClassForExistingParticipation(Guid studentId, Guid courseId, DateTime startTime)
+    
+    public async Task<bool> AddClassWithParticipationAsync(Guid studentId, Guid courseId, 
+        DateTime startTime, Guid? levelId, Guid? languageId)
     {
         if (studentId == Guid.Empty)
         {
@@ -255,21 +264,56 @@ public class ClassesService : IClassesService
             throw new ArgumentException("Invalid course id.", nameof(courseId));
         }
 
-        // Resolve participation by composite key
-        var participation = await _participationRepository.GetByIdAsync(studentId, courseId);
+        // Ensure participation exists or create it
+        var participation =
+            await _participationRepository.GetByIdAsync(studentId, courseId);
         if (participation == null)
         {
-            Console.WriteLine("Participation not found for studentId: " + studentId + ", courseId: " + courseId);
-            return false;
+            // We need levelId and languageId only if participation does not exist
+            // to find the correct course variant and create participation
+            if (levelId == Guid.Empty || levelId == null)
+            {
+                throw new ArgumentException("Invalid level id.", nameof(levelId));
+            }
+
+            if (languageId == Guid.Empty || languageId == null)
+            {
+                throw new ArgumentException("Invalid language id.", nameof(languageId));
+            }
+            
+            // Find existing course variant by courseId + levelId + languageId
+            var variant = await _courseVariantRepository.GetByAttributesAsync(
+                courseId, levelId.GetValueOrDefault(), languageId.GetValueOrDefault());
+            if (variant == null)
+            {
+                Console.WriteLine(
+                    $"CourseVariant not found for course:{courseId}, level:{levelId}, language:{languageId}");
+                return false;
+            }
+            
+            // Find student user
+            var student = await _usersRepository.GetByIdAsync(studentId);
+            if (student == null)
+            {
+                Console.WriteLine("Student user not found: " + studentId);
+                return false;
+            }
+            
+            participation = await _participationRepository.AddAsync(student, variant);
+            if (participation == null)
+            {
+                Console.WriteLine("Failed to create participation for student:" + studentId);
+                return false;
+            }
         }
 
-        // Ensure the participation belongs to the student (redundant check but kept for safety)
+        // Ensure the participation belongs to the student
         if (participation.UserId != studentId)
         {
             Console.WriteLine("Participation userId does not match studentId.");
             return false;
         }
-        
+
         // Ensure teacher availability
         var teacher = participation.CourseVariant?.Course?.Teacher;
         if (teacher == null || teacher.Id == Guid.Empty)
@@ -281,13 +325,14 @@ public class ClassesService : IClassesService
         var teacherAvailability = await _teacherRepository.GetTeacherAvailabilityAsync(teacher.Id);
         if (teacherAvailability == null || !teacherAvailability.Any())
         {
-            Console.WriteLine("Teacher not found for the course.");
+            Console.WriteLine("Teacher not found for the course or none availability.");
             return false;
         }
 
         var requestedDate = DateOnly.FromDateTime(startTime);
         var dayAvailability = teacherAvailability.FirstOrDefault(d => d.Day == requestedDate);
-        if (dayAvailability == null || dayAvailability.Timeslots == null || !dayAvailability.Timeslots.Any())
+        if (dayAvailability == null || dayAvailability.Timeslots == null ||
+            !dayAvailability.Timeslots.Any())
         {
             Console.WriteLine("Teacher is not available on the requested date: " + requestedDate);
             return false;

@@ -1,4 +1,6 @@
-﻿using e_learning_backend.Domain.Participations;
+﻿using e_learning_backend.Domain.Courses;
+using e_learning_backend.Domain.Participations;
+using e_learning_backend.Domain.Users;
 using e_learning_backend.Infrastructure.Api.DTO;
 
 namespace e_learning_backend.Infrastructure.Persistence.Repositories;
@@ -14,4 +16,5 @@ public interface IParticipationRepository
     Task<IEnumerable<Participation>> GetByUserIdAsync(Guid userId);
     Task<IEnumerable<ParticipationBriefDTO>> GetBriefByUserIdAsync(Guid userId);
     Task<IEnumerable<Participation>> GetByCourseIdAsync(Guid courseId);
+    Task<Participation> AddAsync(User user, CourseVariant courseVariant);
 }

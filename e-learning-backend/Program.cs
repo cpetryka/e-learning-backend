@@ -175,7 +175,7 @@ builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
 builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
 builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
 builder.Services.AddScoped<ILinkResourcesRepository, LinkResourcesRepository>();
-
+builder.Services.AddScoped<ICourseVariantRepository, CourseVariantRepository>();
 
 
 builder.Services.AddScoped<ISpectatorsService, SpectatorsService>();
