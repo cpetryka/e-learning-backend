@@ -9,6 +9,7 @@ public interface IFileResourceRepository
     Task<FileResource?> GetByIdAsync(Guid id);
     Task<IEnumerable<FileResource>> GetAllAsync();
     Task AddAsync(FileResource file);
+    Task UpdateAsync(FileResource file);
     Task<bool> DeleteFileAsync(Guid id,CancellationToken ct = default);
 
     Task<(List<GetFileDTO>, int TotalCount)> GetFilesConnectedToUser(
