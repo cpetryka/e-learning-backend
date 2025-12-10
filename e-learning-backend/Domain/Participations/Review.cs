@@ -8,6 +8,8 @@ public class Review
     public int StarsNumber { get; set; }
     public String Content { get; set; }
     
+    public Guid ParticipationUserId { get; set; }
+    public Guid ParticipationCourseVariantId { get; set; }
     public Participation Participation { get; set; }
 
     protected Review() { }

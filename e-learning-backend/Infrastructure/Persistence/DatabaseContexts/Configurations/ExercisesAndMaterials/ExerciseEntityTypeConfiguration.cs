@@ -30,7 +30,7 @@ public class ExerciseEntityTypeConfiguration : IEntityTypeConfiguration<Exercise
 
         builder.HasMany(e => e.ExerciseResources)
             .WithOne(er => er.Exercise)
-            .HasForeignKey(er => er.ExerciseId)
+            .HasForeignKey(er => new { er.ExerciseId, er.FileId })
             .OnDelete(DeleteBehavior.Cascade);
 
         // Sample seed (optional)

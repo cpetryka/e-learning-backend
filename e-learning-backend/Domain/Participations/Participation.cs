@@ -12,7 +12,7 @@ public class Participation
     public Guid CourseVariantId { get; set; }
     public CourseVariant CourseVariant { get; set; }
     
-    public Guid? ReviewId { get;set; }
+    /*public Guid? ReviewId { get;set; }*/
     public Review? Review { get; set; }
     
     public bool Notifications { get; set; } // For a teacher
@@ -53,6 +53,6 @@ public class Participation
         }
 
         Review = new Review(starsNumber, content, this);
-        ReviewId = Review.Id;
+        /*ReviewId = Review.Id;*/
     }
 }

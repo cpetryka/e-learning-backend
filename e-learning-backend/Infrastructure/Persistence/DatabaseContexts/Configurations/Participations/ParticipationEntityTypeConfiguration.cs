@@ -18,9 +18,9 @@ public class ParticipationEntityTypeConfiguration : IEntityTypeConfiguration<Par
             .WithMany(c => c.Participations)
             .HasForeignKey(p => p.CourseVariantId);
 
-        builder.HasOne(p => p.Review)
+        /*builder.HasOne(p => p.Review)
             .WithOne(r => r.Participation)
-            .HasForeignKey<Participation>(p => p.ReviewId);
+            .HasForeignKey<Participation>(p => p.ReviewId);*/
 
         builder.Property(p => p.Notifications);
 
