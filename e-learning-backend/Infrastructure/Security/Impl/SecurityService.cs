@@ -86,7 +86,9 @@ public class SecurityService : ISecurityService
             email: dto.Email,
             hashedPassword: BCrypt.Net.BCrypt.HashPassword(dto.Password),
             phone: dto.Phone,
-            Role.FromString(dto.AccountType.Trim()));
+            initialRole: Role.FromString(dto.AccountType.Trim()),
+            aboutMe: dto.AboutMe
+        );
 
         // generate tokens
         var accessToken = GenerateAccessToken(domainUser);
