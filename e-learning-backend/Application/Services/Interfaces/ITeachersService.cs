@@ -7,7 +7,7 @@ public interface ITeacherService
     Task<TeacherDTO?> GetTeacherAsync(Guid teacherId);
     Task<IEnumerable<TeacherReviewDTO>> GetTeacherReviewsAsync(Guid teacherId);
     Task<List<TeacherAvailabilityDTO>> GetTeacherAvailabilityAsync(Guid teacherId);
-    Task<bool> AddAvailabilityAsync(Guid teacherId, List<AddDayAvailabilityDTO> availability, CancellationToken ct = default);
+    Task<bool> AddAvailabilityAsync(Guid teacherId, List<TeacherAvailabilityDTO> availability, CancellationToken ct = default);
     Task<IEnumerable<StudentBriefDTO>> GetStudentsByTeacherIdAsync(Guid teacherId);
     Task<IEnumerable<CourseBriefDTO>> GetCoursesByTeacherIdAsync(Guid teacherId);
     Task<IEnumerable<StudentBriefDTO>> GetStudentsByTeacherIdAndCourseIdAsync(Guid teacherId, Guid courseId);

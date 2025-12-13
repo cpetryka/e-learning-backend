@@ -100,7 +100,7 @@ public class TeachersService : ITeacherService
         return await _teacherRepository.GetExercisesToGradeAsync(teacherId, courseIds, studentIds);
     }
 
-    public async Task<bool> AddAvailabilityAsync(Guid teacherId, List<AddDayAvailabilityDTO> availability, CancellationToken ct = default)
+    public async Task<bool> AddAvailabilityAsync(Guid teacherId, List<TeacherAvailabilityDTO> availability, CancellationToken ct = default)
     {
         return await _teacherRepository.AddAvailabilityAsync(teacherId, availability, ct);
     }

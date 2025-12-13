@@ -429,7 +429,7 @@ public class TeacherRepository : ITeacherRepository
             .ToListAsync();
     }
 
-    public async Task<bool> AddAvailabilityAsync(Guid teacherId, List<AddDayAvailabilityDTO> availability, CancellationToken ct = default)
+    public async Task<bool> AddAvailabilityAsync(Guid teacherId, List<TeacherAvailabilityDTO> availability, CancellationToken ct = default)
     {
         var teacher = await _context.Users.FindAsync(new object[] { teacherId }, ct);
         if (teacher == null)
@@ -437,9 +437,7 @@ public class TeacherRepository : ITeacherRepository
 
         foreach (var dayAvailability in availability)
         {
-            if (!DateOnly.TryParse(dayAvailability.Day, out var date))
-                continue;
-
+            var date = dayAvailability.Day;
             var dateTime = date.ToDateTime(TimeOnly.MinValue);
 
             var existingAvailability = await _context.Availabilities
@@ -461,9 +459,8 @@ public class TeacherRepository : ITeacherRepository
 
             foreach (var timeslotDto in dayAvailability.Timeslots)
             {
-                if (!TimeOnly.TryParse(timeslotDto.TimeFrom, out var timeFrom) ||
-                    !TimeOnly.TryParse(timeslotDto.TimeUntil, out var timeUntil))
-                    continue;
+                var timeFrom = timeslotDto.TimeFrom;
+                var timeUntil = timeslotDto.TimeUntil;
 
                 var startDateTime = dateTime.Date.Add(timeFrom.ToTimeSpan());
                 var endDateTime = dateTime.Date.Add(timeUntil.ToTimeSpan());

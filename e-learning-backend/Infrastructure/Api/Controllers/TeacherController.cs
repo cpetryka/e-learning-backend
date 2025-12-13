@@ -52,7 +52,7 @@ public class TeacherController : ControllerBase
 
     [HttpPost("{teacherId:guid}/availability")]
     [Authorize]
-    public async Task<IActionResult> AddAvailability(Guid teacherId, [FromBody] List<AddDayAvailabilityDTO> availability, CancellationToken ct = default)
+    public async Task<IActionResult> AddAvailability(Guid teacherId, [FromBody] List<TeacherAvailabilityDTO> availability, CancellationToken ct = default)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userId, out var currentUserId))
