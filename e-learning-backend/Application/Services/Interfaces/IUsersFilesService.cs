@@ -23,4 +23,5 @@ public interface IUsersFilesService
     Task<bool> DeleteFile(Guid userId, Guid fileId, CancellationToken ct = default);
     Task<List<string>> GetFileExtensionsByUserIdAsync(Guid userId, CancellationToken ct = default);
     Task<List<ClassFileOwnerDTO>> GetClassFileOwnersAsync(Guid userId, CancellationToken ct = default);
+    Task<bool> UpdateFileAsync(Guid userId, Guid fileId, UpdateFileDTO updateFileDto, CancellationToken ct = default);
 }

@@ -49,6 +49,25 @@ public class TeacherController : ControllerBase
 
         return Ok(availability);
     }
+
+    [HttpPost("{teacherId:guid}/availability")]
+    [Authorize]
+    public async Task<IActionResult> AddAvailability(Guid teacherId, [FromBody] List<TeacherAvailabilityDTO> availability, CancellationToken ct = default)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userId, out var currentUserId))
+            return Unauthorized("Invalid or missing user identifier.");
+
+        if (currentUserId != teacherId)
+            return Forbid("You can only add availability for yourself.");
+
+        var success = await _teacherService.AddAvailabilityAsync(teacherId, availability, ct);
+        
+        if (!success)
+            return BadRequest("Failed to add availability.");
+
+        return NoContent();
+    }
     
     [HttpGet("{teacherId}/students")]
     public async Task<ActionResult<List<TeacherAvailabilityDTO>>> GetStudents(Guid teacherId)

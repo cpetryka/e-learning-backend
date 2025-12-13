@@ -234,6 +234,56 @@ namespace e_learning_backend.Application.Services.Interfaces
             return true;
         }
 
+        public async Task<bool> UpdateFileAsync(Guid userId, Guid fileId, UpdateFileDTO updateFileDto, CancellationToken ct = default)
+        {
+            if (userId == Guid.Empty || fileId == Guid.Empty)
+                return false;
+
+            var file = await _fileResourceRepo.GetByIdAsync(fileId);
+            if (file == null)
+                return false;
+
+            if (file.UserId != userId)
+                return false;
+
+            if (!string.IsNullOrWhiteSpace(updateFileDto.FileName) && updateFileDto.FileName != file.Name)
+            {
+                var ext = Path.GetExtension(file.Name) ?? string.Empty;
+                var safeName = SanitizeFileName(Path.GetFileNameWithoutExtension(updateFileDto.FileName)) + ext;
+                file.Name = safeName;
+            }
+
+            var currentTagIds = file.Tags.Select(t => t.Id).ToHashSet();
+            var requestedTagIds = updateFileDto.Tags?.Select(t => t.Id).ToHashSet() ?? new HashSet<Guid>();
+
+            var tagsToRemove = currentTagIds.Except(requestedTagIds).ToList();
+            var tagsToAdd = requestedTagIds.Except(currentTagIds).ToList();
+
+            foreach (var tagId in tagsToRemove)
+            {
+                var tag = file.Tags.FirstOrDefault(t => t.Id == tagId);
+                if (tag != null)
+                {
+                    file.RemoveTag(tag);
+                }
+            }
+
+            foreach (var tagDto in updateFileDto.Tags ?? new List<FileTagDTO>())
+            {
+                if (tagsToAdd.Contains(tagDto.Id))
+                {
+                    var tag = await _tagRepo.GetByIdAsync(tagDto.Id);
+                    if (tag != null)
+                    {
+                        file.AddTag(tag);
+                    }
+                }
+            }
+
+            await _fileResourceRepo.UpdateAsync(file);
+            return true;
+        }
+
      
 
 

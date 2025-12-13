@@ -25,4 +25,5 @@ public interface ITeacherRepository
     Task<IEnumerable<ExerciseBriefDTO>> GetExercisesToGradeAsync(
         Guid teacherId, List<Guid>? courseIds = null, List<Guid>? studentIds = null);
     Task<IEnumerable<GetExerciseDTO>> GetAllExercisesByTeacherIdAsync(Guid teacherId, Guid? courseId, Guid? studentId);
+    Task<bool> AddAvailabilityAsync(Guid teacherId, List<TeacherAvailabilityDTO> availability, CancellationToken ct = default);
 }

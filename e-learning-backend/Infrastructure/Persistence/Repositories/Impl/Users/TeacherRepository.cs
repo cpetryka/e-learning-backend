@@ -428,4 +428,54 @@ public class TeacherRepository : ITeacherRepository
             })
             .ToListAsync();
     }
+
+    public async Task<bool> AddAvailabilityAsync(Guid teacherId, List<TeacherAvailabilityDTO> availability, CancellationToken ct = default)
+    {
+        var teacher = await _context.Users.FindAsync(new object[] { teacherId }, ct);
+        if (teacher == null)
+            return false;
+
+        foreach (var dayAvailability in availability)
+        {
+            var date = dayAvailability.Day;
+            var dateTime = date.ToDateTime(TimeOnly.MinValue);
+
+            var existingAvailability = await _context.Availabilities
+                .Include(a => a.TimeSlots)
+                .FirstOrDefaultAsync(a => a.TeacherId == teacherId && 
+                    DateOnly.FromDateTime(a.Date) == date, ct);
+
+            if (existingAvailability != null)
+            {
+                var existingTimeSlots = existingAvailability.TimeSlots.ToList();
+                foreach (var timeSlot in existingTimeSlots)
+                {
+                    existingAvailability.RemoveTimeSlot(timeSlot);
+                    _context.TimeSlots.Remove(timeSlot);
+                }
+            }
+
+            var availabilityEntity = existingAvailability ?? new Availability(dateTime, teacher);
+
+            foreach (var timeslotDto in dayAvailability.Timeslots)
+            {
+                var timeFrom = timeslotDto.TimeFrom;
+                var timeUntil = timeslotDto.TimeUntil;
+
+                var startDateTime = dateTime.Date.Add(timeFrom.ToTimeSpan());
+                var endDateTime = dateTime.Date.Add(timeUntil.ToTimeSpan());
+
+                var timeSlot = new TimeSlot(startDateTime, endDateTime, availabilityEntity);
+                availabilityEntity.AddTimeSlot(timeSlot);
+            }
+
+            if (existingAvailability == null)
+            {
+                await _context.Availabilities.AddAsync(availabilityEntity, ct);
+            }
+        }
+
+        await _context.SaveChangesAsync(ct);
+        return true;
+    }
 }

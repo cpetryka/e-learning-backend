@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using e_learning_backend.Application.Files;
 using e_learning_backend.Application.Services;
+using e_learning_backend.Infrastructure.Api.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -114,6 +115,21 @@ public class UserFilesController : ControllerBase
         
     }
     
+    [HttpPut("{fileId:guid}")]
+    [Authorize]
+    public async Task<IActionResult> UpdateFile(Guid fileId, [FromBody] UpdateFileDTO updateFileDto, CancellationToken ct = default)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userId, out var currentUserId))
+            return Unauthorized("Invalid or missing user identifier.");
+
+        var success = await _service.UpdateFileAsync(currentUserId, fileId, updateFileDto, ct);
+        
+        if (!success)
+            return Forbid("File not found or you don't have permission to update it.");
+
+        return NoContent();
+    }
 
     [HttpGet("extensions")]
     [Authorize]
