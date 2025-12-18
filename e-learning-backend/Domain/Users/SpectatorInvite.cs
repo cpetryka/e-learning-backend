@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-using e_learning_backend.Domain.Users;
-using Microsoft.AspNetCore.WebUtilities;
+﻿using e_learning_backend.Domain.Users;
 
 /// <summary>
 /// Represents an invitation allowing a spectator to gain access to observe a specific user (the spectated one)
