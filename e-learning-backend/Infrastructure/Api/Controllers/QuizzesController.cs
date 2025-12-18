@@ -111,12 +111,15 @@ public class QuizzesController : ControllerBase
         if (userId == null)
             return Unauthorized();
 
-        var category = await _quizzesService.CreateQuestionCategoryAsync(userId.Value, categoryDto.Name);
-
-        if (category == null)
-            return StatusCode(500, "Failed to create category.");
-
-        return Ok(category);
+        try
+        {
+            var category = await _quizzesService.CreateQuestionCategoryAsync(userId.Value, categoryDto.Name);
+            return Ok(category);
+        }
+        catch (InvalidOperationException e)
+        {
+            return BadRequest(e.Message);
+        }
     }
     
     [HttpPost("question")]

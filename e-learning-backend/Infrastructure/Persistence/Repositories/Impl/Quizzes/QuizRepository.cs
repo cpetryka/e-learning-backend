@@ -211,6 +211,14 @@ public class QuizRepository : IQuizRepository
 
     public async Task<QuestionCategoryDTO> CreateQuestionCategoryAsync(Guid userId, string categoryName)
     {
+        var existingCategory = await _context.QuestionCategories
+            .FirstOrDefaultAsync(qc => qc.TeacherId == userId && qc.Name == categoryName);
+        
+        if (existingCategory != null)
+        {
+            throw new InvalidOperationException($"Question category with name '{categoryName}' already exists.");
+        }
+        
         var category = new QuestionCategory(Guid.NewGuid(), categoryName, "", userId);
 
         _context.QuestionCategories.Add(category);
