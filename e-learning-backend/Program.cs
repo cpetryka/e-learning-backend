@@ -5,8 +5,6 @@ using e_learning_backend.Application.Files.Validation;
 using e_learning_backend.Application.Files.Validation.Interfaces;
 using e_learning_backend.Application.Services;
 using e_learning_backend.Application.Services.Interfaces;
-using e_learning_backend.Infrastructure.Configuration;
-using e_learning_backend.Infrastructure.Configuration.Impl;
 using e_learning_backend.Infrastructure.FileStorage;
 using e_learning_backend.Infrastructure.Persistence.DatabaseContexts;
 using e_learning_backend.Infrastructure.Persistence.Repositories;
@@ -157,7 +155,6 @@ Directory.CreateDirectory(uploadsPath);
 // --------------------------------------------------------------------------------------------------------
 // "BEANS" CONFIGURATION (DI)
 // --------------------------------------------------------------------------------------------------------
-builder.Services.AddSingleton<IJsonConfigurationProvider, JsonConfigurationProvider>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();

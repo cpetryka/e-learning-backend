@@ -8,7 +8,7 @@ namespace E_Learning.Infrastructure.Email;
 /// <summary>
 /// Provides an SMTP-based email sender implementation using configuration from <see cref="SmtpOptions"/>.
 /// </summary>
-public  class SmtpEmailSender : IEmailSender
+public class SmtpEmailSender : IEmailSender
 {
     private readonly SmtpOptions _options;
 

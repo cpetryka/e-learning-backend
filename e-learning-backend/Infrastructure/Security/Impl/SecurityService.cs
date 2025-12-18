@@ -38,7 +38,8 @@ public class SecurityService : ISecurityService
         if (existingUser != null)
         {
             // If user already has the role
-            if (existingUser.Roles.Any(r => r.RoleName.ToLowerInvariant() == requestedRoleNameNormalized))
+            if (existingUser.Roles.Any(r =>
+                    r.RoleName.ToLowerInvariant() == requestedRoleNameNormalized))
             {
                 return new AuthorizationResultDto
                 {
@@ -46,7 +47,7 @@ public class SecurityService : ISecurityService
                     Errors = new[] { "User already exists" }
                 };
             }
-            
+
             // Check the provided password
             if (!BCrypt.Net.BCrypt.Verify(dto.Password, existingUser.HashedPassword))
             {

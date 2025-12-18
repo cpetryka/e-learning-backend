@@ -1,5 +1,4 @@
-﻿
-using e_learning_backend.Application.Files;
+﻿using e_learning_backend.Application.Files;
 using Microsoft.Extensions.Options;
 
 namespace e_learning_backend.Infrastructure.FileStorage
@@ -22,7 +21,8 @@ namespace e_learning_backend.Infrastructure.FileStorage
         public LocalDiskFileStorage(IOptions<FileUploadOptions> options)
         {
             _rootPath = options.Value.RootPath
-                        ?? throw new InvalidOperationException("FileUploadOptions.RootPath cannot be null.");
+                        ?? throw new InvalidOperationException(
+                            "FileUploadOptions.RootPath cannot be null.");
         }
 
         /// <summary>
@@ -36,7 +36,8 @@ namespace e_learning_backend.Infrastructure.FileStorage
         /// Existing files with the same name will cause an <see cref="IOException"/> because 
         /// the file mode is set to <see cref="FileMode.CreateNew"/>.
         /// </remarks>
-        public async Task SaveAsync(string relativePath, Stream content, CancellationToken ct = default)
+        public async Task SaveAsync(string relativePath, Stream content,
+            CancellationToken ct = default)
         {
             var fullPath = Path.Combine(_rootPath, relativePath.Replace('\\', '/'));
             var dir = Path.GetDirectoryName(fullPath)!;
@@ -59,13 +60,14 @@ namespace e_learning_backend.Infrastructure.FileStorage
         /// </summary>
         /// <param name="userFolder">The relative folder path to list files from.</param>
         /// <param name="ct">Optional cancellation token to abort the operation.</param>
-        
-        public Task<IReadOnlyList<(string RelativePath, string Name)>> ListAsync(string userFolder, CancellationToken ct = default)
+        public Task<IReadOnlyList<(string RelativePath, string Name)>> ListAsync(string userFolder,
+            CancellationToken ct = default)
         {
             var folder = Path.Combine(_rootPath, userFolder.Replace('\\', '/'));
 
             if (!Directory.Exists(folder))
-                return Task.FromResult<IReadOnlyList<(string, string)>>(Array.Empty<(string, string)>());
+                return Task.FromResult<IReadOnlyList<(string, string)>>(
+                    Array.Empty<(string, string)>());
 
             var files = Directory.GetFiles(folder)
                 .Select(p => (
@@ -81,7 +83,6 @@ namespace e_learning_backend.Infrastructure.FileStorage
         /// </summary>
         /// <param name="relativePath">The relative path of the file to delete (within the root directory).</param>
         /// <param name="ct">Optional cancellation token to abort the operation.</param>
-        
         public Task DeleteAsync(string relativePath, CancellationToken ct = default)
         {
             var fullPath = Path.Combine(_rootPath, relativePath.Replace('\\', '/'));

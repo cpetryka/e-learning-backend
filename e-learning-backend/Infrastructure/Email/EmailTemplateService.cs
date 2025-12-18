@@ -1,12 +1,9 @@
-﻿using Microsoft.Extensions.Hosting;
-
-namespace E_Learning.Infrastructure.Email;
+﻿namespace E_Learning.Infrastructure.Email;
 
 public interface IEmailTemplateService
 {
     string RenderHtml(string templateName, IDictionary<string, string> model);
 }
-
 
 /// <summary>
 /// Provides functionality for rendering email templates by replacing placeholders in
@@ -24,18 +21,17 @@ public class EmailTemplateService : IEmailTemplateService
     {
         _templatesRoot = Path.Combine(env.ContentRootPath, "Infrastructure", "Email", "Templates");
     }
-    
+
     /// <summary>
     /// Renders an HTML email template by replacing all placeholders with the corresponding values from the model.
     /// </summary>
     /// <param name="templateName">The name of the HTML template file (without the <c>.html</c> extension).</param>
     /// <param name="model">A dictionary containing key-value pairs used to replace placeholders in the template.</param>
     /// <returns>The rendered HTML content as a string.</returns>
-    
     public string RenderHtml(string templateName, IDictionary<string, string> model)
         => Render(Path.Combine(_templatesRoot, templateName + ".html"), model);
-    
-    
+
+
     /// <summary>
     /// Reads the specified template file and replaces all placeholders in the format <c>{{Key}}</c>
     /// with their corresponding values from the provided model.
@@ -53,6 +49,7 @@ public class EmailTemplateService : IEmailTemplateService
         {
             content = content.Replace("{{" + kv.Key + "}}", kv.Value ?? string.Empty);
         }
+
         return content;
     }
 }
