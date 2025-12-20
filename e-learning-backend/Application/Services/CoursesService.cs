@@ -325,7 +325,9 @@ public async Task<PagedResult<CourseWidgetDTO>> GetCoursesAsync(
                 .Select(v => new CourseVariantDTO
                 {
                     LanguageName = v.Language?.Name ?? "Unknown",
+                    LanguageId = v.Language.Id,
                     LevelName = v.Level?.Name ?? "Unknown",
+                    LevelId = v.Level.Id,
                     Price = v.Rate?.Amount ?? 0
                 }).ToList() ?? new List<CourseVariantDTO>(),
             Teacher = teacherDto,
