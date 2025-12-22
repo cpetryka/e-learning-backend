@@ -39,7 +39,7 @@ public class SpectatorInviteRepository : ISpectatorInviteRepository
             .AnyAsync(i =>
                 EF.Property<Guid>(i, "SpectatedId") == spectatedId &&
                 EF.Property<Guid>(i, "SpectatorId") == spectatorId &&
-                !i.Accepted &&
+                i.AcceptedAtUtc == null &&
                 i.ExpiresAtUtc > DateTime.UtcNow);
     }
 
@@ -98,7 +98,7 @@ public class SpectatorInviteRepository : ISpectatorInviteRepository
         var exists = await _context.SpectatorInvites
             .AnyAsync(i => EF.Property<Guid>(i, "SpectatedId") == student.Id &&
                           EF.Property<Guid>(i, "SpectatorId") == spectator.Id &&
-                          i.Accepted, ct);
+                          i.AcceptedAtUtc != null, ct);
 
         if (exists)
             return true;
@@ -110,7 +110,7 @@ public class SpectatorInviteRepository : ISpectatorInviteRepository
         var stillExists = await _context.SpectatorInvites
             .AnyAsync(i => EF.Property<Guid>(i, "SpectatedId") == student.Id &&
                           EF.Property<Guid>(i, "SpectatorId") == spectator.Id &&
-                          i.Accepted, ct);
+                          i.AcceptedAtUtc != null, ct);
 
         if (!stillExists)
         {
@@ -118,7 +118,7 @@ public class SpectatorInviteRepository : ISpectatorInviteRepository
             var pendingInvite = await _context.SpectatorInvites
                 .Where(i => EF.Property<Guid>(i, "SpectatedId") == student.Id &&
                            EF.Property<Guid>(i, "SpectatorId") == spectator.Id &&
-                           !i.Accepted)
+                           i.AcceptedAtUtc == null)
                 .FirstOrDefaultAsync(ct);
 
             if (pendingInvite != null)
@@ -132,7 +132,6 @@ public class SpectatorInviteRepository : ISpectatorInviteRepository
                 var newInvite = new SpectatorInvite(
                     spectated: student,
                     spectator: spectator,
-                    email: spectator.Email,
                     token: Guid.NewGuid().ToString(),
                     expiresAtUtc: DateTime.UtcNow.AddYears(100) // Far future expiration
                 );

@@ -35,7 +35,7 @@ public class SpectatorsRepository : ISpectatorsRepository
         var spectators = await _context.SpectatorInvites
             .AsNoTracking()
             .Include(i => i.Spectator)
-            .Where(i => EF.Property<Guid>(i, "SpectatedId") == userId && i.Accepted)
+            .Where(i => EF.Property<Guid>(i, "SpectatedId") == userId && i.AcceptedAtUtc != null)
             .Select(i => new SpectatorDTO
             {
                 Id = i.Spectator.Id,
@@ -75,7 +75,7 @@ public class SpectatorsRepository : ISpectatorsRepository
         var invite = await _context.SpectatorInvites
             .Where(i => EF.Property<Guid>(i, "SpectatedId") == spectatedId &&
                         EF.Property<Guid>(i, "SpectatorId") == spectatorId &&
-                        i.Accepted)
+                        i.AcceptedAtUtc != null)
             .FirstOrDefaultAsync();
 
         if (invite is null)
@@ -133,7 +133,7 @@ public class SpectatorsRepository : ISpectatorsRepository
         var exists = await _context.SpectatorInvites
             .AnyAsync(i => EF.Property<Guid>(i, "SpectatedId") == spectatedId &&
                           EF.Property<Guid>(i, "SpectatorId") == spectatorId &&
-                          i.Accepted);
+                          i.AcceptedAtUtc != null);
         if (exists)
             return false;
 
@@ -141,7 +141,6 @@ public class SpectatorsRepository : ISpectatorsRepository
         var invite = new SpectatorInvite(
             spectated: spectated,
             spectator: spectator,
-            email: spectator.Email,
             token: Guid.NewGuid().ToString(), // Generate a token for consistency
             expiresAtUtc: DateTime.UtcNow.AddYears(100) // Far future expiration
         );
@@ -157,7 +156,7 @@ public class SpectatorsRepository : ISpectatorsRepository
         return await _context.SpectatorInvites
             .AsNoTracking()
             .Include(i => i.Spectated)
-            .Where(i => EF.Property<Guid>(i, "SpectatorId") == spectatorId && i.Accepted)
+            .Where(i => EF.Property<Guid>(i, "SpectatorId") == spectatorId && i.AcceptedAtUtc != null)
             .Select(i => new StudentBriefDTO
             {
                 Id = i.Spectated.Id,
