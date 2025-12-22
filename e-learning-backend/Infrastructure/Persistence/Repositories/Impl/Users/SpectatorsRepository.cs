@@ -25,30 +25,27 @@ public class SpectatorsRepository : ISpectatorsRepository
     /// and an optional <c>Status</c> field (currently <c>null</c>).
     /// </returns>
     /// <remarks>
-    /// This method loads the <c>SpectatedBy</c> navigation property of the <see cref="User"/> entity
-    /// and projects each related spectator into a lightweight data transfer object (<see cref="SpectatorDTO"/>).
-    /// If the user does not exist or has no spectators, an empty collection is returned.
+    /// This method queries accepted <see cref="SpectatorInvite"/> entities where the spectated user matches
+    /// the specified user ID and projects each related spectator into a lightweight data transfer object (<see cref="SpectatorDTO"/>).
+    /// If the user does not exist or has no accepted spectators, an empty collection is returned.
     /// The results are ordered alphabetically by spectator email.
     /// </remarks>
     public async Task<IEnumerable<SpectatorDTO>> GetSpectatedByAsync(Guid userId)
     {
-        var user = await _context.Users
+        var spectators = await _context.SpectatorInvites
             .AsNoTracking()
-            .Include(u => u.SpectatedBy)
-            .SingleOrDefaultAsync(u => u.Id == userId);
-
-        if (user is null || user.SpectatedBy.Count == 0)
-            return Enumerable.Empty<SpectatorDTO>();
-
-        return user.SpectatedBy
-            .Select(s => new SpectatorDTO
+            .Include(i => i.Spectator)
+            .Where(i => EF.Property<Guid>(i, "SpectatedId") == userId && i.Accepted)
+            .Select(i => new SpectatorDTO
             {
-                Id = s.Id,
-                Email = s.Email,
+                Id = i.Spectator.Id,
+                Email = i.Spectator.Email,
                 Status = null
             })
             .OrderBy(x => x.Email)
-            .ToList();
+            .ToListAsync();
+
+        return spectators;
     }
 
 
@@ -67,39 +64,24 @@ public class SpectatorsRepository : ISpectatorsRepository
     /// otherwise, <c>false</c>.
     /// </returns>
     /// <remarks>
-    /// This method ensures that the spectatorship relationship between the two users
-    /// is removed consistently on both sides
-    /// The domain method <see cref="User.RemoveSpectator(User)"/> is invoked on the spectated user
-    /// to enforce aggregate invariants and maintain bidirectional consistency.
+    /// This method removes the accepted <see cref="SpectatorInvite"/> entity that represents the spectatorship
+    /// relationship between the two users. The invite is deleted from the database.
     /// </remarks>
     public async Task<bool> RemoveSpectatorAsync(Guid spectatorId, Guid spectatedId)
     {
         if (spectatorId == Guid.Empty || spectatedId == Guid.Empty)
             return false;
 
-        var spectator = await _context.Users
-            .Include(u => u.Spectates)
-            .SingleOrDefaultAsync(u => u.Id == spectatorId);
+        var invite = await _context.SpectatorInvites
+            .Where(i => EF.Property<Guid>(i, "SpectatedId") == spectatedId &&
+                        EF.Property<Guid>(i, "SpectatorId") == spectatorId &&
+                        i.Accepted)
+            .FirstOrDefaultAsync();
 
-        if (spectator is null)
+        if (invite is null)
             return false;
 
-        var spectated = await _context.Users
-            .Include(u => u.SpectatedBy)
-            .SingleOrDefaultAsync(u => u.Id == spectatedId);
-
-        if (spectated is null)
-            return false;
-
-        try
-        {
-            spectated.RemoveSpectator(spectator);
-        }
-        catch (InvalidOperationException)
-        {
-            return false;
-        }
-
+        _context.SpectatorInvites.Remove(invite);
         await _context.SaveChangesAsync();
         return true;
     }
@@ -127,17 +109,11 @@ public class SpectatorsRepository : ISpectatorsRepository
     /// </para>
     /// <list type="number">
     ///   <item><description>Ensures both users exist in the database.</description></item>
-    ///   <item><description>Prevents duplicate relationships.</description></item>
-    ///   <item><description>Ensures that only users with the <c>Student</c> role can be spectated.</description></item>
+    ///   <item><description>Prevents duplicate relationships by checking for existing accepted invites.</description></item>
     /// </list>
     /// <para>
-    /// The relationship is established using the domain method
-    /// <see cref="User.AddSpectator(User)"/>, which maintains bidirectional consistency
-    /// between the <c>SpectatedBy</c> and <c>Spectates</c> collections.
-    /// </para>
-    /// <para>
-    /// If the operation violates any business rules (e.g., missing role, invalid state),
-    /// an <see cref="InvalidOperationException"/> is caught and the method returns <c>false</c>.
+    /// The relationship is established by creating a new <see cref="SpectatorInvite"/> entity
+    /// that is immediately marked as accepted. This replaces the previous many-to-many relationship.
     /// </para>
     /// </remarks>
     public async Task<bool> AddSpectatorAsync(Guid spectatorId, Guid spectatedId)
@@ -146,8 +122,6 @@ public class SpectatorsRepository : ISpectatorsRepository
             return false;
 
         var spectated = await _context.Users
-            .Include(u => u.SpectatedBy)
-            .Include(u => u.Roles)
             .SingleOrDefaultAsync(u => u.Id == spectatedId);
         if (spectated is null) return false;
 
@@ -155,33 +129,40 @@ public class SpectatorsRepository : ISpectatorsRepository
             .SingleOrDefaultAsync(u => u.Id == spectatorId);
         if (spectator is null) return false;
 
-        if (spectated.SpectatedBy.Contains(spectator))
+        // Check if relationship already exists
+        var exists = await _context.SpectatorInvites
+            .AnyAsync(i => EF.Property<Guid>(i, "SpectatedId") == spectatedId &&
+                          EF.Property<Guid>(i, "SpectatorId") == spectatorId &&
+                          i.Accepted);
+        if (exists)
             return false;
 
-        try
-        {
-            spectated.AddSpectator(spectator);
-        }
-        catch (InvalidOperationException)
-        {
-            return false;
-        }
+        // Create a new accepted invite to represent the relationship
+        var invite = new SpectatorInvite(
+            spectated: spectated,
+            spectator: spectator,
+            email: spectator.Email,
+            token: Guid.NewGuid().ToString(), // Generate a token for consistency
+            expiresAtUtc: DateTime.UtcNow.AddYears(100) // Far future expiration
+        );
+        invite.AcceptInvite(); // Mark as accepted immediately
 
+        _context.SpectatorInvites.Add(invite);
         await _context.SaveChangesAsync();
         return true;
     }
 
     public async Task<IEnumerable<StudentBriefDTO>> GetSpectatedStudentsAsync(Guid spectatorId)
     {
-        return await _context.Users
+        return await _context.SpectatorInvites
             .AsNoTracking()
-            .Where(u => u.Id == spectatorId)
-            .SelectMany(u => u.Spectates)
-            .Select(s => new StudentBriefDTO
+            .Include(i => i.Spectated)
+            .Where(i => EF.Property<Guid>(i, "SpectatorId") == spectatorId && i.Accepted)
+            .Select(i => new StudentBriefDTO
             {
-                Id = s.Id,
-                Name = s.Name,
-                Surname = s.Surname
+                Id = i.Spectated.Id,
+                Name = i.Spectated.Name,
+                Surname = i.Spectated.Surname
             })
             .ToListAsync();
     }
