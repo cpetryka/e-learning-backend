@@ -39,7 +39,7 @@ public class SpectatorInviteRepository : ISpectatorInviteRepository
             .AnyAsync(i =>
                 EF.Property<Guid>(i, "SpectatedId") == spectatedId &&
                 EF.Property<Guid>(i, "SpectatorId") == spectatorId &&
-                !i.Accepted &&
+                i.AcceptedAtUtc == null &&
                 i.ExpiresAtUtc > DateTime.UtcNow);
     }
 
@@ -86,18 +86,19 @@ public class SpectatorInviteRepository : ISpectatorInviteRepository
     /// <c>true</c> if the relation exists or was successfully created; otherwise <c>false</c> if inputs are invalid.
     /// </returns>
     /// <remarks>
-    /// Performs an existence check, then repeats it inside a database transaction (double-check) to avoid races.
-    /// The domain rule <c>student.AddSpectator(spectator)</c> may enforce invariants (e.g., required roles).
+    /// Performs an existence check by looking for an accepted <see cref="SpectatorInvite"/>.
+    /// If no accepted invite exists, creates a new invite and marks it as accepted immediately.
+    /// Uses a transaction with double-check to avoid race conditions.
     /// </remarks>
     public async Task<bool> EnsureSpectatorshipAsync(User student, User spectator, CancellationToken ct = default)
     {
         if (student is null || spectator is null) return false;
 
         // Fast path: check without locking/trx
-        var exists = await _context.Users
-            .Where(u => u.Id == student.Id)
-            .SelectMany(u => u.SpectatedBy)
-            .AnyAsync(u => u.Id == spectator.Id, ct);
+        var exists = await _context.SpectatorInvites
+            .AnyAsync(i => EF.Property<Guid>(i, "SpectatedId") == student.Id &&
+                          EF.Property<Guid>(i, "SpectatorId") == spectator.Id &&
+                          i.AcceptedAtUtc != null, ct);
 
         if (exists)
             return true;
@@ -106,20 +107,37 @@ public class SpectatorInviteRepository : ISpectatorInviteRepository
         await using var tx = await _context.Database.BeginTransactionAsync(ct);
 
         // Double-check inside the transaction
-        var stillExists = await _context.Users
-            .Where(u => u.Id == student.Id)
-            .SelectMany(u => u.SpectatedBy)
-            .AnyAsync(u => u.Id == spectator.Id, ct);
+        var stillExists = await _context.SpectatorInvites
+            .AnyAsync(i => EF.Property<Guid>(i, "SpectatedId") == student.Id &&
+                          EF.Property<Guid>(i, "SpectatorId") == spectator.Id &&
+                          i.AcceptedAtUtc != null, ct);
 
         if (!stillExists)
         {
-            // Load navigations required by domain rule
-            await _context.Entry(student).Collection(u => u.Roles).LoadAsync(ct);
-            await _context.Entry(student).Collection(u => u.SpectatedBy).LoadAsync(ct);
-            await _context.Entry(spectator).Collection(u => u.Spectates).LoadAsync(ct);
+            // Check if there's a pending invite that we can accept
+            var pendingInvite = await _context.SpectatorInvites
+                .Where(i => EF.Property<Guid>(i, "SpectatedId") == student.Id &&
+                           EF.Property<Guid>(i, "SpectatorId") == spectator.Id &&
+                           i.AcceptedAtUtc == null)
+                .FirstOrDefaultAsync(ct);
 
-            // Domain rule (may throw if invariants are not met)
-            student.AddSpectator(spectator);
+            if (pendingInvite != null)
+            {
+                // Accept the existing invite
+                pendingInvite.AcceptInvite();
+            }
+            else
+            {
+                // Create a new invite and mark it as accepted immediately
+                var newInvite = new SpectatorInvite(
+                    spectated: student,
+                    spectator: spectator,
+                    token: Guid.NewGuid().ToString(),
+                    expiresAtUtc: DateTime.UtcNow.AddYears(100) // Far future expiration
+                );
+                newInvite.AcceptInvite();
+                _context.SpectatorInvites.Add(newInvite);
+            }
         }
 
         await _context.SaveChangesAsync(ct);

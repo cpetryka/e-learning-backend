@@ -16,30 +16,26 @@ public class SpectatorInvite
     public User Spectated { get; private set; } = default!;
     public User Spectator { get; private set; } = default!;
 
-    public string SpectatorEmail { get; private set; } = default!;
     public string Token { get; private set; } = default!;
     public DateTime ExpiresAtUtc { get; private set; }
     public DateTime CreatedAtUtc { get; private set; } = DateTime.UtcNow;
-    public bool Accepted { get; private set; } = false;
     public DateTime? AcceptedAtUtc { get; private set; }
     
     private SpectatorInvite() { } 
     
     /// <summary>
-    /// Creates a new spectator invitation for the specified users and email address.
+    /// Creates a new spectator invitation for the specified users.
     /// </summary>
     /// <param name="spectated">The user being spectated (inviter).</param>
     /// <param name="spectator">The invited spectator user.</param>
-    /// <param name="email">The email address of the spectator.</param>
     /// <param name="token">A secure, unique token associated with this invitation.</param>
     /// <param name="expiresAtUtc">The UTC expiration date and time of the invitation.</param>
     /// <exception cref="ArgumentNullException">Thrown when either user reference is null.</exception>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="email"/> or <paramref name="token"/> is null or empty.</exception>
-    public SpectatorInvite(User spectated, User spectator, string email, string token, DateTime expiresAtUtc)
+    /// <exception cref="ArgumentException">Thrown when <paramref name="token"/> is null or empty.</exception>
+    public SpectatorInvite(User spectated, User spectator, string token, DateTime expiresAtUtc)
     {
         Spectated = spectated ?? throw new ArgumentNullException(nameof(spectated));
         Spectator = spectator ?? throw new ArgumentNullException(nameof(spectator));
-        SpectatorEmail = string.IsNullOrWhiteSpace(email) ? throw new ArgumentException("Email required", nameof(email)) : email.Trim();
         Token = string.IsNullOrWhiteSpace(token) ? throw new ArgumentException("Token required", nameof(token)) : token;
         ExpiresAtUtc = expiresAtUtc;
     }
@@ -53,8 +49,7 @@ public class SpectatorInvite
     /// </remarks>
     public void AcceptInvite()
     {
-        if (Accepted) return;
-        Accepted = true;
+        if (AcceptedAtUtc != null) return;
         AcceptedAtUtc = DateTime.UtcNow;
     }
     
