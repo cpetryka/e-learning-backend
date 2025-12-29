@@ -29,7 +29,6 @@ public class SpectatorInviteService : ISpectatorInviteService
     /// </summary>
     /// <param name="spectatedId">The ID of the user being spectated (inviter).</param>
     /// <param name="spectatorId">The ID of the invited spectator.</param>
-    /// <param name="spectatorEmail">The email address of the spectator to be invited.</param>
     /// <param name="token">A secure, unique token used to identify the invitation.</param>
     /// <param name="expiresAtUtc">The UTC expiration date and time of the invitation.</param>
     /// <returns>The unique identifier (<see cref="Guid"/>) of the newly created invitation.</returns>
@@ -43,7 +42,6 @@ public class SpectatorInviteService : ISpectatorInviteService
     public async Task<Guid> CreateAsync(
         Guid spectatedId,
         Guid spectatorId,
-        string spectatorEmail,
         string token,
         DateTime expiresAtUtc)
     {
@@ -60,7 +58,6 @@ public class SpectatorInviteService : ISpectatorInviteService
         var invite = new SpectatorInvite(
             spectated: spectated,
             spectator: spectator,
-            email: spectatorEmail,
             token: token,
             expiresAtUtc: expiresAtUtc
         );
@@ -121,7 +118,7 @@ public class SpectatorInviteService : ISpectatorInviteService
     public async Task<bool> AcceptAsync(SpectatorInvite invite, Guid currentUserId, CancellationToken ct = default)
     {
         if (invite is null || currentUserId == Guid.Empty) return false;
-        if (invite.Accepted) return true;
+        if (invite.AcceptedAtUtc != null) return true;
         if (invite.ExpiresAtUtc <= DateTime.UtcNow) return false;
         if (invite.Spectator is null || invite.Spectated is null) return false;
         if (invite.Spectator.Id != currentUserId) return false;

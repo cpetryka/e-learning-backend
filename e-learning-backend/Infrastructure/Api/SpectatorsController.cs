@@ -181,7 +181,6 @@ public class SpectatorsController : ControllerBase
             var inviteId = await _inviteService.CreateAsync(
                 spectatedId: spectatedId,
                 spectatorId: spectatorId.Value,
-                spectatorEmail: request.SpectatorEmail,
                 token: token,
                 expiresAtUtc: expiresAtUtc
             );
@@ -210,11 +209,11 @@ public class SpectatorsController : ControllerBase
 
             return Created();
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
             return Conflict("Invite already exists.");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return Problem("Something went wrong while creating the invite.");
         }
@@ -257,7 +256,7 @@ public class SpectatorsController : ControllerBase
         if (invite is null)
             return NotFound(); 
 
-        if (invite.Accepted)
+        if (invite.AcceptedAtUtc != null)
             return Conflict("Invitation already accepted.");
 
         if (invite.ExpiresAtUtc <= DateTime.UtcNow)
