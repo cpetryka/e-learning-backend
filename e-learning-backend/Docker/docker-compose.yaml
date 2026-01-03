@@ -30,6 +30,7 @@
       # File Upload
       - FileUpload__RootPath=${UPLOAD_ROOT_PATH}
       - FileUpload__MaxBytes=${UPLOAD_MAX_BYTES}
+      - FileDirectory__Directory=${DOMAIN}
       # Logging
       - GrafanaLoki__Url=${LOKI_URL}
     volumes:
