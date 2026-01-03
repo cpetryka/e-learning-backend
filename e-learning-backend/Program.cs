@@ -24,10 +24,28 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ITeacherRepository = e_learning_backend.Infrastructure.Persistence.Repositories.ITeacherRepository;
+using Serilog;
+using Serilog.Sinks.Grafana.Loki;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 
+var lokiUrl = builder.Configuration["GrafanaLoki:Url"];
+var loggerConfig = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .WriteTo.Console();
+
+if (!string.IsNullOrEmpty(lokiUrl))
+{
+    loggerConfig.WriteTo.GrafanaLoki(
+        lokiUrl,
+        labels: new[] { new LokiLabel { Key = "app", Value = "e-learning-backend" } }
+    );
+}
+
+Log.Logger = loggerConfig.CreateLogger();
+
+builder.Host.UseSerilog();
 // --------------------------------------------------------------------------------------------------------
 // DBCONTEXTS AND CONTROLLERS REGISTRATION
 // --------------------------------------------------------------------------------------------------------
@@ -39,6 +57,17 @@ builder.Services.AddControllers(options =>
     options.Conventions.Add(new RouteTokenTransformerConvention(new LowercaseRouteTransformer()));
 });
 
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddDbContext<ApplicationContext>((sp, options) =>
+{
+    var logger = sp.GetRequiredService<ILogger<SlowQueryInterceptor>>();
+    var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
+        .AddInterceptors(new SlowQueryInterceptor(logger, httpContextAccessor));
+});
+
 // --------------------------------------------------------------------------------------------------------
 // CORS CONFIGURATION
 // --------------------------------------------------------------------------------------------------------
@@ -46,7 +75,20 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5175", "http://localhost:5173")
+        var allowedOrigins = new List<string>
+        {
+            "http://localhost:5175",
+            "http://localhost:5173"
+        };
+        
+        var publicIp = builder.Configuration["PublicIp"];
+        if (!string.IsNullOrEmpty(publicIp))
+        {
+            allowedOrigins.Add($"http://{publicIp}:5173");
+            allowedOrigins.Add($"http://{publicIp}:5175");
+        }
+        
+        policy.WithOrigins(allowedOrigins.ToArray())
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
@@ -191,6 +233,7 @@ builder.Services.AddScoped<ISpectatorInviteRepository, SpectatorInviteRepository
 builder.Services.AddScoped<ISpectatorInviteService, SpectatorInviteService>();
 
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+builder.Services.AddScoped<SlowQueryInterceptor>();
 
 // Pliki: storage + walidator rozszerzeń
 builder.Services.AddSingleton<IFileStorage, LocalDiskFileStorage>();
