@@ -34,7 +34,7 @@ public class TeachersService : ITeacherService
                     Name = c.Name
                 }).ToList(),
             TeacherProfilePictureUrl = teacher.ProfilePicture != null
-                ? _configuration.GetSection("FileDirectory:Directory") + teacher.ProfilePicture.FilePath.Replace("\\", "/")
+                ? _configuration.GetSection("FileDirectory:Directory").Value + teacher.ProfilePicture.FilePath.Replace("\\", "/")
                 : null
         };
     }

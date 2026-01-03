@@ -5,10 +5,17 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
-COPY ["e-learning-backend/e-learning-backend.csproj", "e-learning-backend/"]
-RUN dotnet restore "e-learning-backend/e-learning-backend.csproj"
+
+# Kopiuj plik projektu
+COPY ["e-learning-backend.csproj", "./"]
+
+# Restore zależności
+RUN dotnet restore "e-learning-backend.csproj"
+
+# Kopiuj resztę plików
 COPY . .
-WORKDIR "/src/e-learning-backend"
+
+# Build
 RUN dotnet build "e-learning-backend.csproj" -c Release -o /app/build
 
 FROM build AS publish

@@ -2,7 +2,7 @@
   backend:
     build:
       context: ../
-      dockerfile: Dockerfile
+      dockerfile: Docker/Dockerfile
     container_name: e-learning-backend
     ports:
       - "${PUBLIC_PORT}:80"
@@ -13,10 +13,8 @@
       - PublicIp=${PUBLIC_IP}
       # Baza danych
       - ConnectionStrings__Default=Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD};Include Error Detail=true
-
       # JWT
       - Jwt__Key=${JWT_KEY}
-      
       # SMTP Configuration
       - Smtp__Host=${SMTP_HOST}
       - Smtp__Port=${SMTP_PORT}
@@ -26,22 +24,14 @@
       - Smtp__FromName=${SMTP_FROM_NAME}
       - Smtp__EnableSsl=true
       - Smtp__TimeoutMs=15000
-      
       # Invitations
-      - Invitations__ConfirmBaseUrl=https://${DOMAIN}/accept
+      - Invitations__ConfirmBaseUrl=${INVITATIONS_URL}
       - Invitations__ExpiresInHours=${INVITE_EXPIRES_HOURS}
-      
-      # File Directory (Adres do odczytu plików)
-      # Ustawiam to na domenę, zakładając, że Nginx/Traefik obsłuży pliki statyczne lub backend je serwuje
-      - FileDirectory__Directory=${FILE_BASE_URL}
-      
-      # File Upload (Zachowana literówka z appsettings.json: FleUpload)
-      - FleUpload__RootPath=${UPLOAD_ROOT_PATH}
-      - FleUpload__MaxBytes=${UPLOAD_MAX_BYTES}
-      
+      # File Upload
+      - FileUpload__RootPath=${UPLOAD_ROOT_PATH}
+      - FileUpload__MaxBytes=${UPLOAD_MAX_BYTES}
       # Logging
       - GrafanaLoki__Url=${LOKI_URL}
-    
     volumes:
       - ../wwwroot/uploads:/app/wwwroot/uploads
     restart: unless-stopped
