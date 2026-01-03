@@ -3,7 +3,7 @@
 services:
   backend:
     build:
-      context: .
+      context: ../
       dockerfile: Dockerfile
     container_name: e-learning-backend
     ports:
@@ -46,7 +46,7 @@ services:
       - GrafanaLoki__Url=${LOKI_URL}
     
     volumes:
-      - ./wwwroot/uploads:/app/wwwroot/uploads
+      - ../wwwroot/uploads:/app/wwwroot/uploads
     restart: unless-stopped
     networks:
       - default
