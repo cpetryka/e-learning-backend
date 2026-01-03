@@ -224,7 +224,7 @@ public async Task<PagedResult<CourseWidgetDTO>> GetCoursesAsync(
             .ToArray(),
 
         ProfilePictureUrl = c.ProfilePicture != null
-            ? _configuration.GetSection("FileDirectory:Directory") + c.ProfilePicture.FilePath.Replace("\\", "/")
+            ? _configuration.GetSection("FileDirectory:Directory").Value + c.ProfilePicture.FilePath.Replace("\\", "/")
             : null
     }).ToList();
 
@@ -334,7 +334,7 @@ public async Task<PagedResult<CourseWidgetDTO>> GetCoursesAsync(
                 }).ToList() ?? new List<CourseVariantDTO>(),
             Teacher = teacherDto,
             ProfilePictureUrl = course.ProfilePicture != null
-                ?  _configuration.GetSection("FileDirectory:Directory") + course.ProfilePicture.FilePath.Replace("\\", "/")
+                ?  _configuration.GetSection("FileDirectory:Directory").Value + course.ProfilePicture.FilePath.Replace("\\", "/")
                 : null
         };
     }
