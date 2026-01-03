@@ -13,16 +13,18 @@ public class CoursesService : ICoursesService
     private readonly ICourseRepository _courseRepository;
     private readonly ITeacherService _teacherService;
     private readonly IWebHostEnvironment _env;
+    private readonly IConfiguration _configuration;
 
     private const long MaxFileSize = 5 * 1024 * 1024; // 5 MB
     private readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
 
     public CoursesService(ICourseRepository courseRepository, ITeacherService teacherService,
-        IWebHostEnvironment env)
+        IWebHostEnvironment env, IConfiguration configuration)
     {
         _courseRepository = courseRepository;
         _teacherService = teacherService;
         _env = env;
+        _configuration = configuration;
     }
 
     // public async Task<IEnumerable<CourseWidgetDTO>> GetCoursesAsync(
@@ -222,7 +224,7 @@ public async Task<PagedResult<CourseWidgetDTO>> GetCoursesAsync(
             .ToArray(),
 
         ProfilePictureUrl = c.ProfilePicture != null
-            ? "http://localhost:5249/" + c.ProfilePicture.FilePath.Replace("\\", "/")
+            ? _configuration.GetSection("FileDirectory:Directory") + c.ProfilePicture.FilePath.Replace("\\", "/")
             : null
     }).ToList();
 
@@ -332,7 +334,7 @@ public async Task<PagedResult<CourseWidgetDTO>> GetCoursesAsync(
                 }).ToList() ?? new List<CourseVariantDTO>(),
             Teacher = teacherDto,
             ProfilePictureUrl = course.ProfilePicture != null
-                ? "http://localhost:5249/" + course.ProfilePicture.FilePath.Replace("\\", "/")
+                ?  _configuration.GetSection("FileDirectory:Directory") + course.ProfilePicture.FilePath.Replace("\\", "/")
                 : null
         };
     }
