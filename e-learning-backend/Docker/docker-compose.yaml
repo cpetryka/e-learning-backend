@@ -13,7 +13,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
       - PublicIp=${PUBLIC_IP}
-      - 
       # Baza danych
       - ConnectionStrings__Default=Host=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD};Include Error Detail=true
 
