@@ -1,8 +1,8 @@
 ﻿services:
   backend:
     build:
-      context: ../
-      dockerfile: Docker/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     container_name: e-learning-backend
     ports:
       - "${PUBLIC_PORT}:80"
