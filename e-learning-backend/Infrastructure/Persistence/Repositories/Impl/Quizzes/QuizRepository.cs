@@ -58,7 +58,7 @@ public class QuizRepository : IQuizRepository
             .ToListAsync();
     
     public async Task<IEnumerable<QuizBriefDTO>> GetQuizzesAsync(
-        Guid? studentId,
+        Guid studentId,
         Guid? courseId,
         Guid? classId,
         string? searchQuery)
@@ -68,7 +68,7 @@ public class QuizRepository : IQuizRepository
             .ThenInclude(c => c.Participation)
             .ThenInclude(p => p.CourseVariant)
             .ThenInclude(cv => cv.Course)
-            .Where(q => !studentId.HasValue || q.Class.Participation.UserId == studentId.Value)
+            .Where(q => q.Class.Participation.UserId == studentId)
             .Where(q => !courseId.HasValue || q.Class.Participation.CourseVariant.CourseId == courseId.Value)
             .Where(q => !classId.HasValue || q.Class.Id == classId.Value)
             .Where(q => string.IsNullOrEmpty(searchQuery) || q.Title.ToLower().Contains(searchQuery.ToLower()))

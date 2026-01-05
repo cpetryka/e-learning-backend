@@ -26,7 +26,7 @@ public class QuizzesService : IQuizzesService
     }
 
     public async Task<IEnumerable<QuizBriefDTO>> GetQuizzesAsync(
-        Guid? studentId,
+        Guid studentId,
         Guid? courseId,
         Guid? classId,
         string? searchQuery)

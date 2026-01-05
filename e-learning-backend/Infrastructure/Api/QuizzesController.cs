@@ -21,12 +21,19 @@ public class QuizzesController : ControllerBase
     
     [HttpGet]
     public async Task<ActionResult<IEnumerable<QuizBriefDTO>>> GetQuizzes(
-        [FromQuery] Guid? studentId,
+        // [FromQuery] Guid? studentId,
         [FromQuery] Guid? courseId,
         [FromQuery] Guid? classId,
         [FromQuery] string? searchQuery)
     {
-        var quizzes = await _quizzesService.GetQuizzesAsync(studentId, courseId, classId, searchQuery);
+        var userId = User.GetUserId();
+        
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
+        var quizzes = await _quizzesService.GetQuizzesAsync(userId.Value, courseId, classId, searchQuery);
 
         if (quizzes == null || !quizzes.Any())
             return NoContent();
@@ -234,10 +241,6 @@ public class QuizzesController : ControllerBase
             }
 
             return NoContent();
-        }
-        catch (ArgumentException e)
-        {
-            return NotFound(e.Message);
         }
         catch (Exception e)
         {

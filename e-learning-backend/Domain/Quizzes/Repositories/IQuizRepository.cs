@@ -13,7 +13,7 @@ public interface IQuizRepository
     Task<IEnumerable<Quiz>> GetByClassIdAsync(Guid classId);
 
     Task<IEnumerable<QuizBriefDTO>> GetQuizzesAsync(
-        Guid? studentId,
+        Guid studentId,
         Guid? courseId,
         Guid? classId,
         string? searchQuery);
