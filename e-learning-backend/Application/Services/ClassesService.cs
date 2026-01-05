@@ -286,47 +286,40 @@ public class ClassesService : IClassesService
                 courseId, levelId.GetValueOrDefault(), languageId.GetValueOrDefault());
             if (variant == null)
             {
-                Console.WriteLine(
-                    $"CourseVariant not found for course:{courseId}, level:{levelId}, language:{languageId}");
-                return false;
+                throw new ArgumentException("Course variant not found with the specified attributes.");
             }
             
             // Find student user
             var student = await _usersRepository.GetByIdAsync(studentId);
             if (student == null)
             {
-                Console.WriteLine("Student user not found: " + studentId);
-                return false;
+                throw new ArgumentException("Student user not found.");
             }
             
             participation = await _participationRepository.AddAsync(student, variant);
             if (participation == null)
             {
-                Console.WriteLine("Failed to create participation for student:" + studentId);
-                return false;
+                throw new ArgumentException("Failed to create participation for the student.");
             }
         }
 
         // Ensure the participation belongs to the student
         if (participation.UserId != studentId)
         {
-            Console.WriteLine("Participation userId does not match studentId.");
-            return false;
+            throw new ArgumentException("Participation userId does not match studentId.");
         }
 
         // Ensure teacher availability
         var teacher = participation.CourseVariant?.Course?.Teacher;
         if (teacher == null || teacher.Id == Guid.Empty)
         {
-            Console.WriteLine("Teacher not found for the course.");
-            return false;
+            throw new ArgumentException("Teacher not found for the course.");
         }
 
         var teacherAvailability = await _teacherRepository.GetTeacherAvailabilityAsync(teacher.Id);
         if (teacherAvailability == null || !teacherAvailability.Any())
         {
-            Console.WriteLine("Teacher not found for the course or none availability.");
-            return false;
+            throw new ArgumentException("Teacher not found for the course or none.");
         }
 
         var requestedDate = DateOnly.FromDateTime(startTime);
@@ -334,8 +327,7 @@ public class ClassesService : IClassesService
         if (dayAvailability == null || dayAvailability.Timeslots == null ||
             !dayAvailability.Timeslots.Any())
         {
-            Console.WriteLine("Teacher is not available on the requested date: " + requestedDate);
-            return false;
+            throw new ArgumentException("Teacher is not available on the requested date.");
         }
 
         var startTimeOnly = TimeOnly.FromDateTime(startTime);
@@ -344,8 +336,7 @@ public class ClassesService : IClassesService
 
         if (!isAvailable)
         {
-            Console.WriteLine("Teacher is not available at the requested time: " + startTimeOnly);
-            return false;
+            throw new ArgumentException("Teacher is not available at the requested time.");
         }
 
         var cls = new Class(startTime)
