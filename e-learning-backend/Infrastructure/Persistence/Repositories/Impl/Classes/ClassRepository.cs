@@ -76,7 +76,8 @@ public class ClassRepository : IClassRepository
                         _context.Participations.Any(p => p.UserId == studentId && 
                         p.CourseVariant.CourseId == c.Participation.CourseVariant.CourseId) &&
                         c.StartTime >= from &&
-                        c.StartTime <= to)
+                        c.StartTime <= to &&
+                        c.UserId == studentId)
             .ToListAsync();
 
         return classes;
