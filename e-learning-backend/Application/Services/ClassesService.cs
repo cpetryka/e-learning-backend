@@ -339,6 +339,10 @@ public class ClassesService : IClassesService
             throw new ArgumentException("Teacher is not available at the requested time.");
         }
 
+        startTime = startTime
+            .AddMicroseconds(-startTime.Microsecond)
+            .AddMilliseconds(-startTime.Millisecond);
+        
         var cls = new Class(startTime)
         {
             UserId = studentId,
