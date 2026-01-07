@@ -34,6 +34,14 @@ public class QuizzesService : IQuizzesService
         return await _quizRepository.GetQuizzesAsync(studentId, courseId, classId, searchQuery);
     }
 
+    public async Task<IEnumerable<QuizBriefDTO>> GetTeacherQuizzesAsync(
+        Guid teacherId,
+        Guid? courseId,
+        Guid? classId,
+        string? searchQuery)
+    {
+        return await _quizRepository.GetStudentQuizzesAsync(teacherId, courseId, classId, searchQuery);
+    }
     public async Task<QuizDTO> GetQuizDetailsAsync(Guid quizId)
     {
         return await _quizRepository.GetQuizDetailsAsync(quizId);

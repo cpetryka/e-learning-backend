@@ -4,7 +4,7 @@ namespace e_learning_backend.Application.Services.Interfaces;
 
 public interface IQuizzesService
 {
-    Task<IEnumerable<QuizBriefDTO>> GetQuizzesAsync(
+    Task<IEnumerable<QuizBriefDTO>> GetStudentQuizzesAsync(
         Guid studentId,
         Guid? courseId,
         Guid? classId,

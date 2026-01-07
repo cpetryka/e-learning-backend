@@ -20,7 +20,7 @@ public class QuizzesController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<QuizBriefDTO>>> GetQuizzes(
+    public async Task<ActionResult<IEnumerable<QuizBriefDTO>>> GetStudentQuizzes(
         // [FromQuery] Guid? studentId,
         [FromQuery] Guid? courseId,
         [FromQuery] Guid? classId,
@@ -33,7 +33,7 @@ public class QuizzesController : ControllerBase
             return Unauthorized();
         }
         
-        var quizzes = await _quizzesService.GetQuizzesAsync(userId.Value, courseId, classId, searchQuery);
+        var quizzes = await _quizzesService.GetStudentQuizzesAsync(userId.Value, courseId, classId, searchQuery);
 
         if (quizzes == null || !quizzes.Any())
             return NoContent();

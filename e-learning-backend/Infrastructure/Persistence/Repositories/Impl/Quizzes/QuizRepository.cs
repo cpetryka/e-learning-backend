@@ -57,7 +57,7 @@ public class QuizRepository : IQuizRepository
             .Include(q => q.Questions)
             .ToListAsync();
     
-    public async Task<IEnumerable<QuizBriefDTO>> GetQuizzesAsync(
+    public async Task<IEnumerable<QuizBriefDTO>> GetStudentQuizzesAsync(
         Guid studentId,
         Guid? courseId,
         Guid? classId,
@@ -83,7 +83,32 @@ public class QuizRepository : IQuizRepository
             })
             .ToListAsync();
     }
-    
+    public async Task<IEnumerable<QuizBriefDTO>> GetTeacherQuizzesAsync(
+        Guid teacherId,
+        Guid? courseId,
+        Guid? classId,
+        string? searchQuery)
+    {
+        return await _context.Quizzes
+            .Include(q => q.Class)
+            .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
+            .Where(q => q.Class.Participation.CourseVariant.Course.TeacherId == teacherId)
+            .Where(q => !courseId.HasValue || q.Class.Participation.CourseVariant.CourseId == courseId.Value)
+            .Where(q => !classId.HasValue || q.Class.Id == classId.Value)
+            .Where(q => string.IsNullOrEmpty(searchQuery) || q.Title.ToLower().Contains(searchQuery.ToLower()))
+            .Select(q => new QuizBriefDTO
+            {
+                Id = q.Id,
+                Name = q.Title,
+                CourseId = q.Class.Participation.CourseVariant.CourseId,
+                CourseName = q.Class.Participation.CourseVariant.Course.Name,
+                QuestionNumber = q.Questions.Count,
+                Completed = q.Score.HasValue
+            })
+            .ToListAsync();
+    }
     public async Task<QuizDTO> GetQuizDetailsAsync(Guid quizId)
     {
         return await _context.Quizzes
