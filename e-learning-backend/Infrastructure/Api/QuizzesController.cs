@@ -19,9 +19,8 @@ public class QuizzesController : ControllerBase
         _quizzesService = quizzesService;
     }
     
-    [HttpGet]
+    [HttpGet("/student")]
     public async Task<ActionResult<IEnumerable<QuizBriefDTO>>> GetStudentQuizzes(
-        // [FromQuery] Guid? studentId,
         [FromQuery] Guid? courseId,
         [FromQuery] Guid? classId,
         [FromQuery] string? searchQuery)
@@ -34,6 +33,28 @@ public class QuizzesController : ControllerBase
         }
         
         var quizzes = await _quizzesService.GetStudentQuizzesAsync(userId.Value, courseId, classId, searchQuery);
+
+        if (quizzes == null || !quizzes.Any())
+            return NoContent();
+
+        return Ok(quizzes);
+    }
+    
+    [HttpGet("/teacher")]
+    public async Task<ActionResult<IEnumerable<QuizBriefDTO>>> GetTeacherQuizzes(
+        [FromQuery] Guid? studentId,
+        [FromQuery] Guid? courseId,
+        [FromQuery] Guid? classId,
+        [FromQuery] string? searchQuery)
+    {
+        var userId = User.GetUserId();
+        
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
+        var quizzes = await _quizzesService.GetTeacherQuizzesAsync(userId.Value, studentId, courseId, classId, searchQuery);
 
         if (quizzes == null || !quizzes.Any())
             return NoContent();

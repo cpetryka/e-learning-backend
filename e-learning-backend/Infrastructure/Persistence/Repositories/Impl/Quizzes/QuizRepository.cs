@@ -58,7 +58,7 @@ public class QuizRepository : IQuizRepository
             .ToListAsync();
     
     public async Task<IEnumerable<QuizBriefDTO>> GetStudentQuizzesAsync(
-        Guid studentId,
+        Guid userId,
         Guid? courseId,
         Guid? classId,
         string? searchQuery)
@@ -68,7 +68,7 @@ public class QuizRepository : IQuizRepository
             .ThenInclude(c => c.Participation)
             .ThenInclude(p => p.CourseVariant)
             .ThenInclude(cv => cv.Course)
-            .Where(q => q.Class.Participation.UserId == studentId)
+            .Where(q => q.Class.Participation.UserId == userId)
             .Where(q => !courseId.HasValue || q.Class.Participation.CourseVariant.CourseId == courseId.Value)
             .Where(q => !classId.HasValue || q.Class.Id == classId.Value)
             .Where(q => string.IsNullOrEmpty(searchQuery) || q.Title.ToLower().Contains(searchQuery.ToLower()))
@@ -83,8 +83,10 @@ public class QuizRepository : IQuizRepository
             })
             .ToListAsync();
     }
+    
     public async Task<IEnumerable<QuizBriefDTO>> GetTeacherQuizzesAsync(
-        Guid teacherId,
+        Guid userId,
+        Guid? studentId,
         Guid? courseId,
         Guid? classId,
         string? searchQuery)
@@ -94,7 +96,8 @@ public class QuizRepository : IQuizRepository
             .ThenInclude(c => c.Participation)
             .ThenInclude(p => p.CourseVariant)
             .ThenInclude(cv => cv.Course)
-            .Where(q => q.Class.Participation.CourseVariant.Course.TeacherId == teacherId)
+            .Where(q => q.Class.Participation.CourseVariant.Course.TeacherId == userId)
+            .Where(q => !studentId.HasValue || q.Class.Participation.UserId == studentId)
             .Where(q => !courseId.HasValue || q.Class.Participation.CourseVariant.CourseId == courseId.Value)
             .Where(q => !classId.HasValue || q.Class.Id == classId.Value)
             .Where(q => string.IsNullOrEmpty(searchQuery) || q.Title.ToLower().Contains(searchQuery.ToLower()))
@@ -109,6 +112,7 @@ public class QuizRepository : IQuizRepository
             })
             .ToListAsync();
     }
+    
     public async Task<QuizDTO> GetQuizDetailsAsync(Guid quizId)
     {
         return await _context.Quizzes
