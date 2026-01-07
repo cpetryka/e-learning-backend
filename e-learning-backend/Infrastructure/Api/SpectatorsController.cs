@@ -201,7 +201,8 @@ public class SpectatorsController : ControllerBase
             var htmlBody = _emailTemplates.RenderHtml("spectator-invite", model);
 
             await _emailSender.SendEmailAsync(
-                to: "elearningpjatk@gmail.com", // here we should use: request.SpectatorEmail to send emails properly
+                to: request.SpectatorEmail,
+                //to: "elearningpjatk@gmail.com", // here we should use: request.SpectatorEmail to send emails properly
                 subject: "Spectator Invitation",
                 body: htmlBody,
                 isHtml: true
