@@ -19,7 +19,7 @@ public class QuizzesController : ControllerBase
         _quizzesService = quizzesService;
     }
     
-    [HttpGet("/student")]
+    [HttpGet("student")]
     public async Task<ActionResult<IEnumerable<QuizBriefDTO>>> GetStudentQuizzes(
         [FromQuery] Guid? courseId,
         [FromQuery] Guid? classId,
@@ -40,7 +40,7 @@ public class QuizzesController : ControllerBase
         return Ok(quizzes);
     }
     
-    [HttpGet("/teacher")]
+    [HttpGet("teacher")]
     public async Task<ActionResult<IEnumerable<QuizBriefDTO>>> GetTeacherQuizzes(
         [FromQuery] Guid? studentId,
         [FromQuery] Guid? courseId,
