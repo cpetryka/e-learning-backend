@@ -25,15 +25,25 @@ public class QuizzesService : IQuizzesService
         _classRepository = classRepository;
     }
 
-    public async Task<IEnumerable<QuizBriefDTO>> GetQuizzesAsync(
-        Guid studentId,
+    public async Task<IEnumerable<QuizBriefDTO>> GetStudentQuizzesAsync(
+        Guid userId,
         Guid? courseId,
         Guid? classId,
         string? searchQuery)
     {
-        return await _quizRepository.GetQuizzesAsync(studentId, courseId, classId, searchQuery);
+        return await _quizRepository.GetStudentQuizzesAsync(userId, courseId, classId, searchQuery);
     }
 
+    public async Task<IEnumerable<QuizBriefDTO>> GetTeacherQuizzesAsync(
+        Guid userId,
+        Guid? studentId,
+        Guid? courseId,
+        Guid? classId,
+        string? searchQuery)
+    {
+        return await _quizRepository.GetTeacherQuizzesAsync(userId, studentId, courseId, classId, searchQuery);
+    }
+    
     public async Task<QuizDTO> GetQuizDetailsAsync(Guid quizId)
     {
         return await _quizRepository.GetQuizDetailsAsync(quizId);

@@ -57,8 +57,8 @@ public class QuizRepository : IQuizRepository
             .Include(q => q.Questions)
             .ToListAsync();
     
-    public async Task<IEnumerable<QuizBriefDTO>> GetQuizzesAsync(
-        Guid studentId,
+    public async Task<IEnumerable<QuizBriefDTO>> GetStudentQuizzesAsync(
+        Guid userId,
         Guid? courseId,
         Guid? classId,
         string? searchQuery)
@@ -68,7 +68,36 @@ public class QuizRepository : IQuizRepository
             .ThenInclude(c => c.Participation)
             .ThenInclude(p => p.CourseVariant)
             .ThenInclude(cv => cv.Course)
-            .Where(q => q.Class.Participation.UserId == studentId)
+            .Where(q => q.Class.Participation.UserId == userId)
+            .Where(q => !courseId.HasValue || q.Class.Participation.CourseVariant.CourseId == courseId.Value)
+            .Where(q => !classId.HasValue || q.Class.Id == classId.Value)
+            .Where(q => string.IsNullOrEmpty(searchQuery) || q.Title.ToLower().Contains(searchQuery.ToLower()))
+            .Select(q => new QuizBriefDTO
+            {
+                Id = q.Id,
+                Name = q.Title,
+                CourseId = q.Class.Participation.CourseVariant.CourseId,
+                CourseName = q.Class.Participation.CourseVariant.Course.Name,
+                QuestionNumber = q.Questions.Count,
+                Completed = q.Score.HasValue
+            })
+            .ToListAsync();
+    }
+    
+    public async Task<IEnumerable<QuizBriefDTO>> GetTeacherQuizzesAsync(
+        Guid userId,
+        Guid? studentId,
+        Guid? courseId,
+        Guid? classId,
+        string? searchQuery)
+    {
+        return await _context.Quizzes
+            .Include(q => q.Class)
+            .ThenInclude(c => c.Participation)
+            .ThenInclude(p => p.CourseVariant)
+            .ThenInclude(cv => cv.Course)
+            .Where(q => q.Class.Participation.CourseVariant.Course.TeacherId == userId)
+            .Where(q => !studentId.HasValue || q.Class.Participation.UserId == studentId)
             .Where(q => !courseId.HasValue || q.Class.Participation.CourseVariant.CourseId == courseId.Value)
             .Where(q => !classId.HasValue || q.Class.Id == classId.Value)
             .Where(q => string.IsNullOrEmpty(searchQuery) || q.Title.ToLower().Contains(searchQuery.ToLower()))

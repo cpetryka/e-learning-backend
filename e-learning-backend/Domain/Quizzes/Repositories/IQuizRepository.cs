@@ -12,8 +12,15 @@ public interface IQuizRepository
     Task DeleteAsync(Guid id);
     Task<IEnumerable<Quiz>> GetByClassIdAsync(Guid classId);
 
-    Task<IEnumerable<QuizBriefDTO>> GetQuizzesAsync(
-        Guid studentId,
+    Task<IEnumerable<QuizBriefDTO>> GetStudentQuizzesAsync(
+        Guid userId,
+        Guid? courseId,
+        Guid? classId,
+        string? searchQuery);
+    
+    Task<IEnumerable<QuizBriefDTO>> GetTeacherQuizzesAsync(
+        Guid userId,
+        Guid? studentId,
         Guid? courseId,
         Guid? classId,
         string? searchQuery);
