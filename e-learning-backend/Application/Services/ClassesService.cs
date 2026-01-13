@@ -1,6 +1,7 @@
 ﻿using e_learning_backend.API.DTOs;
 using e_learning_backend.Domain.Classes;
 using e_learning_backend.Domain.ExercisesAndMaterials;
+using e_learning_backend.Domain.Users;
 using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
@@ -264,6 +265,8 @@ public class ClassesService : IClassesService
             throw new ArgumentException("Invalid course id.", nameof(courseId));
         }
 
+        User? teacher = null;
+
         // Ensure participation exists or create it
         var participation =
             await _participationRepository.GetByIdAsync(studentId, courseId);
@@ -289,6 +292,9 @@ public class ClassesService : IClassesService
                 throw new ArgumentException("Course variant not found with the specified attributes.");
             }
             
+            // Find teacher for the course
+            teacher = variant.Course.Teacher;
+            
             // Find student user
             var student = await _usersRepository.GetByIdAsync(studentId);
             if (student == null)
@@ -310,7 +316,7 @@ public class ClassesService : IClassesService
         }
 
         // Ensure teacher availability
-        var teacher = participation.CourseVariant?.Course?.Teacher;
+        teacher ??= participation.CourseVariant?.Course?.Teacher;
         if (teacher == null || teacher.Id == Guid.Empty)
         {
             throw new ArgumentException("Teacher not found for the course.");
@@ -319,7 +325,7 @@ public class ClassesService : IClassesService
         var teacherAvailability = await _teacherRepository.GetTeacherAvailabilityAsync(teacher.Id);
         if (teacherAvailability == null || !teacherAvailability.Any())
         {
-            throw new ArgumentException("Teacher not found for the course or none.");
+            throw new ArgumentException("No teacher availability found.");
         }
 
         var requestedDate = DateOnly.FromDateTime(startTime);
