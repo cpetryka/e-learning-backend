@@ -266,6 +266,11 @@ public class ClassesService : IClassesService
         }
 
         User? teacher = null;
+        
+        startTime = startTime
+            .AddHours(1)
+            .AddMicroseconds(-startTime.Microsecond)
+            .AddMilliseconds(-startTime.Millisecond);
 
         // Ensure participation exists or create it
         var participation =
@@ -344,10 +349,6 @@ public class ClassesService : IClassesService
         {
             throw new ArgumentException("Teacher is not available at the requested time.");
         }
-
-        startTime = startTime
-            .AddMicroseconds(-startTime.Microsecond)
-            .AddMilliseconds(-startTime.Millisecond);
         
         var cls = new Class(startTime)
         {
