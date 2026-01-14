@@ -359,8 +359,8 @@ public class TeacherRepository : ITeacherRepository
                 CourseId = c.Participation.CourseVariant.Course.Id,
                 CourseName = c.Participation.CourseVariant.Course.Name,
                 ClassDate = DateOnly.FromDateTime(c.StartTime),
-                ClassStartTime = TimeOnly.FromDateTime(c.StartTime),
-                ClassEndTime = TimeOnly.FromDateTime(c.StartTime.AddHours(1))
+                ClassStartTime = TimeOnly.FromDateTime(c.StartTime.AddHours((1))),
+                ClassEndTime = TimeOnly.FromDateTime(c.StartTime.AddHours(2))
             })
             .ToListAsync();
         
