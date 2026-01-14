@@ -30,7 +30,7 @@ public class Availability
             throw new ArgumentNullException(nameof(timeSlot));
         }
         
-        if (timeSlot.Availability != null)
+        if (timeSlot.Availability != null && timeSlot.Availability != this)
         {
             throw new InvalidOperationException("Time slot is already associated with an availability.");
         }
@@ -52,5 +52,13 @@ public class Availability
         }
         
         timeSlot.Availability = null;
+    }
+    
+    public void RemoveAllTimeSlots() 
+    {
+        foreach (var timeSlot in _timeSlots.ToList())
+        {
+            RemoveTimeSlot(timeSlot);
+        }
     }
 }

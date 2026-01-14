@@ -435,43 +435,42 @@ public class TeacherRepository : ITeacherRepository
         if (teacher == null)
             return false;
 
-        foreach (var dayAvailability in availability)
+        // Get dates that are being updated
+        var datesToUpdate = availability.Select(a => a.Day).ToList();
+
+        // Remove existing availabilities for these dates
+        var existingAvailabilities = await _context.Availabilities
+            .Include(a => a.TimeSlots)
+            .Where(a => a.TeacherId == teacherId && datesToUpdate.Contains(DateOnly.FromDateTime(a.Date)))
+            .ToListAsync(ct);
+
+        // Remove all time slots for existing availabilities
+        foreach (var existingAvailability in existingAvailabilities)
         {
-            var date = dayAvailability.Day;
-            var dateTime = date.ToDateTime(TimeOnly.MinValue);
+            existingAvailability.RemoveAllTimeSlots();
+        }
 
-            var existingAvailability = await _context.Availabilities
-                .Include(a => a.TimeSlots)
-                .FirstOrDefaultAsync(a => a.TeacherId == teacherId && 
-                    DateOnly.FromDateTime(a.Date) == date, ct);
+        // Remove the availabilities themselves
+        _context.Availabilities.RemoveRange(existingAvailabilities);
 
-            if (existingAvailability != null)
+        // Add new availabilities
+        foreach (var availabilityDto in availability)
+        {
+            if (availabilityDto.Timeslots.Any())
             {
-                var existingTimeSlots = existingAvailability.TimeSlots.ToList();
-                foreach (var timeSlot in existingTimeSlots)
+                var availabilityDateUtc = DateTime.SpecifyKind(availabilityDto.Day.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+                var newAvailability = new Availability(availabilityDateUtc, teacher);
+                
+                foreach (var timeslotDto in availabilityDto.Timeslots)
                 {
-                    existingAvailability.RemoveTimeSlot(timeSlot);
-                    _context.TimeSlots.Remove(timeSlot);
+                    var startDateTime = DateTime.SpecifyKind(availabilityDto.Day.ToDateTime(timeslotDto.TimeFrom), DateTimeKind.Utc);
+                    var endDateTime = DateTime.SpecifyKind(availabilityDto.Day.ToDateTime(timeslotDto.TimeUntil), DateTimeKind.Utc);
+                    
+                    var timeSlot = new TimeSlot(startDateTime, endDateTime, newAvailability);
+                    newAvailability.AddTimeSlot(timeSlot);
                 }
-            }
-
-            var availabilityEntity = existingAvailability ?? new Availability(dateTime, teacher);
-
-            foreach (var timeslotDto in dayAvailability.Timeslots)
-            {
-                var timeFrom = timeslotDto.TimeFrom;
-                var timeUntil = timeslotDto.TimeUntil;
-
-                var startDateTime = dateTime.Date.Add(timeFrom.ToTimeSpan());
-                var endDateTime = dateTime.Date.Add(timeUntil.ToTimeSpan());
-
-                var timeSlot = new TimeSlot(startDateTime, endDateTime, availabilityEntity);
-                availabilityEntity.AddTimeSlot(timeSlot);
-            }
-
-            if (existingAvailability == null)
-            {
-                await _context.Availabilities.AddAsync(availabilityEntity, ct);
+                
+                _context.Availabilities.Add(newAvailability);
             }
         }
 
