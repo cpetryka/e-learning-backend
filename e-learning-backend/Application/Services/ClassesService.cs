@@ -241,7 +241,7 @@ public class ClassesService : IClassesService
                            (cls.Participation.CourseVariant.Course.Name ?? "Unknown") +
                            " [" + cls.StartTime.ToString("yyyy-MM-dd") + "]",
                     CourseName = cls.Participation.CourseVariant.Course.Name ?? "",
-                    Status = exercise.Status.ToString().ToLowerInvariant(),
+                    Status = exercise.Status.ToString(),
                     Graded = exercise.Grade.HasValue,
                     Grade = exercise.Grade,
                     Comments = exercise.Comment ?? "",
