@@ -17,13 +17,16 @@ public class ClassesService : IClassesService
     private readonly ITeacherRepository _teacherRepository;
     private readonly ICourseVariantRepository _courseVariantRepository;
     private readonly IUsersRepository _usersRepository;
+    private readonly IFileResourceRepository _fileResourceRepository;
 
     public ClassesService(IClassRepository repository,
         ILinkResourcesRepository linkResourcesRepository,
         IParticipationRepository participationRepository,
         ITeacherRepository teacherRepository,
         ICourseVariantRepository courseVariantRepository,
-        IUsersRepository usersRepository)
+        IUsersRepository usersRepository,
+        IFileResourceRepository fileResourceRepository)
+    
     {
         _repository = repository;
         _linkResourcesRepository = linkResourcesRepository;
@@ -31,6 +34,7 @@ public class ClassesService : IClassesService
         _teacherRepository = teacherRepository;
         _courseVariantRepository = courseVariantRepository;
         _usersRepository = usersRepository;
+        _fileResourceRepository = fileResourceRepository;
     }
 
     /// <summary>
@@ -360,4 +364,42 @@ public class ClassesService : IClassesService
         await _repository.AddAsync(cls);
         return true;
     }
+    
+    public async Task<bool> AddFileToClassAsync(Guid userId, Guid classId, Guid fileId)
+    {
+        if (fileId == Guid.Empty)
+        {
+            throw new ArgumentException("Invalid file id.", nameof(fileId));
+        }
+
+        var cls = await _repository.GetByIdAsync(classId);
+        if (cls == null)
+        {
+            throw new ArgumentException("Class not found.");
+        }
+
+        var file = await _fileResourceRepository.GetByIdAsync(fileId);
+        if (file == null)
+        {
+            throw new ArgumentException("File not found.");
+        }
+
+        // Only course teacher may add files
+        var teacherId = cls.Participation?.CourseVariant?.Course?.TeacherId;
+        if (teacherId is null || teacherId != userId)
+        {
+            return false;
+        }
+
+        // Check if file is already associated with the class
+        if (cls.Files.Any(f => f.Id == fileId))
+        {
+            throw new InvalidOperationException("File is already associated with this class.");
+        }
+
+        cls.AddFile(file);
+        await _repository.UpdateAsync(cls);
+        return true;
+    }
+    
 }
