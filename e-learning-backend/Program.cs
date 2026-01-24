@@ -26,30 +26,47 @@ using Microsoft.OpenApi.Models;
 using ITeacherRepository = e_learning_backend.Infrastructure.Persistence.Repositories.ITeacherRepository;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddEndpointsApiExplorer();
 
 // --------------------------------------------------------------------------------------------------------
-// DBCONTEXTS AND CONTROLLERS REGISTRATION
+// DATABASE
 // --------------------------------------------------------------------------------------------------------
 builder.Services.AddDbContext<ApplicationContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
+// --------------------------------------------------------------------------------------------------------
+// CONTROLLERS
+// --------------------------------------------------------------------------------------------------------
 builder.Services.AddControllers(options =>
 {
     options.Conventions.Add(new RouteTokenTransformerConvention(new LowercaseRouteTransformer()));
 });
 
+builder.Services.AddEndpointsApiExplorer();
+
 // --------------------------------------------------------------------------------------------------------
-// CORS CONFIGURATION
+// SWAGGER
 // --------------------------------------------------------------------------------------------------------
-builder.Services.AddCors(options =>
+builder.Services.AddSwaggerGen(c =>
 {
-    options.AddPolicy("AllowFrontend", policy =>
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "E-LEARNING", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        policy.WithOrigins("http://localhost:5175", "http://localhost:5173")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials();
+        In = ParameterLocation.Header,
+        Description = "Enter JWT token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
     });
 });
 
@@ -113,48 +130,25 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("spectator", p => p.RequireRole("spectator"));
 });
 
-// Swagger + bearer
-builder.Services.AddSwaggerGen(c =>
+// --------------------------------------------------------------------------------------------------------
+// CORS CONFIGURATION
+// --------------------------------------------------------------------------------------------------------
+builder.Services.AddCors(options =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "E-LEARNING", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        In = ParameterLocation.Header,
-        Description = "Enter JWT token",
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        BearerFormat = "JWT",
-        Scheme = "Bearer"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-            },
-            Array.Empty<string>()
-        }
+        policy.WithOrigins("http://localhost:5175", "http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
 // --------------------------------------------------------------------------------------------------------
-// FILE SERVER ROOTS 
+// "BEANS" CONFIGURATION (DEPENDENCY INJECTION)
 // --------------------------------------------------------------------------------------------------------
-var webRoot = builder.Environment.WebRootPath;
-if (string.IsNullOrEmpty(webRoot))
-{
-    webRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-}
 
-Directory.CreateDirectory(webRoot);
-
-var uploadsPath = Path.Combine(webRoot, "uploads");
-Directory.CreateDirectory(uploadsPath);
-
-// --------------------------------------------------------------------------------------------------------
-// "BEANS" CONFIGURATION (DI)
-// --------------------------------------------------------------------------------------------------------
+// Repositories
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
@@ -173,7 +167,7 @@ builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
 builder.Services.AddScoped<ILinkResourcesRepository, LinkResourcesRepository>();
 builder.Services.AddScoped<ICourseVariantRepository, CourseVariantRepository>();
 
-
+// Services
 builder.Services.AddScoped<ISpectatorsService, SpectatorsService>();
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddScoped<ICoursesService, CoursesService>();
@@ -186,21 +180,34 @@ builder.Services.AddScoped<IQuizzesService, QuizzesService>();
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
 builder.Services.AddScoped<IUsersFilesService, UsersFilesService>();
 
+// Other
 builder.Services.AddSingleton<IEmailTemplateService, EmailTemplateService>();
 builder.Services.AddScoped<ISpectatorInviteRepository, SpectatorInviteRepository>();
 builder.Services.AddScoped<ISpectatorInviteService, SpectatorInviteService>();
 
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
-// Pliki: storage + walidator rozszerzeń
 builder.Services.AddSingleton<IFileStorage, LocalDiskFileStorage>();
 builder.Services.AddSingleton<IFileExtensionValidator.IAssignmentExtensionValidator, AssignmentExtensionValidator>();
 builder.Services.AddSingleton<IFileExtensionValidator.IProfilePictureExtensionValidator, ProfilePictureValidator>();
 
+// --------------------------------------------------------------------------------------------------------
+// FILE SERVER ROOTS 
+// --------------------------------------------------------------------------------------------------------
+var webRoot = builder.Environment.WebRootPath;
+if (string.IsNullOrEmpty(webRoot))
+{
+    webRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+}
 
+Directory.CreateDirectory(webRoot);
 
+var uploadsPath = Path.Combine(webRoot, "uploads");
+Directory.CreateDirectory(uploadsPath);
 
-// EMAIL CONFIGURATION
+// --------------------------------------------------------------------------------------------------------
+//  EMAIL CONFIGURATION
+// --------------------------------------------------------------------------------------------------------
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("Smtp"));
 
 // --------------------------------------------------------------------------------------------------------
@@ -220,15 +227,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// --------------------------------------------------------------------------------------------------------
 // STATIC FILES: /uploads -> wwwroot/uploads
-// --------------------------------------------------------------------------------------------------------
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(uploadsPath),
     RequestPath = "/uploads"
 });
-
 
 // --------------------------------------------------------------------------------------------------------
 // PIPELINE
