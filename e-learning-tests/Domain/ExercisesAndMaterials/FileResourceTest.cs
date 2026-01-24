@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Linq;
 using e_learning_backend.Domain.Users;
-using e_learning_backend.Domain.ExercisesAndMaterials; // Upewnij się, że używasz tego namespace 
+using e_learning_backend.Domain.ExercisesAndMaterials;
 
 [TestClass]
 public class FileResourceTests
@@ -168,7 +168,7 @@ public class FileResourceTests
         // Arrange
         var fileResource = new FileResource("Report.xlsx", "/path/report.xlsx", DateTime.UtcNow, _testStudentUser);
         var tag1 = new Tag("Finance", _testTeacherUser);
-        fileResource.AddTag(tag1); // Najpierw dodaj tag
+        fileResource.AddTag(tag1);
 
         // Assert initial state
         Assert.IsTrue(fileResource.Tags.Contains(tag1));

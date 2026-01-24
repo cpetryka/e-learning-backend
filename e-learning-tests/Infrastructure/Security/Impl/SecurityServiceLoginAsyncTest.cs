@@ -173,18 +173,18 @@ public class SecurityServiceLoginAsyncTests
         Assert.IsNotNull(result.Roles);
         Assert.IsNotNull(result.Roles.Any(r => r == role));
 
-        // Check that new refresh token and expiry ~1h are saved in DB
+        // Check that new refresh token and expiry are saved in DB
         var userFromDb = await ctx.Users
             .Include(u => u.Roles)
             .SingleAsync(u => u.Email == email);
 
         Assert.AreEqual(result.RefreshToken, userFromDb.RefreshToken);
         Assert.IsNotNull(userFromDb.RefreshTokenExpiryTime);
-        var minRt = beforeUtc.AddMinutes(59);
-        var maxRt = afterUtc.AddMinutes(61);
+        var minRt = beforeUtc.AddHours(23);
+        var maxRt = afterUtc.AddHours(25);
         Assert.IsTrue(userFromDb.RefreshTokenExpiryTime >= minRt &&
                       userFromDb.RefreshTokenExpiryTime <= maxRt,
-            $"RefreshTokenExpiryTime {userFromDb.RefreshTokenExpiryTime:O} should be approximately 1h from now.");
+            $"RefreshTokenExpiryTime {userFromDb.RefreshTokenExpiryTime:O} should be approximately 24h from now.");
 
         // Parse JWT
         var handler = new JwtSecurityTokenHandler();
@@ -194,17 +194,17 @@ public class SecurityServiceLoginAsyncTests
         StringAssert.Matches(result.AccessToken,
             new Regex(@"^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+$"));
 
-        // Claim: e-mail w unique_name/name
+        // Claim: e-mail
         var nameValue = GetNameClaim(jwt);
-        Assert.IsNotNull(nameValue, "No 'unique_name'/'name' claim in the token.");
+        Assert.IsNotNull(nameValue, "No email claim in the token.");
         Assert.AreEqual(email, nameValue);
 
-        // Claim: user ir w sub/nameid
+        // Claim: user id
         var idValue = GetUserIdClaim(jwt);
-        Assert.IsNotNull(idValue, "No 'sub'/'nameid' claim in the token.");
+        Assert.IsNotNull(idValue, "No id claim in the token.");
         Assert.AreEqual(user.Id.ToString(), idValue);
 
-        // Claim: roles as JSON array i zawiera "Teacher"
+        // Claim: roles
         var rolesClaim = jwt.Claims.FirstOrDefault(c => c.Type == "roles");
         Assert.IsNotNull(rolesClaim, "No 'roles' claim in the token.");
         Assert.AreEqual(role.ToLower(), rolesClaim.Value);

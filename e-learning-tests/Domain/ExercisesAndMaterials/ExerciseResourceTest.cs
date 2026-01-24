@@ -51,11 +51,11 @@ public class ExerciseResourceTests
         Assert.AreEqual(_testFile.Id, exerciseResource.FileId);
         Assert.AreEqual(resourceType, exerciseResource.Type);
 
-        // Sprawdź, czy ExerciseResource zostało dodane do kolekcji Exercise
+        // Check if ExerciseResource was added to Exercise's collection
         Assert.AreEqual(1, _testExercise.ExerciseResources.Count);
         Assert.IsTrue(_testExercise.ExerciseResources.Contains(exerciseResource));
 
-        // Sprawdź, czy ExerciseResource zostało dodane do kolekcji FileResource
+        // Check if ExerciseResource was added to FileResource's collection
         Assert.AreEqual(1, _testFile.ExerciseResources.Count);
         Assert.IsTrue(_testFile.ExerciseResources.Contains(exerciseResource));
     }
