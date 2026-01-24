@@ -1,5 +1,9 @@
 namespace e_learning_backend.Infrastructure.Persistence.Services.DTO;
 
+/// <summary>
+/// DTO for user registration.
+/// Contains personal details, credentials, and the requested account role.
+/// </summary>
 public class RegisterUserDto
 {
     public string Email    { get; init; } = null!;
