@@ -7,19 +7,22 @@ namespace e_learning_backend.Application.Services;
 public class TeachersService : ITeacherService
 {
     private readonly ITeacherRepository _teacherRepository;
+    private readonly IConfiguration _configuration;
 
-    public TeachersService(ITeacherRepository teacherRepository)
+    public TeachersService(ITeacherRepository teacherRepository, IConfiguration configuration)
     {
         _teacherRepository = teacherRepository;
+        _configuration = configuration;
     }
 
     public async Task<TeacherDTO?> GetTeacherAsync(Guid teacherId)
     {
         var teacher = await _teacherRepository.GetTeacherWithDetailsAsync(teacherId);
         if (teacher == null) return null;
-
+        ;
         return new TeacherDTO
         {
+            
             TeacherId = teacher.Id,
             Name = teacher.Name,
             Surname = teacher.Surname,
@@ -31,7 +34,7 @@ public class TeachersService : ITeacherService
                     Name = c.Name
                 }).ToList(),
             TeacherProfilePictureUrl = teacher.ProfilePicture != null
-                ? "http://localhost:5249/" + teacher.ProfilePicture.FilePath.Replace("\\", "/")
+                ? _configuration.GetSection("FileDirectory:Directory").Value + teacher.ProfilePicture.FilePath.Replace("\\", "/")
                 : null
         };
     }

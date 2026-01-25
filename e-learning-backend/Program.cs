@@ -24,9 +24,27 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ITeacherRepository = e_learning_backend.Infrastructure.Persistence.Repositories.ITeacherRepository;
+using Serilog;
+using Serilog.Sinks.Grafana.Loki;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var lokiUrl = builder.Configuration["GrafanaLoki:Url"];
+var loggerConfig = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .WriteTo.Console();
+
+if (!string.IsNullOrEmpty(lokiUrl))
+{
+    loggerConfig.WriteTo.GrafanaLoki(
+        lokiUrl,
+        labels: new[] { new LokiLabel { Key = "app", Value = "e-learning-backend" } }
+    );
+}
+
+Log.Logger = loggerConfig.CreateLogger();
+
+builder.Host.UseSerilog();
 // --------------------------------------------------------------------------------------------------------
 // DATABASE
 // --------------------------------------------------------------------------------------------------------
@@ -41,7 +59,16 @@ builder.Services.AddControllers(options =>
     options.Conventions.Add(new RouteTokenTransformerConvention(new LowercaseRouteTransformer()));
 });
 
-builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddDbContext<ApplicationContext>((sp, options) =>
+{
+    var logger = sp.GetRequiredService<ILogger<SlowQueryInterceptor>>();
+    var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
+        .AddInterceptors(new SlowQueryInterceptor(logger, httpContextAccessor));
+});
 
 // --------------------------------------------------------------------------------------------------------
 // SWAGGER
@@ -51,22 +78,23 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "E-LEARNING", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        In = ParameterLocation.Header,
-        Description = "Enter JWT token",
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        BearerFormat = "JWT",
-        Scheme = "Bearer"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+        var allowedOrigins = new List<string>
         {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-            },
-            Array.Empty<string>()
+            "http://localhost:5175",
+            "http://localhost:5173"
+        };
+        
+        var publicIp = builder.Configuration["PublicIp"];
+        if (!string.IsNullOrEmpty(publicIp))
+        {
+            allowedOrigins.Add($"http://{publicIp}:5173");
+            allowedOrigins.Add($"http://{publicIp}:5175");
         }
+        
+        policy.WithOrigins(allowedOrigins.ToArray())
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
@@ -186,6 +214,7 @@ builder.Services.AddScoped<ISpectatorInviteRepository, SpectatorInviteRepository
 builder.Services.AddScoped<ISpectatorInviteService, SpectatorInviteService>();
 
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+builder.Services.AddScoped<SlowQueryInterceptor>();
 
 builder.Services.AddSingleton<IFileStorage, LocalDiskFileStorage>();
 builder.Services.AddSingleton<IFileExtensionValidator.IAssignmentExtensionValidator, AssignmentExtensionValidator>();
