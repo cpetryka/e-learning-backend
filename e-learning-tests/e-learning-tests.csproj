@@ -23,14 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\Classes\" />
-    <Folder Include="Domain\Participations\" />
-    <Folder Include="Domain\Quizzes\" />
-    <Folder Include="Domain\Sourses\" />
-    <Folder Include="Domain\Users\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\e-learning-backend\e-learning-backend.csproj" />
   </ItemGroup>
 

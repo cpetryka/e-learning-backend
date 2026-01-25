@@ -1,6 +1,7 @@
 ﻿using e_learning_backend.API.DTOs;
 using e_learning_backend.Domain.Classes;
 using e_learning_backend.Domain.ExercisesAndMaterials;
+using e_learning_backend.Domain.Users;
 using e_learning_backend.Infrastructure.Api.DTO;
 using e_learning_backend.Infrastructure.Persistence.Repositories;
 using e_learning_backend.Infrastructure.Persistence.Repositories.Impl;
@@ -16,13 +17,16 @@ public class ClassesService : IClassesService
     private readonly ITeacherRepository _teacherRepository;
     private readonly ICourseVariantRepository _courseVariantRepository;
     private readonly IUsersRepository _usersRepository;
+    private readonly IFileResourceRepository _fileResourceRepository;
 
     public ClassesService(IClassRepository repository,
         ILinkResourcesRepository linkResourcesRepository,
         IParticipationRepository participationRepository,
         ITeacherRepository teacherRepository,
         ICourseVariantRepository courseVariantRepository,
-        IUsersRepository usersRepository)
+        IUsersRepository usersRepository,
+        IFileResourceRepository fileResourceRepository)
+    
     {
         _repository = repository;
         _linkResourcesRepository = linkResourcesRepository;
@@ -30,6 +34,7 @@ public class ClassesService : IClassesService
         _teacherRepository = teacherRepository;
         _courseVariantRepository = courseVariantRepository;
         _usersRepository = usersRepository;
+        _fileResourceRepository = fileResourceRepository;
     }
 
     /// <summary>
@@ -240,7 +245,7 @@ public class ClassesService : IClassesService
                            (cls.Participation.CourseVariant.Course.Name ?? "Unknown") +
                            " [" + cls.StartTime.ToString("yyyy-MM-dd") + "]",
                     CourseName = cls.Participation.CourseVariant.Course.Name ?? "",
-                    Status = exercise.Status.ToString().ToLowerInvariant(),
+                    Status = exercise.Status.ToString(),
                     Graded = exercise.Grade.HasValue,
                     Grade = exercise.Grade,
                     Comments = exercise.Comment ?? "",
@@ -264,6 +269,13 @@ public class ClassesService : IClassesService
             throw new ArgumentException("Invalid course id.", nameof(courseId));
         }
 
+        User? teacher = null;
+        
+        startTime = startTime
+            .AddHours(1)
+            .AddMicroseconds(-startTime.Microsecond)
+            .AddMilliseconds(-startTime.Millisecond);
+
         // Ensure participation exists or create it
         var participation =
             await _participationRepository.GetByIdAsync(studentId, courseId);
@@ -286,47 +298,43 @@ public class ClassesService : IClassesService
                 courseId, levelId.GetValueOrDefault(), languageId.GetValueOrDefault());
             if (variant == null)
             {
-                Console.WriteLine(
-                    $"CourseVariant not found for course:{courseId}, level:{levelId}, language:{languageId}");
-                return false;
+                throw new ArgumentException("Course variant not found with the specified attributes.");
             }
+            
+            // Find teacher for the course
+            teacher = variant.Course.Teacher;
             
             // Find student user
             var student = await _usersRepository.GetByIdAsync(studentId);
             if (student == null)
             {
-                Console.WriteLine("Student user not found: " + studentId);
-                return false;
+                throw new ArgumentException("Student user not found.");
             }
             
             participation = await _participationRepository.AddAsync(student, variant);
             if (participation == null)
             {
-                Console.WriteLine("Failed to create participation for student:" + studentId);
-                return false;
+                throw new ArgumentException("Failed to create participation for the student.");
             }
         }
 
         // Ensure the participation belongs to the student
         if (participation.UserId != studentId)
         {
-            Console.WriteLine("Participation userId does not match studentId.");
-            return false;
+            throw new ArgumentException("Participation userId does not match studentId.");
         }
 
         // Ensure teacher availability
-        var teacher = participation.CourseVariant?.Course?.Teacher;
+        teacher ??= participation.CourseVariant?.Course?.Teacher;
         if (teacher == null || teacher.Id == Guid.Empty)
         {
-            Console.WriteLine("Teacher not found for the course.");
-            return false;
+            throw new ArgumentException("Teacher not found for the course.");
         }
 
         var teacherAvailability = await _teacherRepository.GetTeacherAvailabilityAsync(teacher.Id);
         if (teacherAvailability == null || !teacherAvailability.Any())
         {
-            Console.WriteLine("Teacher not found for the course or none availability.");
-            return false;
+            throw new ArgumentException("No teacher availability found.");
         }
 
         var requestedDate = DateOnly.FromDateTime(startTime);
@@ -334,8 +342,7 @@ public class ClassesService : IClassesService
         if (dayAvailability == null || dayAvailability.Timeslots == null ||
             !dayAvailability.Timeslots.Any())
         {
-            Console.WriteLine("Teacher is not available on the requested date: " + requestedDate);
-            return false;
+            throw new ArgumentException("Teacher is not available on the requested date.");
         }
 
         var startTimeOnly = TimeOnly.FromDateTime(startTime);
@@ -344,10 +351,9 @@ public class ClassesService : IClassesService
 
         if (!isAvailable)
         {
-            Console.WriteLine("Teacher is not available at the requested time: " + startTimeOnly);
-            return false;
+            throw new ArgumentException("Teacher is not available at the requested time.");
         }
-
+        
         var cls = new Class(startTime)
         {
             UserId = studentId,
@@ -358,4 +364,42 @@ public class ClassesService : IClassesService
         await _repository.AddAsync(cls);
         return true;
     }
+    
+    public async Task<bool> AddFileToClassAsync(Guid userId, Guid classId, Guid fileId)
+    {
+        if (fileId == Guid.Empty)
+        {
+            throw new ArgumentException("Invalid file id.", nameof(fileId));
+        }
+
+        var cls = await _repository.GetByIdAsync(classId);
+        if (cls == null)
+        {
+            throw new ArgumentException("Class not found.");
+        }
+
+        var file = await _fileResourceRepository.GetByIdAsync(fileId);
+        if (file == null)
+        {
+            throw new ArgumentException("File not found.");
+        }
+
+        // Only course teacher may add files
+        var teacherId = cls.Participation?.CourseVariant?.Course?.TeacherId;
+        if (teacherId is null || teacherId != userId)
+        {
+            return false;
+        }
+
+        // Check if file is already associated with the class
+        if (cls.Files.Any(f => f.Id == fileId))
+        {
+            throw new InvalidOperationException("File is already associated with this class.");
+        }
+
+        cls.AddFile(file);
+        await _repository.UpdateAsync(cls);
+        return true;
+    }
+    
 }

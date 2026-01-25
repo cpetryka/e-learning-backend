@@ -16,4 +16,6 @@ public interface IClassesService
     Task<IEnumerable<GetExerciseDTO>> GetClassExercisesAsync(Guid classId);
     Task<bool> AddClassWithParticipationAsync(Guid studentId, Guid courseId, DateTime startTime,
         Guid? levelId, Guid? languageId);
+
+    Task<bool> AddFileToClassAsync(Guid userId, Guid classId, Guid fileId);
 }

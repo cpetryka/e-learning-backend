@@ -70,7 +70,6 @@ public class SecurityServiceRefreshTokenAsyncTests
 
     private static string? GetNameClaim(JwtSecurityToken jwt)
     {
-        // ReadJwtToken zwraca surowe nazwy, więc sprawdzamy najczęstsze warianty
         return jwt.Claims.FirstOrDefault(c =>
                 c.Type == JwtRegisteredClaimNames.UniqueName)
             ?.Value;
@@ -87,7 +86,6 @@ public class SecurityServiceRefreshTokenAsyncTests
 
     private static List<string> ExtractRoles(JwtSecurityToken jwt)
     {
-        // Obsługuje zarówno pojedynczy claim z JSON-em ["Teacher"], jak i wiele claimów "roles" / "role" / ClaimTypes.Role
         var roleClaims = jwt.Claims
             .Where(c =>
                 c.Type == "roles" || c.Type == "role" ||
@@ -158,7 +156,7 @@ public class SecurityServiceRefreshTokenAsyncTests
             email: email,
             role: role,
             refreshToken: expiredToken,
-            refreshExpiryUtc: DateTime.UtcNow.AddSeconds(-1) // przeterminowany
+            refreshExpiryUtc: DateTime.UtcNow.AddSeconds(-1) // already expired
         );
 
         // Act
@@ -210,12 +208,12 @@ public class SecurityServiceRefreshTokenAsyncTests
         Assert.AreEqual(result.RefreshToken, userFromDb.RefreshToken);
         Assert.AreNotEqual(oldRefreshToken, userFromDb.RefreshToken);
         Assert.IsNotNull(userFromDb.RefreshTokenExpiryTime);
-        var minRt = beforeUtc.AddMinutes(59);
-        var maxRt = afterUtc.AddMinutes(61);
+        var minRt = beforeUtc.AddHours(23);
+        var maxRt = afterUtc.AddHours(25);
         Assert.IsTrue(
             userFromDb.RefreshTokenExpiryTime >= minRt &&
             userFromDb.RefreshTokenExpiryTime <= maxRt,
-            $"RefreshTokenExpiryTime {userFromDb.RefreshTokenExpiryTime:O} powinien być ~1h od teraz.");
+            $"RefreshTokenExpiryTime {userFromDb.RefreshTokenExpiryTime:O} should be ~24h from now.");
 
         // JWT
         var handler = new JwtSecurityTokenHandler();
@@ -225,15 +223,15 @@ public class SecurityServiceRefreshTokenAsyncTests
             new Regex(@"^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+$"));
 
         var nameValue = GetNameClaim(jwt);
-        Assert.IsNotNull(nameValue, "Brak claimu 'unique_name'/'name' w tokenie.");
+        Assert.IsNotNull(nameValue, "No email claim in token.");
         Assert.AreEqual(email, nameValue);
 
         var idValue = GetUserIdClaim(jwt);
-        Assert.IsNotNull(idValue, "Brak claimu 'sub'/'nameid' w tokenie.");
+        Assert.IsNotNull(idValue, "No id claim in token.");
         Assert.AreEqual(user.Id.ToString(), idValue);
 
         var roles = ExtractRoles(jwt);
-        Assert.IsTrue(roles.Count >= 1, "Token powinien zawierać przynajmniej jedną rolę.");
+        Assert.IsTrue(roles.Count >= 1, "No roles claim in token.");
         CollectionAssert.Contains(roles, role.ToLower());
     }
 

@@ -277,4 +277,52 @@ public class ClassesController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+    
+    [Authorize]
+    [HttpPost("{classId:guid}/files")]
+    public async Task<IActionResult> AddFileToClass(Guid classId, [FromBody] string fileId)
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdStr, out var userId))
+        {
+            return Unauthorized();
+        }
+        
+        var roles = User.FindAll(ClaimTypes.Role)
+            .Select(c => c.Value)
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+
+        if (!roles.Any(r => r.Equals("teacher", StringComparison.OrdinalIgnoreCase)))
+        {
+            return Forbid();
+        }
+
+        if (string.IsNullOrWhiteSpace(fileId) || !Guid.TryParse(fileId, out var fileIdGuid))
+        {
+            return BadRequest("Invalid file id format.");
+        }
+
+        try
+        {
+            var success = await _classesService.AddFileToClassAsync(userId, classId, fileIdGuid);
+            if (!success)
+            {
+                return Forbid();
+            }
+
+            return Created();
+        }
+        catch (ArgumentException e)
+        {
+            return NotFound(e.Message);
+        }
+        catch (InvalidOperationException e)
+        {
+            return Conflict(e.Message);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }

@@ -19,6 +19,7 @@ public class ParticipationRepository : IParticipationRepository
             .Include(p => p.User)
             .Include(p => p.CourseVariant)
                 .ThenInclude(cv => cv.Course)
+                .ThenInclude(cv => cv.Teacher)
             .Include(p => p.CourseVariant)
                 .ThenInclude(cv => cv.Course)
                     .ThenInclude(co => co.Teacher)

@@ -54,6 +54,8 @@ public class CourseVariantRepository : ICourseVariantRepository
         return await _context.CourseVariants
             .Include(v => v.Level)
             .Include(v => v.Language)
+            .Include(v => v.Course)
+            .ThenInclude(c => c.Teacher)
             .SingleOrDefaultAsync(v =>
                 v.CourseId == courseId &&
                 v.Level.Id == levelId &&
