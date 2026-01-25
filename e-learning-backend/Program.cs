@@ -71,26 +71,25 @@ builder.Services.AddDbContext<ApplicationContext>((sp, options) =>
 });
 
 // --------------------------------------------------------------------------------------------------------
-// SWAGGER
+// CORS CONFIGURATION
 // --------------------------------------------------------------------------------------------------------
-builder.Services.AddSwaggerGen(c =>
+var allowedOrigins = new List<string>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "E-LEARNING", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    "http://localhost:5175",
+    "http://localhost:5173"
+};
+
+var publicIp = builder.Configuration["PublicIp"];
+if (!string.IsNullOrEmpty(publicIp))
+{
+    allowedOrigins.Add($"http://{publicIp}:5173");
+    allowedOrigins.Add($"http://{publicIp}:5175");
+}
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        var allowedOrigins = new List<string>
-        {
-            "http://localhost:5175",
-            "http://localhost:5173"
-        };
-        
-        var publicIp = builder.Configuration["PublicIp"];
-        if (!string.IsNullOrEmpty(publicIp))
-        {
-            allowedOrigins.Add($"http://{publicIp}:5173");
-            allowedOrigins.Add($"http://{publicIp}:5175");
-        }
-        
         policy.WithOrigins(allowedOrigins.ToArray())
             .AllowAnyMethod()
             .AllowAnyHeader()
@@ -98,6 +97,37 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// --------------------------------------------------------------------------------------------------------
+// SWAGGER
+// --------------------------------------------------------------------------------------------------------
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "E-LEARNING", Version = "v1" });
+    
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Wpisz token JWT tutaj."
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 // --------------------------------------------------------------------------------------------------------
 // SECURITY CONFIGURATION
 // --------------------------------------------------------------------------------------------------------
